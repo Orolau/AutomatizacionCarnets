@@ -6,6 +6,7 @@ import {Formik, Form, Field, ErrorMessage} from 'formik';
 import * as Yup from 'yup';
 import '@/app/styles/LoginForm.css'
 import {useRouter} from "next/navigation";
+import { LoginFormInteract } from "@/app/api/LoginFormInteract";
 
 const validationSchema = Yup.object().shape({
     email: Yup.string().required('Este campo es obligatorio').email('EL formato es incorrecto'),
@@ -22,14 +23,14 @@ export default function LoginForm(){
 
     const handleSubmit = async(values) =>{
 
-        //const respuestaServer = await LoginInteract(values); 
-        //console.log(respuestaServer);
+        const respuestaServer = await LoginFormInteract(values);
+        console.log(respuestaServer);
         console.log(values);
-        router.push('/pages/userForms/verify');
-        /*if(respuestaServer.token !== null){
+        
+        if(respuestaServer.token !== null){
             localStorage.setItem('tokenLogin', respuestaServer.token);
-            router.push('/dashboard/clientes/create');
-        }*/
+            router.push('/pages/userForms/verify');
+        }
     }
 
     return (
