@@ -1,0 +1,63 @@
+[
+    {
+      "nombre": "Luis",
+      "apellidos": "Gómez Fernández",
+      "dni": "12345678A",
+      "tipo": "estudiante",
+      "tipo_titulacion": "Grado",
+      "titulacion": "Grado en Ingeniería del Software",
+      "curso": "2º",
+      "modalidad": "Presencial",
+      "anio_comienzo": 2022,
+      "correo": "luis.gomez@live.u-tad.com",
+      "imagen": "https://u-tad.com/images/luis_gomez.jpg",
+      "direccion": "Calle Falsa 123, Madrid"
+    },
+    {
+      "nombre": "Elena",
+      "apellidos": "Martínez Ruiz",
+      "dni": "87654321B",
+      "tipo": "docente",
+      "departamento": "Animación",
+      "cargo": "Profesora",
+      "correo": "elena.martinez@u-tad.com",
+      "imagen": "https://u-tad.com/images/elena_martinez.jpg",
+      "direccion": "Avenida del Arte 45, Madrid"
+    },
+    {
+      "nombre": "Pedro",
+      "apellidos": "López Sánchez",
+      "dni": "23456789C",
+      "tipo": "staff",
+      "cargo": "Administrativo",
+      "correo": "pedro.lopez@u-tad.com",
+      "imagen": "https://u-tad.com/images/pedro_lopez.jpg",
+      "direccion": "Calle Innovación 12, Madrid"
+    },
+    {
+      "nombre": "Carla",
+      "apellidos": "Fernández Pérez",
+      "dni": "34567890D",
+      "tipo": "estudiante",
+      "tipo_titulacion": "Máster",
+      "titulacion": "Máster en Programación de Videojuegos",
+      "curso": "1º",
+      "modalidad": "Online",
+      "anio_comienzo": 2023,
+      "correo": "carla.fernandez@live.u-tad.com",
+      "imagen": "https://u-tad.com/images/carla_fernandez.jpg",
+      "direccion": "Calle Tecnología 34, Madrid"
+    },
+    {
+      "nombre": "Javier",
+      "apellidos": "Rodríguez Muñoz",
+      "dni": "45678901E",
+      "tipo": "docente",
+      "departamento": "Ingeniería del Software",
+      "cargo": "Coordinador",
+      "correo": "javier.rodriguez@u-tad.com",
+      "imagen": "https://u-tad.com/images/javier_rodriguez.jpg",
+      "direccion": "Calle del Conocimiento 56, Madrid"
+    }
+  ]
+  
