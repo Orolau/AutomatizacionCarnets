@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react";
-import Link from "next/link";
 import {Formik, Form, Field, ErrorMessage} from 'formik';
 import * as Yup from 'yup';
 import '@/app/styles/LoginForm.css'
@@ -56,12 +55,6 @@ export default function LoginForm(){
                             <ErrorMessage name="password" component="div" className="error"/>
                         </div>
                         <button type="submit" className="bg-blue-300 w-[300px] border border-cyan-500 rounded-lg mb-5 hover:bg-blue-400">Sing in with email</button>
-                        <p className="dontHaveAccount ml-12 text-gray-500">
-                            Don´t have an account?
-                            <Link href="/user/register" className="getStartedButton font-bold">
-                                Get Started
-                            </Link>
-                        </p>
                     </Form>
                 )}
             </Formik>

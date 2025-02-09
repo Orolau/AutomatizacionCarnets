@@ -21,16 +21,6 @@ body {
     font-size: x-large;
 }
 
-.sendAgain {
-    color: rgb(127, 210, 255);
-    font-size: small;
-}
-
-.rememberContainer {
-    display: flex;
-    flex-direction: row;
-}
-
 .formContainer {
     width: 300px;
 }
@@ -40,26 +30,10 @@ body {
     font-size: x-small;
 }
 
-.forgotPasswordButton {
-    color: rgb(127, 210, 255);
-    font-size: small;
-}
-
-.passwordContainer {
-    position: relative;
-}
-
 .numberBox {
     width: 40px;
     height: 40px;
     background-color: rgb(226, 225, 225);
     color: black;
     text-align: center;
-}
-
-.viewPassword {
-    position: absolute;
-    top: 5%;
-    right: 6px;
-    z-index: 10;
 }

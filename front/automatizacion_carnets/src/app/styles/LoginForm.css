@@ -1,5 +1,3 @@
-.contenedorLogin {}
-
 body {
 
     display: flex;
@@ -19,25 +17,6 @@ body {
 .titulo {
     color: black;
     font-size: x-large;
-}
-
-.getStartedButton {
-    color: rgb(127, 210, 255);
-}
-
-.rememberContainer {
-    display: flex;
-    flex-direction: row;
-}
-
-.rememberText {
-    color: black;
-    font-size: small;
-}
-
-.forgotPasswordButton {
-    color: rgb(127, 210, 255);
-    font-size: small;
 }
 
 .passwordContainer {
