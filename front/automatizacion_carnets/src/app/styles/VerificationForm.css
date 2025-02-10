@@ -1,0 +1,39 @@
+.contenedorLogin {}
+
+body {
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: whitesmoke;
+    height: 100vh;
+}
+
+.inputLogin {
+    width: 300px;
+    background-color: rgb(226, 225, 225);
+    margin-bottom: 20px;
+    color: black;
+}
+
+.titulo {
+    color: black;
+    font-size: x-large;
+}
+
+.formContainer {
+    width: 300px;
+}
+
+.verificactionSentText {
+    color: rgb(84, 83, 83);
+    font-size: x-small;
+}
+
+.numberBox {
+    width: 40px;
+    height: 40px;
+    background-color: rgb(226, 225, 225);
+    color: black;
+    text-align: center;
+}
