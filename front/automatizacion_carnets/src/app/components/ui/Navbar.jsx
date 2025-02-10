@@ -47,6 +47,18 @@ export default function Sidebar() {
               <span onClick={() => setIsOpen(false)}>Filtrado</span>
             </Link>
           </li>
+          {/* Enlace a la página de Modificar Carnets */}
+          <li>
+            <Link href="/pages/userForms/modify">
+              <span onClick={() => setIsOpen(false)}>Modificar Carnets</span>
+            </Link>
+          </li>
+          {/* Enlace a la página de Preview Carnets */}
+          <li>
+            <Link href="/pages/userForms/preview">
+              <span onClick={() => setIsOpen(false)}>Preview Carnets</span>
+            </Link>
+          </li>
         </ul>
       </div>
     </>
