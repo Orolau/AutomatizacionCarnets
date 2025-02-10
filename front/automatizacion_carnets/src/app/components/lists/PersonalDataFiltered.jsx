@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const FiltradoDatisPersonales = ({ filters, people, setSelectedPeople, setFilters }) => {
+export default function PersonalDataFiltered ({ filters, people, setSelectedPeople, setFilters }) {
   const [localSelected, setLocalSelected] = useState([]);
 
   const titulaciones = {
@@ -110,12 +110,16 @@ const FiltradoDatisPersonales = ({ filters, people, setSelectedPeople, setFilter
         </thead>
         <tbody>
           {people.map((person) => (
-            <tr key={person.dni} className="border">
+            <tr 
+              key={person.dni} 
+              className="border hover:bg-blue-100 cursor-pointer"
+              onClick={() => handleSelect(person.dni)} // Al hacer click en la fila
+            >
               <td className="border p-1 text-center">
                 <input
                   type="checkbox"
                   checked={localSelected.includes(person.dni)}
-                  onChange={() => handleSelect(person.dni)}
+                  onChange={(e) => e.stopPropagation()} // Evita que el clic en el checkbox active la fila
                 />
               </td>
               <td className="border p-2">{person.nombre}</td>
@@ -133,5 +137,3 @@ const FiltradoDatisPersonales = ({ filters, people, setSelectedPeople, setFilter
     </div>
   );
 };
-
-export default FiltradoDatisPersonales;

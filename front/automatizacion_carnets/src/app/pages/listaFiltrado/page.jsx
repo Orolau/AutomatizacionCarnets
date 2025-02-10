@@ -1,5 +1,5 @@
 "use client"
-import FiltradoDatosPersonales from '@/app/components/listas/FiltradoDatosPersonales';
+import PersonalDataFiltered from '@/app/components/lists/PersonalDataFiltered';
 import personasFiltrado from '@/app/jsonPruebas/personasFiltrado.json';
 import { useState } from 'react';
 
@@ -12,6 +12,6 @@ export default function listaFiltradoPage (){
         "tipoTitulacion": "Grado"
       });
     return(
-        <FiltradoDatosPersonales filters={filtros} setFilters={setFiltros} people={personasFiltrado} setSelectedPeople={setSelectedPeople}/>
+        <PersonalDataFiltered filters={filtros} setFilters={setFiltros} people={personasFiltrado} setSelectedPeople={setSelectedPeople}/>
     )
 }
