@@ -41,6 +41,12 @@ export default function Sidebar() {
               <span onClick={() => setIsOpen(false)}>Verificación</span>
             </Link>
           </li>
+          {/* Enlace a la página de Filtrado */}
+          <li>
+            <Link href="/pages/userForms/filter">
+              <span onClick={() => setIsOpen(false)}>Filtrado</span>
+            </Link>
+          </li>
         </ul>
       </div>
     </>
