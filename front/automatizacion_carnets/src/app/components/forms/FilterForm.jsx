@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-import "@/app/styles/FilterForm.css";
 import { useRouter } from "next/navigation";
 
 const validationSchema = Yup.object().shape({
@@ -30,7 +29,7 @@ export default function FilterForm() {
   };
 
   return (
-    <div className="contenedorFiltro">
+    <div className="bg-white shadow-md p-6 rounded-lg w-full max-w-md mx-auto">
       <Formik
         initialValues={{
           filterType: "",
@@ -42,15 +41,21 @@ export default function FilterForm() {
         onSubmit={handleSubmit}
       >
         {({ values, setFieldValue }) => (
-          <Form className="formFiltro">
-            <h1 className="titulo">Filtrar búsqueda</h1>
+          <Form className="flex flex-col gap-4 text-gray-700">
+            <h1 className="text-xl font-semibold text-gray-800">Filtrar búsqueda</h1>
 
             {/* Selección de tipo de filtro */}
             <div>
-              <Field as="select" name="filterType" className="inputFiltro" onChange={(e) => {
-                setFieldValue("filterType", e.target.value);
-                setFilterType(e.target.value);
-              }}>
+              <label className="block mb-1">Selecciona un filtro:</label>
+              <Field 
+                as="select" 
+                name="filterType" 
+                className="w-full p-2 border rounded-md text-gray-700" 
+                onChange={(e) => {
+                  setFieldValue("filterType", e.target.value);
+                  setFilterType(e.target.value);
+                }}
+              >
                 <option value="">Selecciona un filtro</option>
                 <option value="grupo">Filtrar por grupo</option>
                 <option value="alumno">Buscar alumno</option>
@@ -61,7 +66,8 @@ export default function FilterForm() {
             {values.filterType && (
               <>
                 <div>
-                  <Field as="select" name="titulacion" className="inputFiltro">
+                  <label className="block mb-1">Titulación:</label>
+                  <Field as="select" name="titulacion" className="w-full p-2 border rounded-md text-gray-700">
                     <option value="">Selecciona la titulación</option>
                     <option value="ingenieria">Ingeniería</option>
                     <option value="diseño">Diseño</option>
@@ -69,7 +75,8 @@ export default function FilterForm() {
                 </div>
 
                 <div>
-                  <Field as="select" name="clase" className="inputFiltro">
+                  <label className="block mb-1">Clase:</label>
+                  <Field as="select" name="clase" className="w-full p-2 border rounded-md text-gray-700">
                     <option value="">Selecciona la clase</option>
                     <option value="a">Clase A</option>
                     <option value="b">Clase B</option>
@@ -81,7 +88,8 @@ export default function FilterForm() {
             {/* Campo específico para alumnos */}
             {values.filterType === "alumno" && (
               <div>
-                <Field as="select" name="alumno" className="inputFiltro">
+                <label className="block mb-1">Alumno:</label>
+                <Field as="select" name="alumno" className="w-full p-2 border rounded-md text-gray-700">
                   <option value="">Selecciona un alumno</option>
                   <option value="juan">Juan Pérez</option>
                   <option value="maria">María López</option>
@@ -89,7 +97,12 @@ export default function FilterForm() {
               </div>
             )}
 
-            <button type="submit" className="btnFiltro">Buscar</button>
+            <button 
+              type="submit" 
+              className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 transition"
+            >
+              Buscar
+            </button>
           </Form>
         )}
       </Formik>
