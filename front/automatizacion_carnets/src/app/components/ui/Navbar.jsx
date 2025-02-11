@@ -59,6 +59,12 @@ export default function Sidebar() {
               <span onClick={() => setIsOpen(false)}>Preview Carnets</span>
             </Link>
           </li>
+          {/* Enlace a la página de Pendientes */}
+          <li>
+            <Link href="/pages/userForms/pending">
+              <span onClick={() => setIsOpen(false)}>Pendientes</span>
+            </Link>
+          </li>
         </ul>
       </div>
     </>

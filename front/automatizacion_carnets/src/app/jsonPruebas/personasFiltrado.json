@@ -58,6 +58,34 @@
       "correo": "javier.rodriguez@u-tad.com",
       "imagen": "https://u-tad.com/images/javier_rodriguez.jpg",
       "direccion": "Calle del Conocimiento 56, Madrid"
+    },
+    {
+      "nombre": "Fernando",
+      "apellidos": "Lopez García",
+      "dni": "",
+      "tipo": "estudiante",
+      "tipo_titulacion": "Grado",
+      "titulacion": "Grado en Animación",
+      "curso": "3º",
+      "modalidad": "Presencial",
+      "anio_comienzo": 2021,
+      "correo": "fernando.lopez@u-tad.com",
+      "imagen": "https://u-tad.com/images/fernando_lopez.jpg",
+      "direccion": "Calle Creativa 10, Madrid"
+    },
+    {
+      "nombre": "Lucía",
+      "apellidos": "Fernández López",
+      "dni": "55667788Z",
+      "tipo": "estudiante",
+      "tipo_titulacion": "Máster",
+      "titulacion": "Máster en Inteligencia Artificial",
+      "curso": "1º",
+      "modalidad": "Online",
+      "anio_comienzo": 2023,
+      "correo": "lucia.fernandez@u-tad.com",
+      "imagen": "",
+      "direccion": "Calle Virtual 22, Barcelona"
     }
   ]
   
