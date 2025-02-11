@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react";
-import Link from "next/link";
 import {Formik, Form, Field, ErrorMessage} from 'formik';
 import * as Yup from 'yup';
 import '@/app/styles/LoginForm.css'
 import {useRouter} from "next/navigation";
+import { LoginFormInteract } from "@/app/api/LoginFormInteract";
 
 const validationSchema = Yup.object().shape({
     email: Yup.string().required('Este campo es obligatorio').email('EL formato es incorrecto'),
@@ -22,14 +22,14 @@ export default function LoginForm(){
 
     const handleSubmit = async(values) =>{
 
-        //const respuestaServer = await LoginInteract(values); 
-        //console.log(respuestaServer);
+        const respuestaServer = await LoginFormInteract(values);
+        console.log(respuestaServer);
         console.log(values);
-        router.push('/pages/userForms/verify');
-        /*if(respuestaServer.token !== null){
+        
+        if(respuestaServer.token !== null){
             localStorage.setItem('tokenLogin', respuestaServer.token);
-            router.push('/dashboard/clientes/create');
-        }*/
+            router.push('/pages/userForms/verify');
+        }
     }
 
     return (
@@ -55,12 +55,6 @@ export default function LoginForm(){
                             <ErrorMessage name="password" component="div" className="error"/>
                         </div>
                         <button type="submit" className="bg-blue-300 w-[300px] border border-cyan-500 rounded-lg mb-5 hover:bg-blue-400">Sing in with email</button>
-                        <p className="dontHaveAccount ml-12 text-gray-500">
-                            Don´t have an account?
-                            <Link href="/user/register" className="getStartedButton font-bold">
-                                Get Started
-                            </Link>
-                        </p>
                     </Form>
                 )}
             </Formik>
