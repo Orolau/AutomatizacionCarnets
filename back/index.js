@@ -1,4 +1,4 @@
-const { connectDB, getDB } = require("./database");
+const { connectDB, getDB } = require("./config/database");
 
 async function fetchPeople() {
     await connectDB(); // Conectar a la base de datos
