@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import personasData from "@/app/jsonPruebas/personasFiltrado.json"; // ✅ Importamos el JSON directamente
+import personasData from "@/app/jsonPruebas/personasFiltrado.json";
 
 export default function PendingCardsList() {
   const [carnets, setCarnets] = useState([]);
@@ -9,7 +9,7 @@ export default function PendingCardsList() {
 
   useEffect(() => {
     const obtenerCarnetsFallidos = () => {
-      console.log("🔍 JSON cargado correctamente:", personasData);
+      console.log("JSON cargado correctamente:", personasData);
 
       const carnetsConErrores = personasData
         .filter((persona) => persona.tipo === "estudiante") // Solo estudiantes
@@ -19,7 +19,7 @@ export default function PendingCardsList() {
           error: !persona.imagen?.trim() ? "Falta imagen" : "DNI ilegible",
         }));
 
-      console.log("✅ Carnets detectados con errores:", carnetsConErrores);
+      console.log("Carnets detectados con errores:", carnetsConErrores);
       setCarnets(carnetsConErrores);
     };
 

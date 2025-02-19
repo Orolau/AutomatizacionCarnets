@@ -37,7 +37,7 @@ export default function Sidebar() {
           </li>
           {/* Enlace a la página de Verificación */}
           <li>
-            <Link href="/pages/userForms/verify">
+            <Link href="/pages/verify">
               <span onClick={() => setIsOpen(false)}>Verificación</span>
             </Link>
           </li>
@@ -49,19 +49,19 @@ export default function Sidebar() {
           </li>
           {/* Enlace a la página de Modificar Carnets */}
           <li>
-            <Link href="/pages/userForms/modify">
+            <Link href="/pages/modify">
               <span onClick={() => setIsOpen(false)}>Modificar Carnets</span>
             </Link>
           </li>
           {/* Enlace a la página de Preview Carnets */}
           <li>
-            <Link href="/pages/userForms/preview">
+            <Link href="/pages/preview">
               <span onClick={() => setIsOpen(false)}>Preview Carnets</span>
             </Link>
           </li>
           {/* Enlace a la página de Pendientes */}
           <li>
-            <Link href="/pages/userForms/pending">
+            <Link href="/pages/pending">
               <span onClick={() => setIsOpen(false)}>Pendientes</span>
             </Link>
           </li>
