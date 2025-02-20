@@ -1,111 +1,116 @@
-"use client";
-
 import { useState } from "react";
-import { Formik, Form, Field } from "formik";
-import * as Yup from "yup";
-import { useRouter } from "next/navigation";
+import personas from "@/app/jsonPruebas/personasFiltrado.json";
 
-const validationSchema = Yup.object().shape({
-  filterType: Yup.string().required("Selecciona una opción"),
-  titulacion: Yup.string().required("Selecciona la titulación"),
-  clase: Yup.string().required("Selecciona la clase"),
-  alumno: Yup.string().when("filterType", {
-    is: "alumno",
-    then: Yup.string().required("Selecciona un alumno"),
-  }),
-});
+const FilterForm = ({ onFilter }) => {
+  const [tipo, setTipo] = useState("");
+  const [tipoTitulacion, setTipoTitulacion] = useState("");
+  const [titulacion, setTitulacion] = useState("");
+  const [curso, setCurso] = useState("");
+  const [departamento, setDepartamento] = useState("");
+  const [cargo, setCargo] = useState("");
+  const [filteredPeople, setFilteredPeople] = useState([]);
 
-export default function FilterForm() {
-  const router = useRouter();
-  const [filterType, setFilterType] = useState("");
+  const tipos = [...new Set(personas.map((p) => p.tipo))];
 
-  const handleSubmit = (values) => {
-    console.log(values);
-    if (values.filterType === "grupo") {
-      router.push(`/pages/grupos?titulacion=${values.titulacion}&clase=${values.clase}`);
-    } else {
-      router.push(`/pages/alumnos?titulacion=${values.titulacion}&clase=${values.clase}&alumno=${values.alumno}`);
+  const tiposTitulacion = tipo === "estudiante" ? [...new Set(personas.filter((p) => p.tipo === "estudiante").map((p) => p.tipo_titulacion))] : [];
+
+  const titulaciones = tipoTitulacion ? [...new Set(personas.filter((p) => p.tipo === "estudiante" && p.tipo_titulacion === tipoTitulacion).map((p) => p.titulacion))] : [];
+
+  const cursos = titulacion ? [...new Set(personas.filter((p) => p.tipo === "estudiante" && p.tipo_titulacion === tipoTitulacion && p.titulacion === titulacion).map((p) => p.curso))] : [];
+
+  const departamentos = tipo === "docente" ? [...new Set(personas.filter((p) => p.tipo === "docente").map((p) => p.departamento))] : [];
+
+  const cargos = tipo === "staff" ? [...new Set(personas.filter((p) => p.tipo === "staff").map((p) => p.cargo))] : [];
+
+  const handleFilter = () => {
+    let filtered = personas.filter((p) => p.tipo === tipo);
+
+    if (tipo === "estudiante") {
+      if (tipoTitulacion) filtered = filtered.filter((p) => p.tipo_titulacion === tipoTitulacion);
+      if (titulacion) filtered = filtered.filter((p) => p.titulacion === titulacion);
+      if (curso) filtered = filtered.filter((p) => p.curso === curso);
+    }
+
+    if (tipo === "docente" && departamento) {
+      filtered = filtered.filter((p) => p.departamento === departamento);
+    }
+
+    if (tipo === "staff" && cargo) {
+      filtered = filtered.filter((p) => p.cargo === cargo);
+    }
+
+    setFilteredPeople(filtered);
+    if (typeof onFilter === 'function') {
+      onFilter(filtered);
     }
   };
 
   return (
-    <div className="bg-white shadow-md p-6 rounded-lg w-full max-w-md mx-auto">
-      <Formik
-        initialValues={{
-          filterType: "",
-          titulacion: "",
-          clase: "",
-          alumno: "",
-        }}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        {({ values, setFieldValue }) => (
-          <Form className="flex flex-col gap-4 text-gray-700">
-            <h1 className="text-xl font-semibold text-gray-800">Filtrar búsqueda</h1>
+    <div className="p-4 bg-white shadow-md rounded-lg">
+      <h1 className="text-2xl font-bold mb-4 text-gray-800">Filtrado de carnets</h1>
+      <select className="w-full p-2 border rounded-md text-gray-800" value={tipo} onChange={(e) => setTipo(e.target.value)}>
+        <option value="">Seleccionar tipo</option>
+        {tipos.map((t) => (
+          <option key={t} value={t}>{t}</option>
+        ))}
+      </select>
 
-            {/* Selección de tipo de filtro */}
-            <div>
-              <label className="block mb-1">Selecciona un filtro:</label>
-              <Field 
-                as="select" 
-                name="filterType" 
-                className="w-full p-2 border rounded-md text-gray-700" 
-                onChange={(e) => {
-                  setFieldValue("filterType", e.target.value);
-                  setFilterType(e.target.value);
-                }}
-              >
-                <option value="">Selecciona un filtro</option>
-                <option value="grupo">Filtrar por grupo</option>
-                <option value="alumno">Buscar alumno</option>
-              </Field>
-            </div>
+      {tipo === "estudiante" && (
+        <>
+          <select className="w-full p-2 border rounded-md text-gray-800" value={tipoTitulacion} onChange={(e) => setTipoTitulacion(e.target.value)}>
+            <option value="">Seleccionar tipo de titulación</option>
+            {tiposTitulacion.map((tt) => (
+              <option key={tt} value={tt}>{tt}</option>
+            ))}
+          </select>
 
-            {/* Campos comunes */}
-            {values.filterType && (
-              <>
-                <div>
-                  <label className="block mb-1">Titulación:</label>
-                  <Field as="select" name="titulacion" className="w-full p-2 border rounded-md text-gray-700">
-                    <option value="">Selecciona la titulación</option>
-                    <option value="ingenieria">Ingeniería</option>
-                    <option value="diseño">Diseño</option>
-                  </Field>
-                </div>
+          {tipoTitulacion && (
+            <select className="w-full p-2 border rounded-md text-gray-800" value={titulacion} onChange={(e) => setTitulacion(e.target.value)}>
+              <option value="">Seleccionar titulación</option>
+              {titulaciones.map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
+          )}
 
-                <div>
-                  <label className="block mb-1">Clase:</label>
-                  <Field as="select" name="clase" className="w-full p-2 border rounded-md text-gray-700">
-                    <option value="">Selecciona la clase</option>
-                    <option value="a">Clase A</option>
-                    <option value="b">Clase B</option>
-                  </Field>
-                </div>
-              </>
-            )}
+          {titulacion && (
+            <select className="w-full p-2 border rounded-md text-gray-800" value={curso} onChange={(e) => setCurso(e.target.value)}>
+              <option value="">Seleccionar curso</option>
+              {cursos.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          )}
+        </>
+      )}
 
-            {/* Campo específico para alumnos */}
-            {values.filterType === "alumno" && (
-              <div>
-                <label className="block mb-1">Alumno:</label>
-                <Field as="select" name="alumno" className="w-full p-2 border rounded-md text-gray-700">
-                  <option value="">Selecciona un alumno</option>
-                  <option value="juan">Juan Pérez</option>
-                  <option value="maria">María López</option>
-                </Field>
-              </div>
-            )}
+      {tipo === "docente" && (
+        <select className="w-full p-2 border rounded-md text-gray-800" value={departamento} onChange={(e) => setDepartamento(e.target.value)}>
+          <option value="">Seleccionar departamento</option>
+          {departamentos.map((d) => (
+            <option key={d} value={d}>{d}</option>
+          ))}
+        </select>
+      )}
 
-            <button 
-              type="submit" 
-              className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 transition"
-            >
-              Buscar
-            </button>
-          </Form>
-        )}
-      </Formik>
+      {tipo === "staff" && (
+        <select className="w-full p-2 border rounded-md text-gray-800" value={cargo} onChange={(e) => setCargo(e.target.value)}>
+          <option value="">Seleccionar cargo</option>
+          {cargos.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+      )}
+
+      <button className="w-full bg-blue-500 text-white p-2 rounded mt-2 hover:bg-blue-600" onClick={handleFilter}>Buscar</button>
+
+      <ul className="mt-4">
+        {filteredPeople.map((p) => (
+          <li key={p.DNI} className="p-2 border-b text-gray-800">{p.nombre} {p.apellidos}</li>
+        ))}
+      </ul>
     </div>
   );
-}
+};
+
+export default FilterForm;
