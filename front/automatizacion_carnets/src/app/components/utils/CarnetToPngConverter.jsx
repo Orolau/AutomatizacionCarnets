@@ -1,69 +1,82 @@
-"use client"
+"use client";
 
-import { useRef, useState, useEffect } from 'react';
-import html2canvas from 'html2canvas';
-import download from 'downloadjs'; // Para descargar el archivo
-import Carnet from '../Carnet'; // Importa tu componente Carnet
+import { useRef, useState, useEffect } from "react";
+import html2canvas from "html2canvas";
+import download from "downloadjs"; 
+import Carnet from "../Carnet"; 
 
 export default function CarnetToJpgConverter({ carnet }) {
     const carnetRef = useRef(null);
-    const [isReady, setIsReady] = useState(false); // Controlamos si el componente está listo
-    const [imagesLoaded, setImagesLoaded] = useState(false); // Estado para verificar si las imágenes están cargadas
+    const [isReady, setIsReady] = useState(false);
+    const [imagesLoaded, setImagesLoaded] = useState(false);
 
-    // Verificar si las imágenes están completamente cargadas
+    // Esperar a que las imágenes dentro del Carnet se carguen
     useEffect(() => {
-        const imgElements = document.querySelectorAll('img');
+        if (!carnetRef.current) return;
+
+        const imgElements = carnetRef.current.querySelectorAll("img");
         let loadedCount = 0;
 
-        imgElements.forEach(img => {
-            img.onload = () => {
+        if (imgElements.length === 0) {
+            setImagesLoaded(true);
+            return;
+        }
+
+        imgElements.forEach((img) => {
+            if (img.complete) {
                 loadedCount++;
                 if (loadedCount === imgElements.length) {
-                    setImagesLoaded(true); // Todas las imágenes están cargadas
+                    setImagesLoaded(true);
                 }
-            };
-            img.onerror = () => {
-                console.error('Error al cargar imagen:', img.src); // Detectamos imágenes que no se cargan
-            };
+            } else {
+                img.onload = () => {
+                    loadedCount++;
+                    if (loadedCount === imgElements.length) {
+                        setImagesLoaded(true);
+                    }
+                };
+                img.onerror = () => console.error("Error al cargar imagen:", img.src);
+            }
         });
-    }, []);
+    }, [carnetRef]);
 
-    // Controlar si el componente está listo para ser convertido
+    // Esperar a que las fuentes estén cargadas antes de marcar isReady
     useEffect(() => {
-        if (carnetRef.current && imagesLoaded) {
-            setIsReady(true); // Solo lo marcamos como listo cuando las imágenes estén cargadas
-        }
+        document.fonts.ready.then(() => {
+            if (carnetRef.current && imagesLoaded) {
+                setIsReady(true);
+            }
+        });
     }, [imagesLoaded]);
 
     const convertToImage = () => {
-        console.log("hola", isReady)
+        console.log("Estado de isReady:", isReady);
         if (isReady && carnetRef.current) {
             setTimeout(() => {
                 html2canvas(carnetRef.current, {
-                    logging: true, // Habilita los logs para ver detalles en la consola
-                    useCORS: true, // Permite el uso de imágenes de orígenes cruzados
-                    allowTaint: false, // Evita tainting de imágenes
-                    backgroundColor: null, // Fondo transparente
-                    scale: 2, // Aumenta la escala de la imagen para mayor calidad
-                    x: 0, // Establecer el desplazamiento si es necesario
-                    y: 0, // Establecer el desplazamiento si es necesario
-                    imageTimeout: 0, // No esperar para imágenes
-                    foreignObjectRendering: true, // Mejora el renderizado de elementos complejos
-                    width: carnetRef.current.offsetWidth, // Captura el ancho exacto del contenedor
-                    height: carnetRef.current.offsetHeight, // Captura la altura exacta del contenedor
-                }).then((canvas) => {
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.9); // Cambiamos a JPEG y calidad 0.9
-                    download(dataUrl, 'carnet.jpg'); // Descargamos la imagen generada
-                }).catch((error) => {
-                    console.error('Error al convertir a imagen:', error);
+                    logging: false,
+                    useCORS: true,
+                    backgroundColor: null,
+                    scale: window.devicePixelRatio, 
+                    width: carnetRef.current.clientWidth,
+                    height: carnetRef.current.clientHeight,
+                    x: 0,
+                    y: 0
+                })
+                .then((canvas) => {
+                    const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+                    download(dataUrl, "carnet.jpg");
+                })
+                .catch((error) => {
+                    console.error("Error al convertir a imagen:", error);
                 });
-            }, 500); // Añadimos un pequeño retraso para asegurarnos de que las imágenes estén listas
+            }, 1000);
         }
     };
 
     return (
         <div>
-            <div ref={carnetRef} style={{ width: '8.6cm', height: '5.4cm' }}> {/* Tamaño fijo para la tarjeta */}
+            <div ref={carnetRef} style={{ width: "340px", height: "214px" }}>
                 <Carnet carnet={carnet} />
             </div>
             <button 

@@ -1,5 +1,5 @@
 import CarnetToPngConverter from '@/app/components/utils/CarnetToPngConverter.jsx';
-import imagenPerfil from '@/../../public/images/images.png';
+
 
 
 export default function cardPage (){
@@ -9,7 +9,7 @@ export default function cardPage (){
         tipoUsuario: 'alumno',
         tipoTitulacion: 'Grado',
         titulacion: 'Ingeniería Informática',
-        foto: imagenPerfil
+        foto: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?cs=srgb&dl=pexels-justin-shaifer-501272-1222271.jpg&fm=jpg'
       };
     return (<div>
         <CarnetToPngConverter carnet={carnet}/>
