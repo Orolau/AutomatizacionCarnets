@@ -1,30 +1,13 @@
-const { MongoClient } = require("mongodb");
-require("dotenv").config(); // Cargar variables de entorno
-
-const uri = process.env.MONGO_URI; // Tomar la URI desde el .env
-
-const client = new MongoClient(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-});
-
-let db;
-
-async function connectDB() {
+const { default: mongoose } = require('mongoose');
+const mogoose = require ('mongoose');
+const dbConnect = () =>{
+    const db_uri = process.env.DB_URI;
+    mogoose.set('strictQuery', false)
     try {
-        await client.connect();
-        db = client.db("carnetAppDB"); // Nombre de la base de datos
-        console.log("✅ Conectado a MongoDB Atlas");
+        mogoose.connect(db_uri)
     } catch (error) {
-        console.error("❌ Error al conectar con MongoDB:", error);
+        console.error("Error conectando a la BD: ", error)
     }
+    mongoose.connection.on("connected", () => console.log("conectado a la base de datos"))
 }
-
-function getDB() {
-    if (!db) {
-        throw new Error("❌ La base de datos no está conectada");
-    }
-    return db;
-}
-
-module.exports = { connectDB, getDB };
+module.exports = dbConnect;

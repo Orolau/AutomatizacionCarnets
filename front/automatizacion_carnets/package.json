@@ -9,7 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "dom-to-image": "^2.6.0",
+    "downloadjs": "^1.4.7",
     "formik": "^2.4.6",
+    "html2canvas": "^1.4.1",
     "jsbarcode": "^3.11.6",
     "next": "15.1.6",
     "react": "^19.0.0",
