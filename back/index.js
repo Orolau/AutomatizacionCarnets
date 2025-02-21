@@ -1,7 +1,12 @@
-const { connectDB, getDB } = require("./config/database");
+const express = require('express')
+const cors = require('cors')
+require('dotenv').config()
+const userRouter = require('./routes/user.js')
+//const { dbConnect, getDB } = require("./config/database");
+const dbConnect = require('./config/database.js')
 
-async function fetchPeople() {
-    await connectDB(); // Conectar a la base de datos
+/*async function fetchPeople() {
+    await dbConnect(); // Conectar a la base de datos
 
     const db = getDB(); // Obtener la base de datos
     const peopleCollection = db.collection("people"); // Obtener la colección
@@ -12,6 +17,13 @@ async function fetchPeople() {
     } catch (error) {
         console.error("❌ Error al obtener datos:", error);
     }
-}
+}*/
 
-fetchPeople();
+const app = express()
+app.use(cors())
+app.use(express.json())
+
+app.use('/api', userRouter)
+
+dbConnect();
+//fetchPeople();
