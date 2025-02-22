@@ -1,72 +1,56 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import "@/app/styles/Navbar.css";
 
-export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false);
+export default function Sidebar({ isOpen, toggleSidebar }) {
 
   return (
-    <>
-      {/* Botón para abrir o cerrar el sidebar */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="p-2 bg-blue-600 text-white rounded-md hover:bg-gray-600"
-      >
-        ☰
-      </button>
-
-      {/* Contenedor del sidebar */}
       <div className={`sidebar ${isOpen ? "open" : ""}`}>
         <div className="p-4 border-b">
           {/* Botón para cerrar el sidebar */}
-          <button
-            onClick={() => setIsOpen(false)}
-            className="close-btn"
-          >
-            ✖ Cerrar
+          <button onClick={toggleSidebar} className="close-btn">
+            ✖
           </button>
         </div>
         <ul className="p-4 space-y-4">
           {/* Enlace a la página de Inicio */}
           <li>
             <Link href="/pages/userForms/login">
-              <span onClick={() => setIsOpen(false)}>Inicio</span>
+              <span onClick={toggleSidebar}>Inicio</span>
             </Link>
           </li>
           {/* Enlace a la página de Verificación */}
           <li>
             <Link href="/pages/verify">
-              <span onClick={() => setIsOpen(false)}>Verificación</span>
+              <span onClick={toggleSidebar}>Verificación</span>
             </Link>
           </li>
           {/* Enlace a la página de Filtrado */}
           <li>
             <Link href="/pages/userForms/filter">
-              <span onClick={() => setIsOpen(false)}>Filtrado</span>
+              <span onClick={toggleSidebar}>Filtrado</span>
             </Link>
           </li>
           {/* Enlace a la página de Modificar Carnets */}
           <li>
             <Link href="/pages/modify">
-              <span onClick={() => setIsOpen(false)}>Modificar Carnets</span>
+              <span onClick={toggleSidebar}>Modificar Carnets</span>
             </Link>
           </li>
           {/* Enlace a la página de Preview Carnets */}
           <li>
             <Link href="/pages/preview">
-              <span onClick={() => setIsOpen(false)}>Preview Carnets</span>
+              <span onClick={toggleSidebar}>Preview Carnets</span>
             </Link>
           </li>
           {/* Enlace a la página de Pendientes */}
           <li>
             <Link href="/pages/pending">
-              <span onClick={() => setIsOpen(false)}>Pendientes</span>
+              <span onClick={toggleSidebar}>Pendientes</span>
             </Link>
           </li>
         </ul>
       </div>
-    </>
   );
 }
