@@ -1,15 +1,19 @@
-const express = require('express')
-const cors = require('cors')
-require('dotenv').config()
-const userRouter = require('./routes/user.js')
-//const { dbConnect, getDB } = require("./config/database");
-const dbConnect = require('./config/database.js')
+const express = require("express")
+const cors = require("cors");
+require('dotenv').config();
+const dbConnect = require("./config/mongo.js");
+const router = require('./routes/index.js')
 
+const app = express();
 
-const app = express()
-app.use(cors())
+app.use(cors());
 app.use(express.json())
 
-app.use('/api', userRouter)
+app.use("/api", router);
 
-dbConnect();
+const port = process.env.PORT || 3000;
+
+app.listen(port, () =>{
+    console.log("Servidor escuchando en el puerto " + port);
+    dbConnect();
+})
