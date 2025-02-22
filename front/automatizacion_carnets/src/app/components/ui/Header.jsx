@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
 
-export default function Header() {
+export default function Header({ toggleSidebar }) {
     const pathname = usePathname(); // Obtenemos el pathname actual
 
     // Mapeo de rutas para mostrar nombres legibles
@@ -32,20 +32,28 @@ export default function Header() {
     }, [pathname]);
 
     return (
-        <div className="bg-blue-600 px-6 py-4 shadow-md">
+        <div className="bg-blue-700 px-6 py-4 shadow-md">
             <div className="flex justify-between items-center mx-20 gap-6">
-                {/* Logo */}
-                <div className="flex items-center">
-                    <Link href="/myAccount">
-                        <Image
-                            src="/images/logoU-tad.png"  // Aquí se usa la imagen proporcionada
-                            alt="Logo"
-                            width={60}
-                            height={60}
-                        />
-                    </Link>
+                <div className='flex flex-row gap-3'>
+                    {/* Botón para abrir el Sidebar */}
+                    <button
+                        onClick={toggleSidebar}
+                        className="text-white text-2xl focus:outline-none"
+                    >
+                        ☰
+                    </button>
+                    {/* Logo */}
+                    <div className="flex items-center">
+                        <Link href="/pages/userForms/filter">
+                            <Image
+                                src="/images/logoU-tad.png"  // Aquí se usa la imagen proporcionada
+                                alt="Logo"
+                                width={60}
+                                height={60}
+                            />
+                        </Link>
+                    </div>
                 </div>
-
                 {/* Barra de ruta */}
                 <div className="text-white text-lg">
                     {breadcrumb.length > 0 && (
@@ -64,7 +72,7 @@ export default function Header() {
                 {/* Icono de perfil a la derecha */}
                 <div className="flex items-center cursor-pointer">
                     <img
-                        src="/images/profile-icon.png" // Reemplaza con tu icono de perfil
+                        src="/images/perfil.png" // Reemplaza con tu icono de perfil
                         alt="Perfil"
                         className="w-8 h-8 rounded-full"
                     />

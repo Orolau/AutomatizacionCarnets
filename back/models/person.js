@@ -38,4 +38,4 @@ const PersonScheme = new mongoose.Schema(
         versionKey: false
     }
 )
-module.exports = mongoose.model("person", PersonScheme)
+module.exports = mongoose.model("Person", PersonScheme);
