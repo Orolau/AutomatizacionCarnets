@@ -5,9 +5,9 @@ const dbConnect = () => {
     mongoose.set('strictQuery', false)
     mongoose.connect(db_uri)
 
-
+}
 mongoose.connection.on('connected', () => console.log("conectado a la base de datos"))
 
 mongoose.connection.on('error', (e) => console.log(e.message))
-}
+
 module.exports = dbConnect

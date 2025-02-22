@@ -24,19 +24,21 @@ export default function ModificarCarnetIndividualPage() {
     useEffect(() => {
 
         // Aquí debemos substituirlo por una llamada a la base de datos, para obtener los datos del usuario con dni especificado
-        const fetchedCarnet = {
-            dni: dni,
-            nombre: "Juan Pérez",
-            tipoUsuario: "alumno",
-            foto: "/images/juan-perez.jpg", 
-            titulacion: "Ingeniería Informática",
-            tipoTitulacion: "Grado",
-            cargo: "",
-            departamento: "",
+        const fetchCarnet = async () => {
+            try {
+                const response = await fetch(`http://localhost:3005/api/person/dni/${dni}`);
+                if (!response.ok) throw new Error("Error al obtener datos del carnet");
+                
+                const data = await response.json();
+                setCarnet(data);
+            } catch (error) {
+                console.error("Error al cargar los datos:", error);
+            }
         };
-
-        // Actualizamos el estado con los datos del carnet
-        setCarnet(fetchedCarnet);
+    
+        if (dni) {
+            fetchCarnet();
+        }
     }, [dni]);
 
     // Si "dni" no está disponible, mostrar un mensaje de carga o vacío

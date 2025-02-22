@@ -1,10 +1,10 @@
 const Person = require("../models/person.js");
 
 // Obtener todas las personas
-const getPersons = async (req, res) => {
+const getPeople = async (req, res) => {
     try {
-        const persons = await Person.find();
-        res.json(persons);
+        const people = await Person.find();
+        res.json(people);
     } catch (error) {
         res.status(500).json({ message: "Error obteniendo los datos" });
     }
@@ -12,52 +12,95 @@ const getPersons = async (req, res) => {
 
 // Crear una nueva persona
 const createPerson = async (req, res) => {
-    try {
-        const person = new Person(req.body);
-        await person.save();
-        res.status(201).json(person);
-    } catch (error) {
-        res.status(400).json({ message: "Error creando la persona" });
-    }
+    const {body} = req;
+    const data = await Person.create(body);
+    res.json(data)
 };
 
-// Obtener una persona por dni
+// Obtener una persona por id
 const getPersonById = async (req, res) => {
+    const {id} = req.params;
+    const data = await Person.findOne({"_id": id})
+    res.json(data);
+};
+// Obtener una persona por dni
+const getPersonByDNI = async (req, res) => {
+    const {dni} = req.params;
+    const data = await Person.findOne({"dni": dni})
+    res.json(data);
+};
+// Obtener una persona por dni
+const getPersonByName = async (req, res) => {
     try {
-        const person = await Person.findById(req.params.dni);
-        if (!person) return res.status(404).json({ message: "Persona no encontrada" });
-        res.json(person);
+        const { nombreCompleto } = req.params;
+
+        // Separar en nombre y apellidos
+        const [nombre, ...apellidosArray] = nombreCompleto.split(" ");
+        const apellidos = apellidosArray.join(" ");
+
+        const data = await Person.findOne({ nombre, apellidos });
+
+        if (!data) {
+            return res.status(404).json({ message: "Persona no encontrada" });
+        }
+
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: "Error obteniendo la persona" });
+        console.error("Error en getPersonByName:", error.message);
+        res.status(500).json({ error: "Error al obtener la persona" });
     }
 };
 
-// Actualizar persona por dni
+
+// Actualizar persona por id
 const updatePerson = async (req, res) => {
+    const {id} = req.params;
+    const data = await Person.findOneAndReplace({"_id": id}, req.body, {new:true});
+    res.json(data);
+};
+
+// Eliminar persona por id
+const deletePerson = async (req, res) => {
+    const {id} = req.params;
+    const data = await Person.findByIdAndDelete(id);
+    res.json(data)
+};
+
+const updatePersonPhoto = async (req, res) => {
     try {
-        const person = await Person.findByIdAndUpdate(req.params.dni, req.body, { new: true });
-        if (!person) return res.status(404).json({ message: "Persona no encontrada" });
-        res.json(person);
+        const { dni } = req.params;  // Se recibe el DNI como identificador único
+        const { foto } = req.body;   // La nueva URL de la foto viene en el body
+
+        if (!foto) {
+            return res.status(400).json({ message: "El campo 'foto' es obligatorio" });
+        }
+
+        // Buscar y actualizar solo el campo 'foto'
+        const updatedPerson = await Person.findOneAndUpdate(
+            { dni }, 
+            { $set: { foto } }, 
+            { new: true } // Para devolver el documento actualizado
+        );
+
+        if (!updatedPerson) {
+            return res.status(404).json({ message: "Persona no encontrada" });
+        }
+
+        res.json({ message: "Foto actualizada exitosamente", updatedPerson });
     } catch (error) {
-        res.status(500).json({ message: "Error actualizando la persona" });
+        console.error("Error en updatePersonPhoto:", error.message);
+        res.status(500).json({ error: "Error al actualizar la foto" });
     }
 };
 
-// Eliminar persona por dni 
-const deletePerson = async (req, res) => {
-    try {
-        const person = await Person.findByIdAndDelete(req.params.dni);
-        if (!person) return res.status(404).json({ message: "Persona no encontrada" });
-        res.json({ message: "Persona eliminada correctamente" });
-    } catch (error) {
-        res.status(500).json({ message: "Error eliminando la persona" });
-    }
-};
 
 module.exports = {
-    getPersons,
+    getPeople,
     createPerson,
     getPersonById,
     updatePerson,
-    deletePerson
+    deletePerson,
+    getPersonByDNI,
+    getPersonByName,
+    updatePersonPhoto
 };

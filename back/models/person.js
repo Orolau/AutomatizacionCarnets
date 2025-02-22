@@ -12,7 +12,7 @@ const PersonScheme = new mongoose.Schema(
             type: String
         },
         tipoTitulacion:{
-            type: ["grado", "grado superior", "postgrado", ""],
+            type: ["Grado", "Ciclo superior", "Máster", ""],
             default: ""
         },
         cargo: {
@@ -31,6 +31,10 @@ const PersonScheme = new mongoose.Schema(
         },
         foto:{
             type: String
+        },
+        modalidad:{
+            type: ["presencial", "online"],
+            default: "presencial"
         }
     },
     {
