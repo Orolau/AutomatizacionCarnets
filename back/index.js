@@ -1,17 +1,19 @@
-const { connectDB, getDB } = require("./config/database");
+const express = require("express")
+const cors = require("cors");
+require('dotenv').config();
+const dbConnect = require("./config/mongo.js");
+const router = require('./routes/index.js')
 
-async function fetchPeople() {
-    await connectDB(); // Conectar a la base de datos
+const app = express();
 
-    const db = getDB(); // Obtener la base de datos
-    const peopleCollection = db.collection("people"); // Obtener la colección
+app.use(cors());
+app.use(express.json())
 
-    try {
-        const people = await peopleCollection.find().toArray(); // Obtener todos los documentos
-        console.log("📄 Datos obtenidos de la colección 'people':", people);
-    } catch (error) {
-        console.error("❌ Error al obtener datos:", error);
-    }
-}
+app.use("/api", router);
 
-fetchPeople();
+const port = process.env.PORT || 3000;
+
+app.listen(port, () =>{
+    console.log("Servidor escuchando en el puerto " + port);
+    dbConnect();
+})
