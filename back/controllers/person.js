@@ -10,6 +10,18 @@ const getPeople = async (req, res) => {
     }
 };
 
+// Obtener personas con filtros
+const getFilteredPersons = async (req, res) => {
+    try {
+        const filters = req.query; // Obtener los filtros de los query params
+        const filteredPersons = await Person.find(filters); // Usar los filtros directamente en la consulta
+        res.json(filteredPersons); // Devolver las personas filtradas
+    } catch (error) {
+        res.status(500).json({ message: "Error en la obtención de las personas filtradas", error });
+    }
+};
+
+
 // Crear una nueva persona
 const createPerson = async (req, res) => {
     const {body} = req;
@@ -95,7 +107,8 @@ const updatePersonPhoto = async (req, res) => {
 
 
 module.exports = {
-    getPeople,
+    getPersons,
+    getFilteredPersons,
     createPerson,
     getPersonById,
     updatePerson,

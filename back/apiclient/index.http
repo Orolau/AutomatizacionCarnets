@@ -5,7 +5,10 @@ GET http://localhost:3005/api/user
 
 
 ###
-GET http://localhost:3005/api/person/67aa21c50e8e631dbf097fd4
+GET http://localhost:3005/api/person/45678901E
 
 ###
-GET http://localhost:3005/api/person/dni/45678901E
+GET http://localhost:3005/api/person/filtered?tipoUsuario=alumno
+
+###
+GET http://localhost:3005/api/person/filtered?tipoUsuario=alumno&curso=3º&modalidad=Presencial&tipoTitulacion=Grado

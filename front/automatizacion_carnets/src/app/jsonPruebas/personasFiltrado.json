@@ -86,6 +86,146 @@
       "correo": "lucia.fernandez@u-tad.com",
       "imagen": "",
       "direccion": "Calle Virtual 22, Barcelona"
+    },
+    {
+      "nombre": "Ana",
+      "apellidos": "García Pérez",
+      "dni": "67890123G",
+      "tipo": "estudiante",
+      "tipo_titulacion": "Grado",
+      "titulacion": "Grado en Diseño Digital",
+      "curso": "4º",
+      "modalidad": "Presencial",
+      "anio_comienzo": 2020,
+      "correo": "ana.garcia@live.u-tad.com",
+      "imagen": "https://u-tad.com/images/ana_garcia.jpg",
+      "direccion": "Calle Innovación 78, Madrid"
+    },
+    {
+      "nombre": "Miguel",
+      "apellidos": "Sánchez López",
+      "dni": "78901234H",
+      "tipo": "docente",
+      "departamento": "Diseño",
+      "cargo": "Profesor",
+      "correo": "miguel.sanchez@u-tad.com",
+      "imagen": "https://u-tad.com/images/miguel_sanchez.jpg",
+      "direccion": "Calle Creativa 45, Madrid"
+    },
+    {
+      "nombre": "Sofía",
+      "apellidos": "Martín Gómez",
+      "dni": "89012345I",
+      "tipo": "staff",
+      "cargo": "Recursos Humanos",
+      "correo": "sofia.martin@u-tad.com",
+      "imagen": "https://u-tad.com/images/sofia_martin.jpg",
+      "direccion": "Calle del Conocimiento 89, Madrid"
+    },
+    {
+      "nombre": "David",
+      "apellidos": "Ruiz Fernández",
+      "dni": "90123456J",
+      "tipo": "estudiante",
+      "tipo_titulacion": "Máster",
+      "titulacion": "Máster en Big Data",
+      "curso": "2º",
+      "modalidad": "Online",
+      "anio_comienzo": 2022,
+      "correo": "david.ruiz@live.u-tad.com",
+      "imagen": "https://u-tad.com/images/david_ruiz.jpg",
+      "direccion": "Calle Tecnología 56, Madrid"
+    },
+    {
+      "nombre": "Laura",
+      "apellidos": "Díaz Martínez",
+      "dni": "01234567K",
+      "tipo": "docente",
+      "departamento": "Inteligencia Artificial",
+      "cargo": "Profesora",
+      "correo": "laura.diaz@u-tad.com",
+      "imagen": "https://u-tad.com/images/laura_diaz.jpg",
+      "direccion": "Calle Virtual 33, Barcelona"
+    },
+    {
+      "nombre": "Carlos",
+      "apellidos": "Pérez Gómez",
+      "dni": "12345678L",
+      "tipo": "staff",
+      "cargo": "Técnico de Sistemas",
+      "correo": "carlos.perez@u-tad.com",
+      "imagen": "https://u-tad.com/images/carlos_perez.jpg",
+      "direccion": "Calle Innovación 90, Madrid"
+    },
+    {
+      "nombre": "Marta",
+      "apellidos": "Gómez Sánchez",
+      "dni": "23456789M",
+      "tipo": "estudiante",
+      "tipo_titulacion": "Grado",
+      "titulacion": "Grado en Ciberseguridad",
+      "curso": "1º",
+      "modalidad": "Presencial",
+      "anio_comienzo": 2023,
+      "correo": "marta.gomez@live.u-tad.com",
+      "imagen": "https://u-tad.com/images/marta_gomez.jpg",
+      "direccion": "Calle Tecnología 78, Madrid"
+    },
+    {
+      "nombre": "Pablo",
+      "apellidos": "Martínez López",
+      "dni": "34567890N",
+      "tipo": "docente",
+      "departamento": "Ciberseguridad",
+      "cargo": "Coordinador",
+      "correo": "pablo.martinez@u-tad.com",
+      "imagen": "https://u-tad.com/images/pablo_martinez.jpg",
+      "direccion": "Calle del Conocimiento 12, Madrid"
+    },
+    {
+      "nombre": "Isabel",
+      "apellidos": "Fernández Ruiz",
+      "dni": "45678901O",
+      "tipo": "staff",
+      "cargo": "Administrativo",
+      "correo": "isabel.fernandez@u-tad.com",
+      "imagen": "https://u-tad.com/images/isabel_fernandez.jpg",
+      "direccion": "Calle Creativa 34, Madrid"
+    },
+    {
+      "nombre": "Jorge",
+      "apellidos": "López Díaz",
+      "dni": "56789012P",
+      "tipo": "estudiante",
+      "tipo_titulacion": "Máster",
+      "titulacion": "Máster en Realidad Virtual",
+      "curso": "1º",
+      "modalidad": "Online",
+      "anio_comienzo": 2023,
+      "correo": "jorge.lopez@live.u-tad.com",
+      "imagen": "https://u-tad.com/images/jorge_lopez.jpg",
+      "direccion": "Calle Virtual 45, Barcelona"
+    },
+    {
+      "nombre": "Raquel",
+      "apellidos": "Sánchez Martínez",
+      "dni": "67890123Q",
+      "tipo": "docente",
+      "departamento": "Realidad Virtual",
+      "cargo": "Profesora",
+      "correo": "raquel.sanchez@u-tad.com",
+      "imagen": "https://u-tad.com/images/raquel_sanchez.jpg",
+      "direccion": "Calle Innovación 56, Madrid"
+    },
+    {
+      "nombre": "Alberto",
+      "apellidos": "Gómez Fernández",
+      "dni": "78901234R",
+      "tipo": "staff",
+      "cargo": "Técnico de Laboratorio",
+      "correo": "alberto.gomez@u-tad.com",
+      "imagen": "https://u-tad.com/images/alberto_gomez.jpg",
+      "direccion": "Calle Creativa 67, Madrid"
     }
   ]
   
