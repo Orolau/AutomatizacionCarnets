@@ -50,6 +50,12 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
               <span onClick={toggleSidebar}>Pendientes</span>
             </Link>
           </li>
+          {/* Enlace a la página de EtiquetasEnvio */}
+          <li>
+            <Link href="/pages/etiqueta">
+              <span onClick={toggleSidebar}>Etiquetas</span>
+            </Link>
+          </li>
         </ul>
       </div>
   );
