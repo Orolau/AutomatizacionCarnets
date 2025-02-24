@@ -8,7 +8,7 @@ export default function ModificarErroresPage() {
   const [registros, setRegistros] = useState([
     {
       nombre: 'Juan Pérez',
-      dni: '12345678A',
+      dni: '45678901E',
       tipoUsuario: 'alumno',
       tipoTitulacion: 'Grado',
       titulacion: 'Ingeniería Informática',
@@ -16,7 +16,7 @@ export default function ModificarErroresPage() {
     },
     {
       nombre: 'Ana Gómez',
-      dni: '87654321B',
+      dni: '12345678A',
       tipoUsuario: 'profesor',
       cargo: 'Profesor Titular',
       departamento: 'Ciencias de la Computación',

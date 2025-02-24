@@ -16,8 +16,9 @@ export default function ModificarCarnetIndividualPage() {
         titulacion: "",
         cargo: "",
         departamento: "",
-        foto: "/images/default-photo.jpg",
+        foto: "/images/images.png",
         nombre: "",
+        _id: ""
     });
 
     // Solo realizar la carga de datos si "dni" está disponible
@@ -30,6 +31,7 @@ export default function ModificarCarnetIndividualPage() {
                 if (!response.ok) throw new Error("Error al obtener datos del carnet");
                 
                 const data = await response.json();
+                console.log(data)
                 setCarnet(data);
             } catch (error) {
                 console.error("Error al cargar los datos:", error);
@@ -47,18 +49,19 @@ export default function ModificarCarnetIndividualPage() {
     }
 
     return (
-        <div>
         <div className="grid grid-cols-2 items-center justify-center p-4">
-            <Carnet carnet={carnet} />
-            <FormActualizacionCarnet carnet={carnet} setCarnet={setCarnet} />
-            
-        </div>
-        <button 
-                className="m-4 w-11/12 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            <div className="flex flex-col align-top">
+            <button 
+                className="m-4 w-fit bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                 onClick={() => router.push('/pages/preview')}
             >
-                Siguiente
+                &larr;
             </button>
+            <Carnet carnet={carnet} />
+            </div>
+            
+            <FormActualizacionCarnet carnet={carnet} setCarnet={setCarnet} />
+            
         </div>
     );
 }

@@ -2,17 +2,22 @@ const mongoose = require("mongoose");
 const PersonScheme = new mongoose.Schema(
     {
         tipoUsuario: {
-            type: ["alumno", "personal", "profesor"],
+            type: String,
+            enum: ["alumno", "personal", "profesor"],
             default: "alumno"
-        },
+        },        
         nombre: {
+            type: String
+        },
+        apellidos: {
             type: String
         },
         titulacion: {
             type: String
         },
         tipoTitulacion:{
-            type: ["Grado", "Ciclo superior", "Máster", ""],
+            type: String,
+            enum: ["Grado", "Ciclo superior", "Máster", ""],
             default: ""
         },
         cargo: {

@@ -28,7 +28,7 @@ export default function Carnet({ carnet }) {
                     <div className='text-left col-span-3 flex flex-col gap-2'>
                         <p className='text-white text-xxs'>U-TAD CENTRO DIGITAL</p>
                         <br/>
-                        <p className='font-bold'>{carnet.nombre}</p>
+                        <p className='font-bold'>{carnet.nombre} {carnet.apellidos}</p>
                         {carnet.tipoUsuario === 'alumno' ? <p className='font-bold'>{carnet.tipoTitulacion} {carnet.titulacion}</p> : null}
                         {carnet.tipoUsuario === 'profesor' ? <p className='font-bold'>{carnet.cargo} {carnet.departamento}</p> : null}
                         {carnet.tipoUsuario === 'personal' ? <p className='font-bold'>{carnet.cargo}</p> : null}

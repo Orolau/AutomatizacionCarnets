@@ -1,4 +1,5 @@
 const Person = require("../models/person.js");
+const { uploadToPinata } = require("../utils/pinata"); 
 
 // Obtener todas las personas
 const getPeople = async (req, res) => {
@@ -63,13 +64,29 @@ const getPersonByName = async (req, res) => {
     }
 };
 
-
 // Actualizar persona por id
 const updatePerson = async (req, res) => {
-    const {id} = req.params;
-    const data = await Person.findOneAndReplace({"_id": id}, req.body, {new:true});
-    res.json(data);
-};
+    const { id } = req.params;
+  
+    // Asegúrate de que 'id' no sea undefined
+    if (!id) {
+      return res.status(400).json({ error: "ID es requerido" });
+    }
+  
+    try {
+      const updatedPerson = await Person.findByIdAndUpdate(id, req.body, { new: true });
+  
+      if (!updatedPerson) {
+        return res.status(404).json({ error: "Persona no encontrada" });
+      }
+  
+      res.json(updatedPerson);  // Responde con los datos actualizados
+    } catch (error) {
+      console.error("Error al actualizar la persona:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  };
+  
 
 // Eliminar persona por id
 const deletePerson = async (req, res) => {
@@ -80,7 +97,7 @@ const deletePerson = async (req, res) => {
 
 const updatePersonPhoto = async (req, res) => {
     try {
-        const { dni } = req.params;  // Se recibe el DNI como identificador único
+        const { id } = req.params;  // Se recibe el ID de la persona
         const { foto } = req.body;   // La nueva URL de la foto viene en el body
 
         if (!foto) {
@@ -89,7 +106,7 @@ const updatePersonPhoto = async (req, res) => {
 
         // Buscar y actualizar solo el campo 'foto'
         const updatedPerson = await Person.findOneAndUpdate(
-            { dni }, 
+            { _id: id }, // Usamos el _id aquí, ya que estamos buscando por el ID de MongoDB
             { $set: { foto } }, 
             { new: true } // Para devolver el documento actualizado
         );
@@ -106,8 +123,47 @@ const updatePersonPhoto = async (req, res) => {
 };
 
 
+const uploadImageAndUpdatePerson = async (req, res) => {
+    try {
+        const { id } = req.params; // Asegúrate de que id existe y es correcto
+        if (!req.file) {
+            return res.status(400).json({ message: "No se ha proporcionado ninguna imagen." });
+        }
+
+        // Subir imagen a Pinata
+        const fileBuffer = req.file.buffer;
+        const fileName = req.file.originalname;
+        const pinataResponse = await uploadToPinata(fileBuffer, fileName);
+
+        if (!pinataResponse.IpfsHash) {
+            throw new Error("No se pudo obtener el hash de la imagen en Pinata.");
+        }
+
+        // Construir URL de la imagen en IPFS
+        const imageUrl = `https://${process.env.PINATA_GATEWAY}/ipfs/${pinataResponse.IpfsHash}`;
+
+        // Actualizar el campo "foto" en MongoDB
+        const updatedPerson = await Person.findByIdAndUpdate(
+            id,
+            { $set: { foto: imageUrl } },
+            { new: true }
+        );
+
+        if (!updatedPerson) {
+            return res.status(404).json({ message: "Persona no encontrada." });
+        }
+
+        res.json({ message: "Foto actualizada correctamente", updatedPerson });
+    } catch (error) {
+        console.error("Error al subir la imagen y actualizar la persona:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+};
+
+
+
 module.exports = {
-    getPersons,
+    getPeople,
     getFilteredPersons,
     createPerson,
     getPersonById,
@@ -115,5 +171,6 @@ module.exports = {
     deletePerson,
     getPersonByDNI,
     getPersonByName,
-    updatePersonPhoto
+    updatePersonPhoto,
+    uploadImageAndUpdatePerson 
 };
