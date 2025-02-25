@@ -7,7 +7,7 @@ export default function FilterPage() {
   return (
     <>
       <Navbar />{/*Navbar*/}
-      <FilterForm />;
+      <FilterForm />
     </>
   );
 }
