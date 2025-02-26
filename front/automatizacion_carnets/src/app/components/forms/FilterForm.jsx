@@ -1,53 +1,79 @@
-import { useState } from "react";
-import personas from "@/app/jsonPruebas/personasFiltrado.json";
+import { useState, useEffect } from "react";
 
 const FilterForm = ({ onFilter }) => {
   const [tipo, setTipo] = useState("");
   const [tipoTitulacion, setTipoTitulacion] = useState("");
   const [titulacion, setTitulacion] = useState("");
-  const [curso, setCurso] = useState("");
   const [departamento, setDepartamento] = useState("");
   const [cargo, setCargo] = useState("");
   const [filteredPeople, setFilteredPeople] = useState([]);
+  const [tipos, setTipos] = useState([]);
+  const [tiposTitulacion, setTiposTitulacion] = useState([]);
+  const [titulaciones, setTitulaciones] = useState([]);
+  const [departamentos, setDepartamentos] = useState([]);
+  const [cargos, setCargos] = useState([]);
 
-  const tipos = [...new Set(personas.map((p) => p.tipo))];
+  useEffect(() => {
+    fetch("/api/person/filtered")
+      .then((res) => res.json())
+      .then((data) => {
+        const people = data || [];
+        setTipos([...new Set(people.map((p) => p.tipoUsuario))]);
+        setDepartamentos([...new Set(people.map((p) => p.departamento).filter(Boolean))]);
+        setCargos([...new Set(people.map((p) => p.cargo).filter(Boolean))]);
+      })
+      .catch((err) => console.error("Error fetching people:", err));
+  }, []);
 
-  const tiposTitulacion = tipo === "estudiante" ? [...new Set(personas.filter((p) => p.tipo === "estudiante").map((p) => p.tipo_titulacion))] : [];
+  useEffect(() => {
+    if (tipo === "alumno") {
+      fetch("/api/person/filtered")
+        .then((res) => res.json())
+        .then((data) => {
+          const students = data.filter((p) => p.tipoUsuario === "alumno");
+          setTiposTitulacion([...new Set(students.map((p) => p.tipoTitulacion))]);
+        })
+        .catch((err) => console.error("Error fetching students:", err));
+    }
+  }, [tipo]);
 
-  const titulaciones = tipoTitulacion ? [...new Set(personas.filter((p) => p.tipo === "estudiante" && p.tipo_titulacion === tipoTitulacion).map((p) => p.titulacion))] : [];
-
-  const cursos = titulacion ? [...new Set(personas.filter((p) => p.tipo === "estudiante" && p.tipo_titulacion === tipoTitulacion && p.titulacion === titulacion).map((p) => p.curso))] : [];
-
-  const departamentos = tipo === "docente" ? [...new Set(personas.filter((p) => p.tipo === "docente").map((p) => p.departamento))] : [];
-
-  const cargos = tipo === "staff" ? [...new Set(personas.filter((p) => p.tipo === "staff").map((p) => p.cargo))] : [];
+  useEffect(() => {
+    if (tipoTitulacion) {
+      fetch("/api/person/filtered")
+        .then((res) => res.json())
+        .then((data) => {
+          const filtered = data.filter(
+            (p) => p.tipoUsuario === "alumno" && p.tipoTitulacion === tipoTitulacion
+          );
+          setTitulaciones([...new Set(filtered.map((p) => p.titulacion))]);
+        })
+        .catch((err) => console.error("Error fetching titulaciones:", err));
+    }
+  }, [tipoTitulacion]);
 
   const handleFilter = () => {
-    let filtered = personas.filter((p) => p.tipo === tipo);
+    let query = "/api/person/filtered?";
+    if (tipo) query += `tipoUsuario=${tipo}&`;
+    if (tipoTitulacion) query += `tipoTitulacion=${tipoTitulacion}&`;
+    if (titulacion) query += `titulacion=${titulacion}&`;
+    if (departamento) query += `departamento=${departamento}&`;
+    if (cargo) query += `cargo=${cargo}`;
 
-    if (tipo === "estudiante") {
-      if (tipoTitulacion) filtered = filtered.filter((p) => p.tipo_titulacion === tipoTitulacion);
-      if (titulacion) filtered = filtered.filter((p) => p.titulacion === titulacion);
-      if (curso) filtered = filtered.filter((p) => p.curso === curso);
-    }
-
-    if (tipo === "docente" && departamento) {
-      filtered = filtered.filter((p) => p.departamento === departamento);
-    }
-
-    if (tipo === "staff" && cargo) {
-      filtered = filtered.filter((p) => p.cargo === cargo);
-    }
-
-    setFilteredPeople(filtered);
-    if (typeof onFilter === 'function') {
-      onFilter(filtered);
-    }
+    fetch(query)
+      .then((res) => res.json())
+      .then((data) => {
+        setFilteredPeople(data);
+        if (typeof onFilter === "function") {
+          onFilter(data);
+        }
+      })
+      .catch((err) => console.error("Error fetching filtered data:", err));
   };
 
   return (
     <div className="p-4 bg-white shadow-md rounded-lg">
       <h1 className="text-2xl font-bold mb-4 text-gray-800">Filtrado de carnets</h1>
+
       <select className="w-full p-2 border rounded-md text-gray-800" value={tipo} onChange={(e) => setTipo(e.target.value)}>
         <option value="">Seleccionar tipo</option>
         {tipos.map((t) => (
@@ -55,7 +81,7 @@ const FilterForm = ({ onFilter }) => {
         ))}
       </select>
 
-      {tipo === "estudiante" && (
+      {tipo === "alumno" && (
         <>
           <select className="w-full p-2 border rounded-md text-gray-800" value={tipoTitulacion} onChange={(e) => setTipoTitulacion(e.target.value)}>
             <option value="">Seleccionar tipo de titulación</option>
@@ -72,19 +98,10 @@ const FilterForm = ({ onFilter }) => {
               ))}
             </select>
           )}
-
-          {titulacion && (
-            <select className="w-full p-2 border rounded-md text-gray-800" value={curso} onChange={(e) => setCurso(e.target.value)}>
-              <option value="">Seleccionar curso</option>
-              {cursos.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          )}
         </>
       )}
 
-      {tipo === "docente" && (
+      {tipo === "profesor" && (
         <select className="w-full p-2 border rounded-md text-gray-800" value={departamento} onChange={(e) => setDepartamento(e.target.value)}>
           <option value="">Seleccionar departamento</option>
           {departamentos.map((d) => (
@@ -93,7 +110,7 @@ const FilterForm = ({ onFilter }) => {
         </select>
       )}
 
-      {tipo === "staff" && (
+      {tipo === "personal" && (
         <select className="w-full p-2 border rounded-md text-gray-800" value={cargo} onChange={(e) => setCargo(e.target.value)}>
           <option value="">Seleccionar cargo</option>
           {cargos.map((c) => (
@@ -102,11 +119,15 @@ const FilterForm = ({ onFilter }) => {
         </select>
       )}
 
-      <button className="w-full bg-blue-500 text-white p-2 rounded mt-2 hover:bg-blue-600" onClick={handleFilter}>Buscar</button>
+      <button className="w-full bg-blue-500 text-white p-2 rounded mt-2 hover:bg-blue-600" onClick={handleFilter}>
+        Buscar
+      </button>
 
       <ul className="mt-4">
         {filteredPeople.map((p) => (
-          <li key={p.DNI} className="p-2 border-b text-gray-800">{p.nombre} {p.apellidos}</li>
+          <li key={p.dni} className="p-2 border-b text-gray-800">
+            {p.nombre} {p.apellidos}
+          </li>
         ))}
       </ul>
     </div>
