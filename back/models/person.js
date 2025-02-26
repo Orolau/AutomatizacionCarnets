@@ -38,8 +38,9 @@ const PersonScheme = new mongoose.Schema(
             type: String
         },
         modalidad:{
-            type: ["presencial", "online"],
-            default: "presencial"
+            type: String,
+            enum: ["Presencial", "Online"],
+            default: "Presencial"
         }
     },
     {
