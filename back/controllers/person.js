@@ -79,7 +79,7 @@ const updatePerson = async (req, res) => {
       if (!updatedPerson) {
         return res.status(404).json({ error: "Persona no encontrada" });
       }
-  
+      console.log(updatePerson)
       res.json(updatedPerson);  // Responde con los datos actualizados
     } catch (error) {
       console.error("Error al actualizar la persona:", error);
@@ -93,33 +93,6 @@ const deletePerson = async (req, res) => {
     const {id} = req.params;
     const data = await Person.findByIdAndDelete(id);
     res.json(data)
-};
-
-const updatePersonPhoto = async (req, res) => {
-    try {
-        const { id } = req.params;  // Se recibe el ID de la persona
-        const { foto } = req.body;   // La nueva URL de la foto viene en el body
-
-        if (!foto) {
-            return res.status(400).json({ message: "El campo 'foto' es obligatorio" });
-        }
-
-        // Buscar y actualizar solo el campo 'foto'
-        const updatedPerson = await Person.findOneAndUpdate(
-            { _id: id }, // Usamos el _id aquí, ya que estamos buscando por el ID de MongoDB
-            { $set: { foto } }, 
-            { new: true } // Para devolver el documento actualizado
-        );
-
-        if (!updatedPerson) {
-            return res.status(404).json({ message: "Persona no encontrada" });
-        }
-
-        res.json({ message: "Foto actualizada exitosamente", updatedPerson });
-    } catch (error) {
-        console.error("Error en updatePersonPhoto:", error.message);
-        res.status(500).json({ error: "Error al actualizar la foto" });
-    }
 };
 
 
@@ -171,6 +144,5 @@ module.exports = {
     deletePerson,
     getPersonByDNI,
     getPersonByName,
-    updatePersonPhoto,
     uploadImageAndUpdatePerson 
 };
