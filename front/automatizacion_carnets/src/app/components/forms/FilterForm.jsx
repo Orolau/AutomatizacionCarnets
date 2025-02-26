@@ -10,6 +10,7 @@ const FilterForm = ({ onFilter }) => {
   const [curso, setCurso] = useState("");
   const [cargo, setCargo] = useState("");
   const [departamento, setDepartamento] = useState("");
+  const [modalidad, setModalidad] = useState("");
 
   const [tiposUsuarios, setTiposUsuarios] = useState([]);
   const [tiposTitulacion, setTiposTitulacion] = useState([]);
@@ -17,6 +18,10 @@ const FilterForm = ({ onFilter }) => {
   const [cursos, setCursos] = useState([]);
   const [cargos, setCargos] = useState([]);
   const [departamentos, setDepartamentos] = useState([]);
+  const [modalidades, setModalidades] = useState([]);
+  
+  // Estado para los resultados filtrados
+  const [resultados, setResultados] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,6 +34,7 @@ const FilterForm = ({ onFilter }) => {
         setCursos([...new Set(data.map(p => p.curso).filter(Boolean))]);
         setCargos([...new Set(data.map(p => p.cargo).filter(Boolean))]);
         setDepartamentos([...new Set(data.map(p => p.departamento).filter(Boolean))]);
+        setModalidades([...new Set(data.flatMap(p => p.modalidad).filter(Boolean))]);
 
         const titulacionesAgrupadas = data.reduce((acc, p) => {
           if (p.tipoTitulacion && p.titulacion) {
@@ -57,11 +63,13 @@ const FilterForm = ({ onFilter }) => {
     if (curso) params.append("curso", curso);
     if (cargo) params.append("cargo", cargo);
     if (departamento) params.append("departamento", departamento);
+    if (modalidad) params.append("modalidad", modalidad);
 
     try {
       const response = await fetch(`${FILTER_URL}?${params.toString()}`);
       const data = await response.json();
-      if (typeof onFilter === "function") onFilter(data);
+      // Almacenar los resultados en el estado
+      setResultados(data);
     } catch (error) {
       console.error("Error fetching filtered data:", error);
     }
@@ -132,9 +140,49 @@ const FilterForm = ({ onFilter }) => {
         </select>
       )}
 
+      <select className="w-full p-2 border rounded-md text-gray-800" value={modalidad} onChange={(e) => setModalidad(e.target.value)}>
+        <option value="">Seleccionar modalidad</option>
+        {modalidades.map((mod, index) => (
+          <option key={index} value={mod}>{mod}</option>
+        ))}
+      </select>
+
       <button className="w-full bg-blue-500 text-white p-2 rounded mt-2 hover:bg-blue-600" onClick={handleFilter}>
         Buscar
       </button>
+
+      {/* Mostrar los resultados filtrados */}
+      <div className="mt-6">
+        <h2 className="text-xl font-bold text-gray-800">Resultados:</h2>
+        <div className="mt-4">
+          {resultados.length > 0 ? (
+            resultados.map((persona, index) => (
+              <div key={index} className="p-4 bg-gray-100 mb-4 rounded-lg">
+                <h3 className="font-semibold text-lg">{persona.nombre}</h3>
+                <p><strong>Tipo de Usuario:</strong> {persona.tipoUsuario}</p>
+                {persona.tipoUsuario === "alumno" && (
+                  <>
+                    <p><strong>Titulación:</strong> {persona.titulacion}</p>
+                    <p><strong>Curso:</strong> {persona.curso}</p>
+                  </>
+                )}
+                {persona.tipoUsuario === "profesor" && (
+                  <>
+                    <p><strong>Cargo:</strong> {persona.cargo}</p>
+                    <p><strong>Departamento:</strong> {persona.departamento}</p>
+                  </>
+                )}
+                {persona.tipoUsuario === "personal" && (
+                  <p><strong>Cargo:</strong> {persona.cargo}</p>
+                )}
+                <p><strong>Modalidad:</strong> {persona.modalidad}</p>
+              </div>
+            ))
+          ) : (
+            <p>No se han encontrado resultados.</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
