@@ -1,5 +1,7 @@
-import { useState } from "react";
-import personas from "@/app/jsonPruebas/personasFiltrado.json";
+import { useState, useEffect } from "react";
+
+const API_URL = "http://localhost:3005/api/person";
+const FILTER_URL = "http://localhost:3005/api/person/filtered";
 
 const FilterForm = ({ onFilter }) => {
   const [tipo, setTipo] = useState("");
@@ -8,106 +10,154 @@ const FilterForm = ({ onFilter }) => {
   const [curso, setCurso] = useState("");
   const [departamento, setDepartamento] = useState("");
   const [cargo, setCargo] = useState("");
+
+  const [tiposTitulacion, setTiposTitulacion] = useState([]);
+  const [titulaciones, setTitulaciones] = useState([]);
+  const [cursos, setCursos] = useState([]);
+  const [departamentos, setDepartamentos] = useState([]);
+  const [cargos, setCargos] = useState([]);
+
+  const [filteredTitulaciones, setFilteredTitulaciones] = useState([]);
   const [filteredPeople, setFilteredPeople] = useState([]);
 
-  const tipos = [...new Set(personas.map((p) => p.tipo))];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
 
-  const tiposTitulacion = tipo === "estudiante" ? [...new Set(personas.filter((p) => p.tipo === "estudiante").map((p) => p.tipo_titulacion))] : [];
+        const tiposTitulacionUnicos = [...new Set(data.map((p) => p.tipoTitulacion).filter(Boolean))];
 
-  const titulaciones = tipoTitulacion ? [...new Set(personas.filter((p) => p.tipo === "estudiante" && p.tipo_titulacion === tipoTitulacion).map((p) => p.titulacion))] : [];
+        const titulacionesUnicas = data.reduce((acc, p) => {
+          if (p.tipoTitulacion && p.titulacion) {
+            if (!acc[p.tipoTitulacion]) acc[p.tipoTitulacion] = [];
+            acc[p.tipoTitulacion].push(p.titulacion);
+          }
+          return acc;
+        }, {});
 
-  const cursos = titulacion ? [...new Set(personas.filter((p) => p.tipo === "estudiante" && p.tipo_titulacion === tipoTitulacion && p.titulacion === titulacion).map((p) => p.curso))] : [];
+        const cursosUnicos = [...new Set(data.map((p) => p.curso).filter(Boolean))];
+        const departamentosUnicos = [...new Set(data.map((p) => p.departamento).filter(Boolean))];
+        const cargosUnicos = [...new Set(data.map((p) => p.cargo).filter(Boolean))];
 
-  const departamentos = tipo === "docente" ? [...new Set(personas.filter((p) => p.tipo === "docente").map((p) => p.departamento))] : [];
+        setTiposTitulacion(tiposTitulacionUnicos);
+        setTitulaciones(titulacionesUnicas);
+        setCursos(cursosUnicos);
+        setDepartamentos(departamentosUnicos);
+        setCargos(cargosUnicos);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
 
-  const cargos = tipo === "staff" ? [...new Set(personas.filter((p) => p.tipo === "staff").map((p) => p.cargo))] : [];
+    fetchData();
+  }, []);
 
-  const handleFilter = () => {
-    let filtered = personas.filter((p) => p.tipo === tipo);
-
-    if (tipo === "estudiante") {
-      if (tipoTitulacion) filtered = filtered.filter((p) => p.tipo_titulacion === tipoTitulacion);
-      if (titulacion) filtered = filtered.filter((p) => p.titulacion === titulacion);
-      if (curso) filtered = filtered.filter((p) => p.curso === curso);
+  useEffect(() => {
+    if (tipoTitulacion && titulaciones[tipoTitulacion]) {
+      setFilteredTitulaciones([...new Set(titulaciones[tipoTitulacion])]);
+    } else {
+      setFilteredTitulaciones([]);
     }
+    setTitulacion("");
+  }, [tipoTitulacion]);
 
-    if (tipo === "docente" && departamento) {
-      filtered = filtered.filter((p) => p.departamento === departamento);
-    }
+  const handleFilter = async () => {
+    try {
+      const queryParams = new URLSearchParams({
+        tipoUsuario: tipo || "",
+        tipoTitulacion: tipoTitulacion || "",
+        titulacion: titulacion || "",
+        curso: curso || "",
+        departamento: departamento || "",
+        cargo: cargo || "",
+      });
 
-    if (tipo === "staff" && cargo) {
-      filtered = filtered.filter((p) => p.cargo === cargo);
-    }
+      console.log("Enviando filtros a la API:", queryParams.toString());
 
-    setFilteredPeople(filtered);
-    if (typeof onFilter === 'function') {
-      onFilter(filtered);
+      const response = await fetch(`${FILTER_URL}?${queryParams}`);
+      const data = await response.json();
+
+      console.log("Respuesta de la API:", data);
+
+      setFilteredPeople(Array.isArray(data) ? data : []);
+
+      if (typeof onFilter === "function") {
+        onFilter(data);
+      }
+    } catch (error) {
+      console.error("Error fetching filtered people:", error);
     }
   };
 
   return (
     <div className="p-4 bg-white shadow-md rounded-lg">
       <h1 className="text-2xl font-bold mb-4 text-gray-800">Filtrado de carnets</h1>
+
       <select className="w-full p-2 border rounded-md text-gray-800" value={tipo} onChange={(e) => setTipo(e.target.value)}>
         <option value="">Seleccionar tipo</option>
-        {tipos.map((t) => (
-          <option key={t} value={t}>{t}</option>
-        ))}
+        <option value="alumno">Alumno</option>
+        <option value="profesor">Profesor</option>
+        <option value="personal">Personal</option>
       </select>
 
-      {tipo === "estudiante" && (
+      {tipo === "alumno" && (
         <>
           <select className="w-full p-2 border rounded-md text-gray-800" value={tipoTitulacion} onChange={(e) => setTipoTitulacion(e.target.value)}>
             <option value="">Seleccionar tipo de titulación</option>
-            {tiposTitulacion.map((tt) => (
-              <option key={tt} value={tt}>{tt}</option>
+            {tiposTitulacion.map((tt, index) => (
+              <option key={index} value={tt}>{tt}</option>
             ))}
           </select>
 
-          {tipoTitulacion && (
-            <select className="w-full p-2 border rounded-md text-gray-800" value={titulacion} onChange={(e) => setTitulacion(e.target.value)}>
-              <option value="">Seleccionar titulación</option>
-              {titulaciones.map((t) => (
-                <option key={t} value={t}>{t}</option>
-              ))}
-            </select>
-          )}
+          <select className="w-full p-2 border rounded-md text-gray-800" value={titulacion} onChange={(e) => setTitulacion(e.target.value)} disabled={!tipoTitulacion}>
+            <option value="">Seleccionar titulación</option>
+            {filteredTitulaciones.map((tit, index) => (
+              <option key={index} value={tit}>{tit}</option>
+            ))}
+          </select>
 
-          {titulacion && (
-            <select className="w-full p-2 border rounded-md text-gray-800" value={curso} onChange={(e) => setCurso(e.target.value)}>
-              <option value="">Seleccionar curso</option>
-              {cursos.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          )}
+          <select className="w-full p-2 border rounded-md text-gray-800" value={curso} onChange={(e) => setCurso(e.target.value)}>
+            <option value="">Seleccionar curso</option>
+            {cursos.map((cur, index) => (
+              <option key={index} value={cur}>{cur}</option>
+            ))}
+          </select>
         </>
       )}
 
-      {tipo === "docente" && (
+      {tipo === "profesor" && (
         <select className="w-full p-2 border rounded-md text-gray-800" value={departamento} onChange={(e) => setDepartamento(e.target.value)}>
           <option value="">Seleccionar departamento</option>
-          {departamentos.map((d) => (
-            <option key={d} value={d}>{d}</option>
+          {departamentos.map((dep, index) => (
+            <option key={index} value={dep}>{dep}</option>
           ))}
         </select>
       )}
 
-      {tipo === "staff" && (
+      {tipo === "personal" && (
         <select className="w-full p-2 border rounded-md text-gray-800" value={cargo} onChange={(e) => setCargo(e.target.value)}>
           <option value="">Seleccionar cargo</option>
-          {cargos.map((c) => (
-            <option key={c} value={c}>{c}</option>
+          {cargos.map((c, index) => (
+            <option key={index} value={c}>{c}</option>
           ))}
         </select>
       )}
 
-      <button className="w-full bg-blue-500 text-white p-2 rounded mt-2 hover:bg-blue-600" onClick={handleFilter}>Buscar</button>
+      <button className="w-full bg-blue-500 text-white p-2 rounded mt-2 hover:bg-blue-600" onClick={handleFilter}>
+        Buscar
+      </button>
 
       <ul className="mt-4">
-        {filteredPeople.map((p) => (
-          <li key={p.DNI} className="p-2 border-b text-gray-800">{p.nombre} {p.apellidos}</li>
-        ))}
+        {filteredPeople.length > 0 ? (
+          filteredPeople.map((p) => (
+            <li key={p._id} className="p-2 border-b text-gray-800">
+              {p.nombre} {p.apellidos}
+            </li>
+          ))
+        ) : (
+          <li className="p-2 text-gray-800">No se encontraron resultados.</li>
+        )}
       </ul>
     </div>
   );
