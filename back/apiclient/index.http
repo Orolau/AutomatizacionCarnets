@@ -11,6 +11,9 @@ GET http://localhost:3005/api/person/67aa21c50e8e631dbf097fd4
 GET http://localhost:3005/api/person/filtered?tipoUsuario=alumno
 
 ###
+GET http://localhost:3005/api/person/filtered?tipoUsuario=profesor
+
+###
 GET http://localhost:3005/api/person/filtered?tipoUsuario=alumno&curso=3º&modalidad=Presencial&tipoTitulacion=Grado
 
 ### URL no muestra SOLO modalidad, lo comporbé en la web y me olvidé esto
