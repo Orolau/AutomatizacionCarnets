@@ -27,3 +27,9 @@ Content-Type: application/json
 {
     "nombre":"Laura"
 }
+
+### 
+PUT http://localhost:3005/api/user/verify/carnetsutad@gmail.com HTTP/1.1
+Content-Type: application/json
+
+{}

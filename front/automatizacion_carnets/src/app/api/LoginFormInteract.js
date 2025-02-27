@@ -21,6 +21,9 @@ export const LoginFormInteract = async ({ email, passwordHash }) => {
             throw new Error("Contraseña incorrecta");
         }
 
+        const updateResponse = await axios.put(`http://localhost:3005/api/user/verify/${encodeURIComponent(email)}`);
+        console.log("Respuesta de updateVerifying:", updateResponse.data);
+
         return usuarioEncontrado.mail;
     } catch (error) {
         console.error("Error en la autenticación:", error.message);

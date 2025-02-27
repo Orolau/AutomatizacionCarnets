@@ -6,7 +6,12 @@ const userModel = new mongoose.Schema(
             type: String,
             unique: true
         },
-        passwd: String
+        passwd: String,
+        verificando: {
+            type: Boolean,
+            default: false
+        },
+        verifyCode: Number
     },
     {
         timestamps: true,
