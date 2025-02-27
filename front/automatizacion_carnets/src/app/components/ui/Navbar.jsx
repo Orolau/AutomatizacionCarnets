@@ -17,7 +17,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
           {/* Enlace a la página de Inicio */}
           <li>
             <Link href="/pages/userForms/login">
-              <span onClick={toggleSidebar}>Inicio</span>
+              <span onClick={toggleSidebar}>Log IN</span>
             </Link>
           </li>
           {/* Enlace a la página de Verificación */}
@@ -28,20 +28,26 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
           </li>
           {/* Enlace a la página de Filtrado */}
           <li>
-            <Link href="/pages/userForms/filter">
+            <Link href="/pages/listaFiltrado">
               <span onClick={toggleSidebar}>Filtrado</span>
-            </Link>
-          </li>
-          {/* Enlace a la página de Modificar Carnets */}
-          <li>
-            <Link href="/pages/modify">
-              <span onClick={toggleSidebar}>Modificar Carnets</span>
             </Link>
           </li>
           {/* Enlace a la página de Preview Carnets */}
           <li>
             <Link href="/pages/preview">
               <span onClick={toggleSidebar}>Preview Carnets</span>
+            </Link>
+          </li>
+          {/* Enlace a la página de Download Carnets */}
+          <li>
+            <Link href="/pages/download">
+              <span onClick={toggleSidebar}>Descarga Carnets</span>
+            </Link>
+          </li>
+          {/* Enlace a la página de Modificar Carnets */}
+          <li>
+            <Link href="/pages/modify">
+              <span onClick={toggleSidebar}>Modificar Carnets</span>
             </Link>
           </li>
           {/* Enlace a la página de Pendientes */}
