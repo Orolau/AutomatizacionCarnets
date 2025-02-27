@@ -6,22 +6,27 @@ import { useEffect, useState } from 'react';
 export default function cardPage() {
   const [carnets, setCarnets] = useState({})
   useEffect(() => {
+    // Recuperar los datos desde el localStorage
+    const data = localStorage.getItem('selectedPeople');
+    if (data) {
+      setCarnets(JSON.parse(data));
+    }
 
-    // Aquí debemos substituirlo por una llamada a la base de datos, para obtener los datos del usuario con dni especificado
-    const fetchCarnet = async () => {
-      try {
-        const response = await fetch(`http://localhost:3005/api/person`);
-        if (!response.ok) throw new Error("Error al obtener datos");
 
-        const data = await response.json();
-        console.log(data)
-        setCarnets(data);
-      } catch (error) {
-        console.error("Error al cargar los datos:", error);
-      }
-    };
+    // const fetchCarnet = async () => {
+    //   try {
+    //     const response = await fetch(`http://localhost:3005/api/person`);
+    //     if (!response.ok) throw new Error("Error al obtener datos");
 
-    fetchCarnet();
+    //     const data = await response.json();
+    //     console.log(data)
+    //     setCarnets(data);
+    //   } catch (error) {
+    //     console.error("Error al cargar los datos:", error);
+    //   }
+    // };
+
+    // fetchCarnet();
 
   }, []);
   return (<div>

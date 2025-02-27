@@ -32,7 +32,7 @@ export default function Header({ toggleSidebar }) {
     }, [pathname]);
 
     return (
-        <div className="bg-blue-700 px-6 py-4 shadow-md">
+        <div className="bg-blue-700 px-6 py-4 shadow-md w-full">
             <div className="flex justify-between items-center mx-20 gap-6">
                 <div className='flex flex-row gap-3'>
                     {/* Botón para abrir el Sidebar */}
