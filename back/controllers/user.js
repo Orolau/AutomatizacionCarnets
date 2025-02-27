@@ -46,7 +46,6 @@ const updateVerified = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 
-    console.log("Datos updateVerified:", data)
 }
 
 module.exports = { getItems, updateVerifying, updateVerified }
