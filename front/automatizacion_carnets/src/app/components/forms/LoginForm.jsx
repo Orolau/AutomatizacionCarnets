@@ -41,6 +41,7 @@ export default function LoginForm() {
         console.log(values);
 
         if (respuestaServer === userData.email) {
+            localStorage.setItem("email", userData.email);
             router.push('./pages/verify');
         }
     };
