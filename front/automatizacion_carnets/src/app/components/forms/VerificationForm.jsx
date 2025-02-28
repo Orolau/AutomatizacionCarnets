@@ -41,7 +41,13 @@ export default function VerificationForm() {
             console.log("Respuesta del backend:", response);
 
             if (response && response.mail) {
-                router.push('../../pages/listaFiltrado');
+                //router.push('../../pages/listaFiltrado');
+                router.push('/pages/listaFiltrado').then(() => {
+                    setTimeout(() => {
+                        window.location.replace('/pages/listaFiltrado');
+                    }, 300); // Le damos un poco más de tiempo para que termine la navegación
+                });
+                                
             }
         } catch (err) {
             console.error("Error en la verificación:", error.message);
@@ -50,38 +56,46 @@ export default function VerificationForm() {
     }
 
     return (
-        <div className="contenedorLogin bg-white flex-wrap justify-items-center p-20 shadow-md border rounded-lg">
-            <Formik initialValues={verificationResult} validationSchema={validationSchema} onSubmit={handleSubmit}>
-                {() => (
-                    <Form className="formContainer flex-wrap">
-                        <h1 className="titulo font-bold mb-5">Enter verification code</h1>
-                        <p className="verificactionSentText w-[300px] mb-5">We have just sent a verification code to</p>
+        <div className="p-4 bg-white text-black min-h-screen flex items-center justify-center">
+            <div className="p-6 bg-blue-200 rounded-xl shadow-lg w-full max-w-md">
+                <Formik
+                    initialValues={verificationResult}
+                    validationSchema={validationSchema}
+                    onSubmit={handleSubmit}
+                >
+                    {() => (
+                        <Form className="flex flex-col">
+                            <h1 className="text-xl font-semibold text-blue-800 mb-4 text-center">
+                                Enter verification code
+                            </h1>
+                            <p className="text-center text-gray-700 mb-4">
+                                We have just sent a verification code to your email.
+                            </p>
 
-                        <div className="numbersContainer flex w-[300px] mb-5 gap-3">
-                            <Field maxLength="1" name="firstNumber" type="string" placeholder="" className="numberBox border rounded-md" />
-                            <ErrorMessage name="firstNumber" component="div" className="error" />
+                            <div className="flex justify-center gap-3 mb-4">
+                                {["firstNumber", "secondNumber", "thirdNumber", "fourthNumber", "fifthNumber", "sixthNumber"].map((name, index) => (
+                                    <Field
+                                        key={index}
+                                        maxLength="1"
+                                        name={name}
+                                        type="text"
+                                        placeholder=""
+                                        className="w-10 h-10 text-center text-lg border border-blue-400 rounded-lg bg-white"
+                                    />
+                                ))}
+                            </div>
 
-                            <Field maxLength="1" name="secondNumber" type="string" placeholder="" className="numberBox border rounded-md" />
-                            <ErrorMessage name="secondNumber" component="div" className="error" />
-
-                            <Field maxLength="1" name="thirdNumber" type="string" placeholder="" className="numberBox border rounded-md" />
-                            <ErrorMessage name="thirdNumber" component="div" className="error" />
-
-                            <Field maxLength="1" name="fourthNumber" type="string" placeholder="" className="numberBox border rounded-md" />
-                            <ErrorMessage name="fourthNumber" component="div" className="error" />
-
-                            <Field maxLength="1" name="fifthNumber" type="string" placeholder="" className="numberBox border rounded-md" />
-                            <ErrorMessage name="fifthNumber" component="div" className="error" />
-
-                            <Field maxLength="1" name="sixthNumber" type="string" placeholder="" className="numberBox border rounded-md" />
-                            <ErrorMessage name="sixthNumber" component="div" className="error" />
-                        </div>
-
-                        <button type="submit" className="bg-blue-300 w-[300px] border border-cyan-500 rounded-lg mb-5 hover:bg-blue-400">
-                            verify
-                        </button>
-                    </Form>
-                )}
-            </Formik>
-        </div>);
+                            <ErrorMessage name="firstNumber" component="div" className="text-red-600 text-sm text-center" />
+                            <button
+                                type="submit"
+                                className="w-full bg-blue-600 text-white p-3 rounded-lg mt-2 hover:bg-blue-700 transition"
+                            >
+                                Verify
+                            </button>
+                        </Form>
+                    )}
+                </Formik>
+            </div>
+        </div>
+    );
 }

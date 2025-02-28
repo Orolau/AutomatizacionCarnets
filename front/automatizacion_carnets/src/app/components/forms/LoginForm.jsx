@@ -15,7 +15,7 @@ const generarMD5 = (password) => {
 const validationSchema = Yup.object().shape({
     email: Yup.string()
         .required("Este campo es obligatorio")
-        .email("EL formato es incorrecto"),
+        .email("El formato es incorrecto"),
     password: Yup.string().required("Este campo es obligatorio"),
 });
 
@@ -28,12 +28,11 @@ export default function LoginForm() {
     });
 
     const handleSubmit = async (values) => {
-
         console.log("Hola");
         const passwordHash = generarMD5(values.password);
         const userData = {
             email: values.email,
-            passwordHash: passwordHash
+            passwordHash: passwordHash,
         };
         console.log(userData.password);
         const respuestaServer = await LoginFormInteract(userData);
@@ -42,56 +41,51 @@ export default function LoginForm() {
 
         if (respuestaServer === userData.email) {
             localStorage.setItem("email", userData.email);
-            router.push('./pages/verify');
+            router.push("./pages/verify");
         }
     };
 
     return (
-        <div className="contenedorLogin bg-white flex-wrap justify-items-center p-20 shadow-md border rounded-lg">
-            <Formik
-                initialValues={userInfo}
-                validationSchema={validationSchema}
-                onSubmit={handleSubmit}
-            >
-                {() => (
-                    <Form className="flex-wrap">
-                        <h1 className="titulo font-bold mb-5">Login to your account</h1>
-                        <div>
-                            <Field
-                                name="email"
-                                type="email"
-                                placeholder="email"
-                                className="inputLogin border rounded-md"
-                            />
-                            <ErrorMessage name="email" component="div" className="error" />
-                        </div>
-                        <div>
-                            <div className="passwordContainer">
+        <div className="p-4 bg-white text-black min-h-screen flex items-center justify-center">
+            <div className="p-6 bg-blue-200 rounded-xl shadow-lg w-full max-w-md">
+                <Formik
+                    initialValues={userInfo}
+                    validationSchema={validationSchema}
+                    onSubmit={handleSubmit}
+                >
+                    {() => (
+                        <Form className="flex flex-col">
+                            <h1 className="text-xl font-semibold text-blue-800 mb-4 text-center">
+                                Login to your account
+                            </h1>
+                            <div className="mb-4">
+                                <Field
+                                    name="email"
+                                    type="email"
+                                    placeholder="Email"
+                                    className="w-full p-2 border border-blue-400 rounded-lg bg-white"
+                                />
+                                <ErrorMessage name="email" component="div" className="text-red-600 text-sm mt-1" />
+                            </div>
+                            <div className="mb-4">
                                 <Field
                                     name="password"
                                     type="password"
-                                    placeholder="password"
-                                    className="inputLogin border rounded-md"
-                                    id="passWordField"
-                                ></Field>
-                                <button className="viewPassword">
-                                    <img
-                                        src="https://img.icons8.com/material-outlined/24/000000/invisible.png"
-                                        className="size-5"
-                                    />
-                                </button>
+                                    placeholder="Password"
+                                    className="w-full p-2 border border-blue-400 rounded-lg bg-white"
+                                />
+                                <ErrorMessage name="password" component="div" className="text-red-600 text-sm mt-1" />
                             </div>
-                            <ErrorMessage name="password" component="div" className="error" />
-                        </div>
-                        <button
-                            type="submit"
-                            className="bg-blue-300 w-[300px] border border-cyan-500 rounded-lg mb-5 hover:bg-blue-400"
-                        >
-                            Sing in with email
-                        </button>
-                    </Form>
-                )}
-            </Formik>
+                            <button
+                                type="submit"
+                                className="w-full bg-blue-600 text-white p-3 rounded-lg mt-2 hover:bg-blue-700 transition"
+                            >
+                                Sign in with email
+                            </button>
+                        </Form>
+                    )}
+                </Formik>
+            </div>
         </div>
-    );
+    );    
 }
