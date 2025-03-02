@@ -1,0 +1,35 @@
+GET http://localhost:3005/api/person
+
+###
+GET http://localhost:3005/api/user
+
+
+###
+GET http://localhost:3005/api/person/67aa21c50e8e631dbf097fd4
+
+###
+GET http://localhost:3005/api/person/filtered?tipoUsuario=alumno
+
+###
+GET http://localhost:3005/api/person/filtered?tipoUsuario=profesor
+
+###
+GET http://localhost:3005/api/person/filtered?tipoUsuario=alumno&curso=3º&modalidad=Presencial&tipoTitulacion=Grado
+
+### URL no muestra SOLO modalidad, lo comporbé en la web y me olvidé esto
+GET http://localhost:3005/api/person?modalidad=Online
+
+
+###
+PUT http://localhost:3005/api/person/67aa21c50e8e631dbf097fd4
+Content-Type: application/json
+
+{
+    "nombre":"Laura"
+}
+
+### 
+PUT http://localhost:3005/api/user/verify/carnetsutad@gmail.com HTTP/1.1
+Content-Type: application/json
+
+{}

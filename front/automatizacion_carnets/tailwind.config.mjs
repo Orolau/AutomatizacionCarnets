@@ -10,6 +10,11 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        'AzulUtad' : "#212A77",
+      },
+      fontSize: {
+        'xxs': '0.6rem',
+        'xxxs': '0.5rem' 
       },
     },
   },
