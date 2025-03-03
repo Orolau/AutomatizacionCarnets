@@ -1,7 +1,55 @@
 const Person = require("../models/person.js");
 const { uploadToPinata } = require("../utils/pinata"); 
+/**
+ * @swagger
+ * tags:
+ *   - name: Personas
+ *     description: Operaciones relacionadas con personas
+ */
+/**
+ * @swagger
+ * /api/person:
+ *   get:
+ *     summary: Obtener todas las personas
+ *     description: Retorna una lista de todas las personas en la base de datos.
+ *     tags: [Personas]
+ *     responses:
+ *       200:
+ *         description: Lista de personas obtenida correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   tipoUsuario:
+ *                     type: string
+ *                     enum: [alumno, personal, profesor]
+ *                   nombre:
+ *                     type: string
+ *                   apellidos:
+ *                     type: string
+ *                   titulacion:
+ *                     type: string
+ *                   tipoTitulacion:
+ *                     type: string
+ *                     enum: [Grado, Ciclo superior, Máster, ""]
+ *                   cargo:
+ *                     type: string
+ *                   departamento:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *                   dni:
+ *                     type: string
+ *                   foto:
+ *                     type: string
+ *                   modalidad:
+ *                     type: string
+ *                     enum: [Presencial, Online]
+ */
 
-// Obtener todas las personas
 const getPeople = async (req, res) => {
     try {
         const people = await Person.find();
@@ -11,7 +59,70 @@ const getPeople = async (req, res) => {
     }
 };
 
-// Obtener personas con filtros
+/**
+ * @swagger
+ * /api/person/filtered:
+ *   get:
+ *     summary: Obtener personas con filtros
+ *     description: Devuelve personas filtradas según los parámetros proporcionados.
+ *     tags: [Personas]
+ *     parameters:
+ *       - name: tipoUsuario
+ *         in: query
+ *         description: Tipo de usuario (alumno, profesor, personal)
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [alumno, personal, profesor]
+ *       - name: nombre
+ *         in: query
+ *         description: Nombre de la persona
+ *         required: false
+ *         schema:
+ *           type: string
+ *       - name: apellidos
+ *         in: query
+ *         description: Apellidos de la persona
+ *         required: false
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lista de personas filtradas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   tipoUsuario:
+ *                     type: string
+ *                     enum: [alumno, personal, profesor]
+ *                   nombre:
+ *                     type: string
+ *                   apellidos:
+ *                     type: string
+ *                   titulacion:
+ *                     type: string
+ *                   tipoTitulacion:
+ *                     type: string
+ *                     enum: [Grado, Ciclo superior, Máster, ""]
+ *                   cargo:
+ *                     type: string
+ *                   departamento:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *                   dni:
+ *                     type: string
+ *                   foto:
+ *                     type: string
+ *                   modalidad:
+ *                     type: string
+ *                     enum: [Presencial, Online]
+ */
+
 const getFilteredPersons = async (req, res) => {
     try {
         const filters = req.query; // Obtener los filtros de los query params
@@ -23,26 +134,246 @@ const getFilteredPersons = async (req, res) => {
 };
 
 
-// Crear una nueva persona
+/**
+ * @swagger
+ * /api/person:
+ *   post:
+ *     summary: Crear una nueva persona
+ *     description: Crea una nueva persona en la base de datos.
+ *     tags: [Personas]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tipoUsuario:
+ *                 type: string
+ *                 enum: [alumno, personal, profesor]
+ *               nombre:
+ *                 type: string
+ *               apellidos:
+ *                 type: string
+ *               titulacion:
+ *                 type: string
+ *               tipoTitulacion:
+ *                 type: string
+ *                 enum: [Grado, Ciclo superior, Máster, ""]
+ *               cargo:
+ *                 type: string
+ *               departamento:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               dni:
+ *                 type: string
+ *               foto:
+ *                 type: string
+ *               modalidad:
+ *                 type: string
+ *                 enum: [Presencial, Online]
+ *     responses:
+ *       201:
+ *         description: Persona creada correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 tipoUsuario:
+ *                   type: string
+ *                   enum: [alumno, personal, profesor]
+ *                 nombre:
+ *                   type: string
+ *                 apellidos:
+ *                   type: string
+ *                 titulacion:
+ *                   type: string
+ *                 tipoTitulacion:
+ *                   type: string
+ *                   enum: [Grado, Ciclo superior, Máster, ""]
+ *                 cargo:
+ *                   type: string
+ *                 departamento:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 dni:
+ *                   type: string
+ *                 foto:
+ *                   type: string
+ *                 modalidad:
+ *                   type: string
+ *                   enum: [Presencial, Online]
+ */
+
 const createPerson = async (req, res) => {
     const {body} = req;
     const data = await Person.create(body);
     res.json(data)
 };
 
-// Obtener una persona por id
+/**
+ * @swagger
+ * /api/person/{id}:
+ *   get:
+ *     summary: Obtener una persona por ID
+ *     tags: [Personas]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID de la persona a obtener
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Persona encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 tipoUsuario:
+ *                   type: string
+ *                   enum: [alumno, personal, profesor]
+ *                 nombre:
+ *                   type: string
+ *                 apellidos:
+ *                   type: string
+ *                 titulacion:
+ *                   type: string
+ *                 tipoTitulacion:
+ *                   type: string
+ *                   enum: [Grado, Ciclo superior, Máster, ""]
+ *                 cargo:
+ *                   type: string
+ *                 departamento:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 dni:
+ *                   type: string
+ *                 foto:
+ *                   type: string
+ *                 modalidad:
+ *                   type: string
+ *                   enum: [Presencial, Online]
+ *       404:
+ *         description: Persona no encontrada
+ */
+
 const getPersonById = async (req, res) => {
     const {id} = req.params;
     const data = await Person.findOne({"_id": id})
     res.json(data);
 };
-// Obtener una persona por dni
+/**
+ * @swagger
+ * /api/person/dni/{dni}:
+ *   get:
+ *     summary: Obtener una persona por DNI
+ *     tags: [Personas]
+ *     parameters:
+ *       - name: dni
+ *         in: path
+ *         required: true
+ *         description: DNI de la persona a obtener
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Persona encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 tipoUsuario:
+ *                   type: string
+ *                   enum: [alumno, personal, profesor]
+ *                 nombre:
+ *                   type: string
+ *                 apellidos:
+ *                   type: string
+ *                 titulacion:
+ *                   type: string
+ *                 tipoTitulacion:
+ *                   type: string
+ *                   enum: [Grado, Ciclo superior, Máster, ""]
+ *                 cargo:
+ *                   type: string
+ *                 departamento:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 dni:
+ *                   type: string
+ *                 foto:
+ *                   type: string
+ *                 modalidad:
+ *                   type: string
+ *                   enum: [Presencial, Online]
+ *       404:
+ *         description: Persona no encontrada
+ */
+
 const getPersonByDNI = async (req, res) => {
     const {dni} = req.params;
     const data = await Person.findOne({"dni": dni})
     res.json(data);
 };
-// Obtener una persona por dni
+/**
+ * @swagger
+ * /api/person/name/{nombreCompleto}:
+ *   get:
+ *     summary: Obtener una persona por nombre completo
+ *     tags: [Personas]
+ *     parameters:
+ *       - name: nombreCompleto
+ *         in: path
+ *         required: true
+ *         description: Nombre completo de la persona
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Persona encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 tipoUsuario:
+ *                   type: string
+ *                   enum: [alumno, personal, profesor]
+ *                 nombre:
+ *                   type: string
+ *                 apellidos:
+ *                   type: string
+ *                 titulacion:
+ *                   type: string
+ *                 tipoTitulacion:
+ *                   type: string
+ *                   enum: [Grado, Ciclo superior, Máster, ""]
+ *                 cargo:
+ *                   type: string
+ *                 departamento:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 dni:
+ *                   type: string
+ *                 foto:
+ *                   type: string
+ *                 modalidad:
+ *                   type: string
+ *                   enum: [Presencial, Online]
+ *       404:
+ *         description: Persona no encontrada
+ */
+
 const getPersonByName = async (req, res) => {
     try {
         const { nombreCompleto } = req.params;
@@ -63,8 +394,88 @@ const getPersonByName = async (req, res) => {
         res.status(500).json({ error: "Error al obtener la persona" });
     }
 };
+/**
+ * @swagger
+ * /api/person/{id}:
+ *   put:
+ *     summary: Actualizar persona por ID
+ *     tags: [Personas]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID de la persona a actualizar
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tipoUsuario:
+ *                 type: string
+ *                 enum: [alumno, personal, profesor]
+ *               nombre:
+ *                 type: string
+ *               apellidos:
+ *                 type: string
+ *               titulacion:
+ *                 type: string
+ *               tipoTitulacion:
+ *                 type: string
+ *                 enum: [Grado, Ciclo superior, Máster, ""]
+ *               cargo:
+ *                 type: string
+ *               departamento:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               dni:
+ *                 type: string
+ *               foto:
+ *                 type: string
+ *               modalidad:
+ *                 type: string
+ *                 enum: [Presencial, Online]
+ *     responses:
+ *       200:
+ *         description: Persona actualizada correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 tipoUsuario:
+ *                   type: string
+ *                   enum: [alumno, personal, profesor]
+ *                 nombre:
+ *                   type: string
+ *                 apellidos:
+ *                   type: string
+ *                 titulacion:
+ *                   type: string
+ *                 tipoTitulacion:
+ *                   type: string
+ *                   enum: [Grado, Ciclo superior, Máster, ""]
+ *                 cargo:
+ *                   type: string
+ *                 departamento:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 dni:
+ *                   type: string
+ *                 foto:
+ *                   type: string
+ *                 modalidad:
+ *                   type: string
+ *                   enum: [Presencial, Online]
+ *       404:
+ *         description: Persona no encontrada
+ */
 
-// Actualizar persona por id
 const updatePerson = async (req, res) => {
     const { id } = req.params;
   
@@ -88,13 +499,124 @@ const updatePerson = async (req, res) => {
   };
   
 
-// Eliminar persona por id
+/**
+ * @swagger
+ * /api/person/{id}:
+ *   delete:
+ *     summary: Eliminar persona por ID
+ *     tags: [Personas]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID de la persona a eliminar
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Persona eliminada correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 tipoUsuario:
+ *                   type: string
+ *                   enum: [alumno, personal, profesor]
+ *                 nombre:
+ *                   type: string
+ *                 apellidos:
+ *                   type: string
+ *                 titulacion:
+ *                   type: string
+ *                 tipoTitulacion:
+ *                   type: string
+ *                   enum: [Grado, Ciclo superior, Máster, ""]
+ *                 cargo:
+ *                   type: string
+ *                 departamento:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 dni:
+ *                   type: string
+ *                 foto:
+ *                   type: string
+ *                 modalidad:
+ *                   type: string
+ *                   enum: [Presencial, Online]
+ */
+
 const deletePerson = async (req, res) => {
     const {id} = req.params;
     const data = await Person.findByIdAndDelete(id);
     res.json(data)
 };
 
+/**
+ * @swagger
+ * /api/person/{id}/upload-image:
+ *   put:
+ *     summary: Subir imagen y actualizar foto de la persona
+ *     tags: [Personas]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID de la persona a actualizar
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Foto actualizada correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 updatedPerson:
+ *                   type: object
+ *                   properties:
+ *                     tipoUsuario:
+ *                       type: string
+ *                       enum: [alumno, personal, profesor]
+ *                     nombre:
+ *                       type: string
+ *                     apellidos:
+ *                       type: string
+ *                     titulacion:
+ *                       type: string
+ *                     tipoTitulacion:
+ *                       type: string
+ *                       enum: [Grado, Ciclo superior, Máster, ""]
+ *                     cargo:
+ *                       type: string
+ *                     departamento:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     dni:
+ *                       type: string
+ *                     foto:
+ *                       type: string
+ *                     modalidad:
+ *                       type: string
+ *                       enum: [Presencial, Online]
+ *       404:
+ *         description: Persona no encontrada
+ */
 
 const uploadImageAndUpdatePerson = async (req, res) => {
     try {
