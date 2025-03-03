@@ -4,41 +4,61 @@ import JsBarcode from 'jsbarcode';
 import logoU from '@/../../public/images/logoU-tad_U.png';
 import logoUtad from '@/../../public/images/logoU-tad.png';
 
-export default function Carnet({ carnet }) {
+
+export default function Carnet({ carnet, fondoTransparente=false }) {
     const barcodeRef = useRef(null);
 
     useEffect(() => {
         if (carnet.dni && barcodeRef.current) {
+            barcodeRef.current.innerHTML = ""; // Vaciar el SVG antes de generar el código de barras
             JsBarcode(barcodeRef.current, carnet.dni, {
                 format: "CODE128",
                 displayValue: false,
                 width: 2,
                 height: 25,
-                background: "white"
+                background: fondoTransparente ? "transparent" : "white"
             });
         }
         console.log(carnet.foto)
-    }, [carnet.dni]);
+    }, [carnet.dni, fondoTransparente]);
 
     return (
-        <div className="w-[340px] h-[214px] bg-AzulUtad text-black rounded-lg p-4 flex flex-col items-center font-sans relative">
-            <div className="p-2 w-full h-4/5 grid grid-cols-3">
-                <img src={carnet.foto} alt="Foto no encontrada" className="w-[80px] h-[100px] object-cover" />
-                <div className='col-span-2 grid grid-cols-4 ml-4 gap-2 text-xs justify-center'>
-                    <div className='text-left col-span-3 flex flex-col gap-2'>
-                        <p className='text-white text-xxs'>U-TAD CENTRO DIGITAL</p>
-                        <br/>
-                        <p className='font-bold'>{carnet.nombre} {carnet.apellidos}</p>
-                        {carnet.tipoUsuario === 'alumno' ? <p className='font-bold'>{carnet.tipoTitulacion} {carnet.titulacion}</p> : null}
-                        {carnet.tipoUsuario === 'profesor' ? <p className='font-bold'>{carnet.cargo} {carnet.departamento}</p> : null}
-                        {carnet.tipoUsuario === 'personal' ? <p className='font-bold'>{carnet.cargo}</p> : null}
-                    </div>
+        <div className={`w-[340px] h-[214px] ${fondoTransparente ? 'bg-transparent' : 'bg-AzulUtad'} text-black rounded-lg p-4 font-sans relative`} 
+        style={{ backgroundColor: fondoTransparente ? "transparent" : "" }}>
+            {/* Contenedor principal */}
+            <div className="absolute top-4 left-4 w-[80px] h-[100px]">
+                <img src={carnet.foto} alt="Foto no encontrada" className="w-full h-full object-cover" />
+            </div>
+            
+            <div className="absolute top-7 left-[120px] w-[180px] text-xs text-white">
+                {!fondoTransparente && <p className='text-xxs'>U-TAD CENTRO DIGITAL</p>}
+                <br/>
+                <p className='font-bold text-black'>{carnet.nombre} {carnet.apellidos}</p>
+                {carnet.tipoUsuario === 'alumno' && (
+                    <p className='font-bold text-black'>{carnet.tipoTitulacion} {carnet.titulacion}</p>
+                )}
+                {carnet.tipoUsuario === 'profesor' && (
+                    <p className='font-bold text-black'>{carnet.cargo} {carnet.departamento}</p>
+                )}
+                {carnet.tipoUsuario === 'personal' && (
+                    <p className='font-bold text-black'>{carnet.cargo}</p>
+                )}
+            </div>
+            
+            {!fondoTransparente && (
+                <div className="absolute top-4 right-4">
                     <img src={logoU.src} alt="Logo U" className="w-[30px] h-[30px]" />
                 </div>
-            </div>
-            <div className="p-2 w-full h-1/6 mt-2 flex items-center flex-row gap-3">
-                <img src={logoUtad.src} alt="Logo Utad" className="w-[90px] h-[40px]" />
-                <svg ref={barcodeRef}></svg>
+            )}
+            
+            {/* Sección inferior */}
+            {!fondoTransparente && (
+                <div className="absolute bottom-4 left-4 flex items-center gap-3">
+                    <img src={logoUtad.src} alt="Logo Utad" className="w-[90px] h-[40px]" />
+                </div>
+            )}
+            <div className='absolute bottom-4 right-2'>
+                <svg ref={barcodeRef} className='w-[200px]'></svg>
             </div>
         </div>
     );
