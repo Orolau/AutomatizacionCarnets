@@ -90,6 +90,53 @@ export default function CarnetToPngConverter({ carnets }) {
         saveAs(zipBlob, `${folderName}.zip`);
     };
     
+    // Nueva función para generar y descargar logs
+    const descargarLogs = () => {
+        let logs = "=== Carnets Impresos ===\n";
+
+        carnetList.forEach((carnet) => {
+            if (carnet.estaddo === "hecho") {
+                logs += `Nombre: ${carnet.nombre} ${carnet.apellidos}\n`;
+                logs += `DNI: ${carnet.dni}\n`;
+                logs += `Departamento: ${carnet.departamento}\n`;
+                logs += `Cargo: ${carnet.cargo}\n`;
+                logs += `Correo: ${carnet.correo}\n`;
+                logs += `Número de Carnets Impresos: ${carnet.numeroCarnets}\n`;
+                logs += "-----------------------------\n";
+            }
+        });
+
+        logs += "\n=== Carnets con Errores ===\n";
+
+        carnetList.forEach((carnet) => {
+            let errores = [];
+            const camposObligatorios = ["nombre", "apellidos", "dni", "departamento", "cargo", "correo", "direccion", "titulacion", "anio_comienzo", "curso"];
+            
+            camposObligatorios.forEach((campo) => {
+                if (!carnet[campo]) {
+                    errores.push(campo);
+                }
+            });
+
+            if (errores.length > 0) {
+                logs += `Nombre: ${carnet.nombre || "N/A"} ${carnet.apellidos || "N/A"}\n`;
+                logs += `DNI: ${carnet.dni || "N/A"}\n`;
+                logs += `Departamento: ${carnet.departamento || "N/A"}\n`;
+                logs += `Cargo: ${carnet.cargo || "N/A"}\n`;
+                logs += `Correo: ${carnet.correo || "N/A"}\n`;
+                logs += `Dirección: ${carnet.direccion || "N/A"}\n`;
+                logs += `Titulación: ${carnet.titulacion || "N/A"}\n`;
+                logs += `Año de Comienzo: ${carnet.anio_comienzo || "N/A"}\n`;
+                logs += `Curso: ${carnet.curso || "N/A"}\n`;
+                logs += `Errores detectados: ${errores.join(", ")}\n`;
+                logs += "-----------------------------\n";
+            }
+        });
+
+        // Crear un Blob y forzar la descarga del archivo TXT
+        const blob = new Blob([logs], { type: "text/plain;charset=utf-8" });
+        saveAs(blob, "logs_carnets.txt");
+    };
 
     return (
         <div className="flex flex-col items-center p-4">
@@ -110,7 +157,13 @@ export default function CarnetToPngConverter({ carnets }) {
                         className="p-2 bg-blue-500 text-white rounded"
                         disabled={!isReady}
                     >
-                        Descargar
+                        Descargar Carnets
+                    </button>
+                    <button
+                        onClick={descargarLogs}
+                        className="p-2 bg-purple-500 text-white rounded"
+                    >
+                        Descargar Logs
                     </button>
                     <button
                         onClick={() => setFondoTransparente(!fondoTransparente)}
