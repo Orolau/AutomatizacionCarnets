@@ -1,8 +1,8 @@
 import axios from "axios";
 
-export const LoginFormInteract = async ({ email, passwordHash }) => {
+export const LoginFormInteract = async ({ mail, passwd }) => {
     try {
-        const response = await axios.get("http://localhost:3005/api/user");
+        /*const response = await axios.get("http://localhost:3005/api/user");
         console.log("Respuesta de la API:", response.data);
 
         const usuarios = Array.isArray(response.data.data) ? response.data.data : [];
@@ -19,12 +19,25 @@ export const LoginFormInteract = async ({ email, passwordHash }) => {
 
         if (usuarioEncontrado.passwd.trim() !== passwordHash.trim()) {
             throw new Error("Contraseña incorrecta");
-        }
+        }*/
+        const response = await fetch('http://localhost:3005/api/auth/login', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ mail, passwd })
+        });
 
-        const updateResponse = await axios.put(`http://localhost:3005/api/user/verify/${encodeURIComponent(email)}`);
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || "Error al iniciar sesión");
+        }
+        const data = await response.json();
+
+        const updateResponse = await axios.put(`http://localhost:3005/api/user/verify/${encodeURIComponent(mail)}`);
         console.log("Respuesta de updateVerifying:", updateResponse.data);
 
-        return usuarioEncontrado.mail;
+        return data.user.mail;
     } catch (error) {
         console.error("Error en la autenticación:", error.message);
         throw error;
