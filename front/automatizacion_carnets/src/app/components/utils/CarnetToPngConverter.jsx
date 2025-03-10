@@ -2,146 +2,89 @@
 
 import { useRef, useState, useEffect } from "react";
 import html2canvas from "html2canvas";
-import JSZip from "jszip";
-import { saveAs } from "file-saver";
-import Carnet from "../Carnet";
-import { useRouter } from "next/navigation";
+import download from "downloadjs"; 
+import Carnet from "../Carnet"; 
 
-export default function CarnetToPngConverter({ carnets }) {
-    const router = useRouter();
-    const carnetRefs = useRef([]);
+export default function CarnetToJpgConverter({ carnet }) {
+    const carnetRef = useRef(null);
     const [isReady, setIsReady] = useState(false);
     const [imagesLoaded, setImagesLoaded] = useState(false);
-    const [folderName, setFolderName] = useState("carnets");
-    const [fondoTransparente, setFondoTransparente] = useState(false);
 
-    const carnetList = Array.isArray(carnets) ? carnets : Object.values(carnets);
-
+    // Esperar a que las imágenes dentro del Carnet se carguen
     useEffect(() => {
+        if (!carnetRef.current) return;
+
+        const imgElements = carnetRef.current.querySelectorAll("img");
         let loadedCount = 0;
-        let totalImages = 0;
 
-        carnetList.forEach((_, index) => {
-            if (!carnetRefs.current[index]) return;
-            const imgElements = carnetRefs.current[index].querySelectorAll("img");
-            totalImages += imgElements.length;
-
-            imgElements.forEach((img) => {
-                if (img.complete) {
-                    loadedCount++;
-                } else {
-                    img.onload = () => {
-                        loadedCount++;
-                        if (loadedCount === totalImages) {
-                            setImagesLoaded(true);
-                        }
-                    };
-                    img.onerror = () => console.error("Error al cargar imagen:", img.src);
-                }
-            });
-        });
-
-        if (totalImages === 0) {
+        if (imgElements.length === 0) {
             setImagesLoaded(true);
+            return;
         }
-    }, [carnetRefs, carnetList]);
 
+        imgElements.forEach((img) => {
+            if (img.complete) {
+                loadedCount++;
+                if (loadedCount === imgElements.length) {
+                    setImagesLoaded(true);
+                }
+            } else {
+                img.onload = () => {
+                    loadedCount++;
+                    if (loadedCount === imgElements.length) {
+                        setImagesLoaded(true);
+                    }
+                };
+                img.onerror = () => console.error("Error al cargar imagen:", img.src);
+            }
+        });
+    }, [carnetRef]);
+
+    // Esperar a que las fuentes estén cargadas antes de marcar isReady
     useEffect(() => {
         document.fonts.ready.then(() => {
-            if (imagesLoaded) {
+            if (carnetRef.current && imagesLoaded) {
                 setIsReady(true);
             }
         });
     }, [imagesLoaded]);
 
-    const convertAllToImages = async () => {
-        if (!isReady) return;
-    
-        const zip = new JSZip();
-    
-        for (let i = 0; i < carnetList.length; i++) {
-            const carnet = carnetList[i];
-            if (!carnetRefs.current[i]) continue;
-    
-            const canvas = await html2canvas(carnetRefs.current[i], {
-                logging: false,
-                useCORS: true,
-                backgroundColor: "rgba(0,0,0,0)", // Intenta forzar transparencia
-                removeContainer: true,
-                scale: window.devicePixelRatio,
-                width: carnetRefs.current[i].clientWidth,
-                height: carnetRefs.current[i].clientHeight,
-            });
-    
-            // Generar un Blob en formato PNG
-            await new Promise((resolve) => {
-                canvas.toBlob((blob) => {
-                    if (blob) {
-                        const fileName = `carnet.${carnet.nombre || "desconocido"}_${carnet.apellidos || "sin_apellidos"}.png`;
-                        zip.file(fileName, blob);
-                    }
-                    resolve();
-                }, "image/png");
-            });
+    const convertToImage = () => {
+        console.log("Estado de isReady:", isReady);
+        if (isReady && carnetRef.current) {
+            setTimeout(() => {
+                html2canvas(carnetRef.current, {
+                    logging: false,
+                    useCORS: true,
+                    backgroundColor: null,
+                    scale: window.devicePixelRatio, 
+                    width: carnetRef.current.clientWidth,
+                    height: carnetRef.current.clientHeight,
+                    x: 0,
+                    y: 0
+                })
+                .then((canvas) => {
+                    const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+                    download(dataUrl, "carnet.jpg");
+                })
+                .catch((error) => {
+                    console.error("Error al convertir a imagen:", error);
+                });
+            }, 1000);
         }
-    
-        // Generar el ZIP y descargarlo
-        const zipBlob = await zip.generateAsync({ type: "blob" });
-        saveAs(zipBlob, `${folderName}.zip`);
-    };
-
-    const handleNext = () => {
-        // Redirigir a la página de etiquetas
-        router.push('/pages/etiqueta');
     };
 
     return (
-        <div className="flex flex-col items-center p-4">
-            <div className="flex items-center w-full justify-between mb-4 p-2 bg-gray-200 rounded">
-                <button onClick={() => router.back()} className="p-2 bg-gray-500 text-white rounded">
-                    ← Retroceso
-                </button>
-                <div className="flex flex-row flex-wrap gap-3">
-                    <input
-                        type="text"
-                        value={folderName}
-                        onChange={(e) => setFolderName(e.target.value)}
-                        placeholder="Nombre de la carpeta"
-                        className="p-2 border border-gray-300 rounded"
-                    />
-                    <button
-                        onClick={convertAllToImages}
-                        className="p-2 bg-blue-500 text-white rounded"
-                        disabled={!isReady}
-                    >
-                        Descargar
-                    </button>
-                    <button
-                        onClick={() => setFondoTransparente(!fondoTransparente)}
-                        className={`p-2 rounded ${fondoTransparente ? 'bg-green-500' : 'bg-red-500'} text-white`}
-                    >
-                        {fondoTransparente ? "Fondo Visible" : "Fondo Transparente"}
-                    </button>
-                    <button
-                        onClick={handleNext}
-                        className="p-2 bg-green-500 text-white rounded"
-                    >
-                        Ir a Etiquetas
-                    </button>
-                </div>
+        <div>
+            <div ref={carnetRef} style={{ width: "340px", height: "214px" }}>
+                <Carnet carnet={carnet} />
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 bg-slate-200 gap-4 justify-center h-[75vh] overflow-y-auto">
-                {carnetList.map((carnet, index) => (
-                    <div
-                        key={index}
-                        ref={(el) => (carnetRefs.current[index] = el)}
-                        className="w-fit h-fit flex justify-center items-center p-2 rounded shadow-md"
-                    >
-                        <Carnet carnet={carnet} fondoTransparente={fondoTransparente} />
-                    </div>
-                ))}
-            </div>
+            <button 
+                onClick={convertToImage} 
+                className="mt-4 p-2 bg-blue-500 text-white rounded"
+            >
+                Convertir a JPG
+            </button>
         </div>
     );
 }
