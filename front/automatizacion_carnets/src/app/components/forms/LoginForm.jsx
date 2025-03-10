@@ -8,9 +8,9 @@ import { useRouter } from "next/navigation";
 import { LoginFormInteract } from "@/app/api/LoginFormInteract";
 import crypto from "crypto";
 
-const generarMD5 = (password) => {
+/*const generarMD5 = (password) => {
     return crypto.createHash("md5").update(password).digest("hex");
-};
+};*/
 
 const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -29,18 +29,17 @@ export default function LoginForm() {
 
     const handleSubmit = async (values) => {
         console.log("Hola");
-        const passwordHash = generarMD5(values.password);
         const userData = {
-            email: values.email,
-            passwordHash: passwordHash,
+            mail: values.email,
+            passwd: values.password,
         };
         console.log(userData.password);
         const respuestaServer = await LoginFormInteract(userData);
         console.log(respuestaServer);
         console.log(values);
 
-        if (respuestaServer === userData.email) {
-            localStorage.setItem("email", userData.email);
+        if (respuestaServer === userData.mail) {
+            localStorage.setItem("email", userData.mail);
             router.push("./pages/verify");
         }
     };
@@ -87,5 +86,5 @@ export default function LoginForm() {
                 </Formik>
             </div>
         </div>
-    );    
+    );
 }
