@@ -98,7 +98,7 @@ export default function CarnetToPngConverter({ carnets }) {
     return (
         <div className="flex flex-col items-center p-4">
             <div className="flex items-center w-full justify-between mb-4 p-2 bg-gray-200 rounded">
-                <button onClick={() => router.back()} className="p-2 bg-gray-500 text-white rounded">
+                <button onClick={() => router.push('/pages/preview')} className="p-2 bg-gray-500 text-white rounded">
                     ← Retroceso
                 </button>
                 <div className="flex flex-row flex-wrap gap-3">
