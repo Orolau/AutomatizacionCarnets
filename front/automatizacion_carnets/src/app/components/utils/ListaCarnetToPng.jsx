@@ -89,7 +89,11 @@ export default function CarnetToPngConverter({ carnets }) {
         const zipBlob = await zip.generateAsync({ type: "blob" });
         saveAs(zipBlob, `${folderName}.zip`);
     };
-    
+
+    const handleNext = () => {
+        // Redirigir a la página de etiquetas
+        router.push('/pages/etiqueta');
+    };
 
     return (
         <div className="flex flex-col items-center p-4">
@@ -117,6 +121,13 @@ export default function CarnetToPngConverter({ carnets }) {
                         className={`p-2 rounded ${fondoTransparente ? 'bg-green-500' : 'bg-red-500'} text-white`}
                     >
                         {fondoTransparente ? "Fondo Visible" : "Fondo Transparente"}
+                    </button>
+                    {/* Botón de Siguiente */}
+                    <button
+                        onClick={handleNext}
+                        className="p-2 bg-green-500 text-white rounded"
+                    >
+                        Siguiente →
                     </button>
                 </div>
             </div>
