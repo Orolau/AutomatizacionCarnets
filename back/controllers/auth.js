@@ -4,6 +4,49 @@ const { tokenSign } = require("../utils/handleJwt.js")
 const { matchedData } = require('express-validator')
 const { encrypt, compare } = require("../utils/handlePassword")
 
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Hace el login del user
+ *     description: Comprueba que las credenciales de usuario son correctas y logea el user.
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               mail:
+ *                 type: string
+ *               passwd:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Lista de users obtenida correctamente
+ *         content: 
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 user: 
+ *                   type: object
+ *                   properties: 
+ *                     _id:
+ *                       type: string
+ *                     mail:
+ *                       type: string
+ *       401:
+ *         description: contraseña incorrecta.
+ *         content:
+ *           test/html:
+ *             schema:
+ *               type: string
+ */
+
 const loginCtrl = async (req, res) => {
     try {
         console.log("req.body:", req.body);
