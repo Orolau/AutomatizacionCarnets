@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { jsPDF } from "jspdf";
+import { useRouter } from "next/navigation"; // Importar useRouter
 
 const EtiquetaEnvio = () => {
+    const router = useRouter(); // Usar el hook useRouter
     const [carnets, setCarnets] = useState([]);
     const [seleccionado, setSeleccionado] = useState(null);
 
@@ -39,8 +41,21 @@ const EtiquetaEnvio = () => {
         doc.save("etiqueta_envio.pdf");
     };
 
+    const handleBack = () => {
+        // Redirigir a la página de descargas
+        router.push('/pages/download');
+    };
+
     return (
         <div className="p-4 text-black">
+            {/* Botón de Atrás */}
+            <button 
+                onClick={handleBack}
+                className="p-2 bg-gray-500 text-white rounded-md mb-4"
+            >
+                ← Atrás
+            </button>
+
             <h2 className="text-xl font-bold text-gray-900">Generar Etiqueta de Envío</h2>
             <p className="mb-4 text-gray-800">Selecciona un carnet con modalidad "Online" para generar su etiqueta de envío.</p>
             
