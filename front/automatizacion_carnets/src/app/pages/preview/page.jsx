@@ -6,13 +6,18 @@ import Preview from '@/app/components/forms/Preview';
 export default function ModificarErroresPage() {
   const [selectedPeople, setSelectedPeople] = useState([]);
 
-    useEffect(() => {
-        // Recuperar los datos desde el localStorage
-        const data = localStorage.getItem('selectedPeople');
+  useEffect(() => {
+    const data = localStorage.getItem('selectedPeople');
+    try {
         if (data) {
             setSelectedPeople(JSON.parse(data));
         }
-    }, []);
+    } catch (error) {
+        console.error("Error al parsear los datos del localStorage", error);
+        setSelectedPeople([]);
+    }
+}, []);
+
   return (
 
     <div className="bg-white w-full h-full">

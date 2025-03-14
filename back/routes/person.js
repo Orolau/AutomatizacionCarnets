@@ -1,6 +1,6 @@
 const express = require("express");
 const multer = require("multer");
-const {getFilteredPersons, createPerson, getPersonByDNI, getPersonByName, getPersonById, updatePerson, deletePerson, uploadImageAndUpdatePerson, getPeople  } = require("../controllers/person.js");
+const {getFilteredPersons, createPerson, createPeopleWithFile, getPersonByDNI, getPersonByName, getPersonById, updatePerson, deletePerson, uploadImageAndUpdatePerson, getPeople  } = require("../controllers/person.js");
 
 const router = express.Router();
 const upload = multer();
@@ -8,6 +8,7 @@ const upload = multer();
 router.get("/", getPeople);
 router.get("/filtered", getFilteredPersons)
 router.post("/", createPerson);
+router.post("/upload", createPeopleWithFile);
 router.get("/:id", getPersonById);
 router.put("/:id", updatePerson);
 router.delete("/:id", deletePerson);
