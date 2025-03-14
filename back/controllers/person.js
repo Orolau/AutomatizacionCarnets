@@ -1,5 +1,5 @@
 const Person = require("../models/person.js");
-const { uploadToPinata } = require("../utils/pinata"); 
+const { uploadToPinata } = require("../utils/pinata");
 /**
  * @swagger
  * tags:
@@ -209,7 +209,7 @@ const getFilteredPersons = async (req, res) => {
  */
 
 const createPerson = async (req, res) => {
-    const {body} = req;
+    const { body } = req;
     const data = await Person.create(body);
     res.json(data)
 };
@@ -265,8 +265,8 @@ const createPerson = async (req, res) => {
  */
 
 const getPersonById = async (req, res) => {
-    const {id} = req.params;
-    const data = await Person.findOne({"_id": id})
+    const { id } = req.params;
+    const data = await Person.findOne({ "_id": id })
     res.json(data);
 };
 /**
@@ -320,8 +320,8 @@ const getPersonById = async (req, res) => {
  */
 
 const getPersonByDNI = async (req, res) => {
-    const {dni} = req.params;
-    const data = await Person.findOne({"dni": dni})
+    const { dni } = req.params;
+    const data = await Person.findOne({ "dni": dni })
     res.json(data);
 };
 /**
@@ -478,26 +478,26 @@ const getPersonByName = async (req, res) => {
 
 const updatePerson = async (req, res) => {
     const { id } = req.params;
-  
+
     // Asegúrate de que 'id' no sea undefined
     if (!id) {
-      return res.status(400).json({ error: "ID es requerido" });
+        return res.status(400).json({ error: "ID es requerido" });
     }
-  
+
     try {
-      const updatedPerson = await Person.findByIdAndUpdate(id, req.body, { new: true });
-  
-      if (!updatedPerson) {
-        return res.status(404).json({ error: "Persona no encontrada" });
-      }
-      console.log(updatePerson)
-      res.json(updatedPerson);  // Responde con los datos actualizados
+        const updatedPerson = await Person.findByIdAndUpdate(id, req.body, { new: true });
+
+        if (!updatedPerson) {
+            return res.status(404).json({ error: "Persona no encontrada" });
+        }
+        console.log(updatePerson)
+        res.json(updatedPerson);  // Responde con los datos actualizados
     } catch (error) {
-      console.error("Error al actualizar la persona:", error);
-      res.status(500).json({ error: "Error interno del servidor" });
+        console.error("Error al actualizar la persona:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
     }
-  };
-  
+};
+
 
 /**
  * @swagger
@@ -548,7 +548,7 @@ const updatePerson = async (req, res) => {
  */
 
 const deletePerson = async (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
     const data = await Person.findByIdAndDelete(id);
     res.json(data)
 };
@@ -655,6 +655,43 @@ const uploadImageAndUpdatePerson = async (req, res) => {
     }
 };
 
+const createPeopleWithFile = async (req, res) => {
+    try {
+        const { data } = req.body; // Datos provenientes del frontend
+        const persons = [];
+
+        for (let i = 0; i < data.length; i++) {
+            const personData = data[i];
+
+            // Construcción de un objeto de acuerdo con el modelo
+            const person = {
+                tipoUsuario: personData.tipoUsuario || "alumno",
+                nombre: personData.nombre,
+                apellidos: personData.apellidos,
+                titulacion: personData.titulacion || undefined,  // Solo para alumnos
+                tipoTitulacion: personData.tipoTitulacion || "",
+                cargo: personData.cargo || undefined,  // Solo para personal y profesores
+                departamento: personData.departamento || undefined,  // Solo para profesores
+                email: personData.email,
+                dni: personData.dni,
+                foto: personData.foto || "",
+                modalidad: personData.modalidad || "Presencial",
+                curso: personData.curso || "" // Solo para alumnos
+            };
+
+            // Creamos un nuevo documento Person
+            const newPerson = new Person(person);
+            await newPerson.save();
+            persons.push(newPerson);
+        }
+
+        return res.status(201).json({ message: "Datos cargados correctamente", persons });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error al procesar el archivo" });
+    }
+};
+
 
 
 module.exports = {
@@ -666,5 +703,6 @@ module.exports = {
     deletePerson,
     getPersonByDNI,
     getPersonByName,
-    uploadImageAndUpdatePerson 
+    uploadImageAndUpdatePerson,
+    createPeopleWithFile
 };
