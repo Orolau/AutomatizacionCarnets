@@ -46,6 +46,16 @@ const PersonScheme = new mongoose.Schema(
             type: String,
             enum: ["Presencial", "Online"],
             default: "Presencial"
+        },
+        estadoCarnet: {
+            type: String,
+            enum: ["hecho", "pendiente"],
+            required: true,
+            default: "pendiente"
+        },
+        numeroCarnets: {
+            type: Number,
+            default: 0
         }
     },
     {

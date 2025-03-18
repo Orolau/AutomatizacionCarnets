@@ -692,7 +692,42 @@ const createPeopleWithFile = async (req, res) => {
     }
 };
 
+// Actualizar el estado de un carnet
+const putEstado = async (req, res) => {
+    try {
+        const { dni } = req.params;
+        const { estadoCarnet } = req.body;
 
+        if (!["hecho", "pendiente"].includes(estadoCarnet)) {
+            return res.status(400).json({ mensaje: "Estado inválido" });
+        }
+
+        const persona = await Person.findOne({ dni });
+
+        if (!persona) {
+            return res.status(404).json({ mensaje: "Persona no encontrada" });
+        }
+
+        // Si cambia de "pendiente" a "hecho", aumentar numeroCarnet
+        if (persona.estadoCarnet === "pendiente" && estadoCarnet === "hecho") {
+            await Person.updateOne(
+                { dni },
+                { $inc: { numeroCarnets: 1 } }
+            );
+        }
+
+        const updatedPersona = await Person.findOneAndUpdate(
+            { dni },
+            { $set: { estadoCarnet } },
+            { new: true, runValidators: false }
+        );
+
+        res.json(updatedPersona);
+    } catch (error) {
+        console.error("Error en el servidor:", error);
+        res.status(500).json({ mensaje: "Error en el servidor", error });
+    }
+};
 
 module.exports = {
     getPeople,
@@ -704,5 +739,6 @@ module.exports = {
     getPersonByDNI,
     getPersonByName,
     uploadImageAndUpdatePerson,
-    createPeopleWithFile
+    createPeopleWithFile, 
+    putEstado
 };
