@@ -1,6 +1,41 @@
 const { userModel } = require('../models/index.js')
 const sendVerificationEmail = require('../utils/email.js');
 
+/**
+ * @swagger
+ * /api/user:
+ *   get:
+ *     summary: Obtener todos los users
+ *     description: Retorna una lista de todos los users de la base de datos.
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Lista de users obtenida correctamente
+ *         content: 
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items: 
+ *                     type: object
+ *                     properties: 
+ *                       _id:
+ *                         type: string
+ *                       mail:
+ *                         type: string
+ *                       passwd:
+ *                         type: string
+ *                       verificando:
+ *                         type: boolean
+ *                       verifyCode:
+ *                         type: integer
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time 
+ */
+
 const getItems = async (req, res) => {
     const data = await userModel.find({});
     console.log(data)

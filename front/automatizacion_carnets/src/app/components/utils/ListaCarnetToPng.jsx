@@ -20,7 +20,6 @@ export default function CarnetToPngConverter({ carnets }) {
     useEffect(() => {
         let loadedCount = 0;
         let totalImages = 0;
-
         carnetList.forEach((_, index) => {
             if (!carnetRefs.current[index]) return;
             const imgElements = carnetRefs.current[index].querySelectorAll("img");
@@ -89,7 +88,12 @@ export default function CarnetToPngConverter({ carnets }) {
         const zipBlob = await zip.generateAsync({ type: "blob" });
         saveAs(zipBlob, `${folderName}.zip`);
     };
-    
+
+    const handleNext = () => {
+        // Redirigir a la página de etiquetas
+        router.push('/pages/etiqueta');
+    };
+
     // Nueva función para generar y descargar logs
     const descargarLogs = () => {
         let logs = "=== Carnets Impresos ===\n";
@@ -137,11 +141,12 @@ export default function CarnetToPngConverter({ carnets }) {
         const blob = new Blob([logs], { type: "text/plain;charset=utf-8" });
         saveAs(blob, "logs_carnets.txt");
     };
+    
 
     return (
         <div className="flex flex-col items-center p-4">
             <div className="flex items-center w-full justify-between mb-4 p-2 bg-gray-200 rounded">
-                <button onClick={() => router.back()} className="p-2 bg-gray-500 text-white rounded">
+                <button onClick={() => router.push('/pages/preview')} className="p-2 bg-gray-500 text-white rounded">
                     ← Retroceso
                 </button>
                 <div className="flex flex-row flex-wrap gap-3">
@@ -170,6 +175,13 @@ export default function CarnetToPngConverter({ carnets }) {
                         className={`p-2 rounded ${fondoTransparente ? 'bg-green-500' : 'bg-red-500'} text-white`}
                     >
                         {fondoTransparente ? "Fondo Visible" : "Fondo Transparente"}
+                    </button>
+                    {/* Botón de Siguiente */}
+                    <button
+                        onClick={handleNext}
+                        className="p-2 bg-green-500 text-white rounded"
+                    >
+                        Siguiente →
                     </button>
                 </div>
             </div>
