@@ -39,7 +39,7 @@ export default function LoginForm() {
         <div className="flex flex-col items-center justify-center min-h-screen bg-stone-300">
             {/* Logo en la esquina superior izquierda */}
             <div className="absolute top-5 left-5">
-                <Image src="/images/Logo-U-tad 1.png" alt="U-Tad Logo" width={175} height={100} />
+                <Image src="/images/Logo-U-tad 1.png" alt="U-Tad Logo" width={125} height={75} />
             </div>
 
             {/* Formulario de inicio de sesión */}
