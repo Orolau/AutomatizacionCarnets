@@ -148,7 +148,6 @@ export default function PersonalDataFiltered() {
         else
             alert('Selecciona al menos una persona');
     };
-
     return (
         <div className="p-4 bg-white text-black">
             <div className="p-6 bg-blue-200 rounded-xl shadow-lg mb-6">
@@ -313,4 +312,5 @@ export default function PersonalDataFiltered() {
             </button>
         </div>
     );
+    
 }
