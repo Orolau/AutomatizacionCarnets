@@ -65,3 +65,7 @@ Content-Type: application/json
 {
     "estadoCarnet": "hecho"
 }
+
+###
+GET http://localhost:3005/api/person/name/Carlos García
+

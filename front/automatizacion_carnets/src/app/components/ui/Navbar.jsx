@@ -61,6 +61,11 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
               <span onClick={toggleSidebar}>Etiquetas</span>
             </Link>
           </li>
+          <li>
+            <Link href="/pages/uploadAndCreate">
+              <span onClick={toggleSidebar}>Subir Excel</span>
+            </Link>
+          </li>
         </ul>
       </div>
     
