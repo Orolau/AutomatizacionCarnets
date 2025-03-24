@@ -26,9 +26,19 @@ export default function ModificarCarnetIndividualPage() {
 
     const handleChangePhoto = (newPhoto) => {
         setPreviewFoto(newPhoto);
-        setCarnet(prev => ({ ...prev, foto: newPhoto }))
-    }
-
+        setCarnet((prev) => {
+            const updatedCarnet = { ...prev, foto: newPhoto };
+            // Actualizar en localStorage
+            updatePersonInLocalStorage(updatedCarnet);
+            return updatedCarnet;
+        });
+    };
+    
+    const handleChangeCarnet = (updatedCarnet) => {
+        setCarnet(updatedCarnet);
+        // Actualizar en localStorage
+        updatePersonInLocalStorage(updatedCarnet);
+    };
     // Solo realizar la carga de datos si "dni" está disponible
     useEffect(() => {
 
@@ -57,6 +67,25 @@ export default function ModificarCarnetIndividualPage() {
         return <div>Cargando...</div>;
     }
 
+    const updatePersonInLocalStorage = (updatedCarnet) => {
+        // Obtener el array de personas de localStorage
+        const storedPeople = localStorage.getItem("SelectedPeople");
+        let selectedPeople = storedPeople ? JSON.parse(storedPeople) : [];
+    
+        // Encontrar la persona a actualizar por su _id
+        const personIndex = selectedPeople.findIndex(person => person._id === updatedCarnet._id);
+    
+        if (personIndex !== -1) {
+            // Actualizamos la persona con los nuevos datos
+            selectedPeople[personIndex] = { ...selectedPeople[personIndex], ...updatedCarnet };
+    
+            // Guardamos el array actualizado nuevamente en localStorage
+            localStorage.setItem("SelectedPeople", JSON.stringify(selectedPeople));
+        }
+    };
+    
+    
+
     return (
         <div className="flex flex-col h-[85vh]">
             <button
@@ -71,7 +100,7 @@ export default function ModificarCarnetIndividualPage() {
                     <Carnet carnet={carnet} />
                 </div>
                 <div className="flex flex-col gap-4">
-                    <FormActualizacionCarnet carnet={carnet} setCarnet={setCarnet} />
+                    <FormActualizacionCarnet carnet={carnet} setCarnet={handleChangeCarnet} />
                     <FormActualizaFoto id={carnet._id} previewFoto={previewFoto} setPreviewFoto={handleChangePhoto} />
                 </div>
 
