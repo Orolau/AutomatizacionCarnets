@@ -3,7 +3,7 @@ import Link from "next/link"; // Importamos Link de Next.js
 
 export default function NavbarTop({ setEstado }) {
   return (
-    <nav className="bg-blue-100 p-4 flex justify-between items-center">
+    <nav className="bg-blue-200 p-4 flex justify-between items-center">
       {/* Logo de la universidad a la izquierda */}
       <img src="/images/Logo-U-tad 1.png" alt="U-Tad Logo" width={125} height={75} />
 
