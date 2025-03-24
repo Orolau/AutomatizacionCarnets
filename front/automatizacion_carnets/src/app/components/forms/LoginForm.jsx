@@ -31,7 +31,7 @@ export default function LoginForm() {
 
         if (respuestaServer === userData.mail) {
             localStorage.setItem("email", userData.mail);
-            router.push("../pages/verify");
+            router.push("../verify");
         }
     };
 
