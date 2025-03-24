@@ -20,7 +20,6 @@ export default function CarnetToPngConverter({ carnets }) {
     useEffect(() => {
         let loadedCount = 0;
         let totalImages = 0;
-
         carnetList.forEach((_, index) => {
             if (!carnetRefs.current[index]) return;
             const imgElements = carnetRefs.current[index].querySelectorAll("img");
