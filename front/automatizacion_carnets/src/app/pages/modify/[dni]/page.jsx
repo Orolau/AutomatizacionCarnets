@@ -7,7 +7,7 @@ import FormActualizacionCarnet from "@/app/components/forms/FormActualizacionCar
 import FormActualizaFoto from "@/app/components/forms/FormActualizaFoto";
 
 export default function ModificarCarnetIndividualPage() {
-    const { dni } = useParams();  
+    const { dni } = useParams();
     const router = useRouter();
 
     const [previewFoto, setPreviewFoto] = useState("");
@@ -53,41 +53,54 @@ export default function ModificarCarnetIndividualPage() {
 
     return (
         <div className="min-h-screen bg-[#f0f6ff] px-4 py-6">
-            {/* Botón volver */}
-            <button
-                className="mb-4 bg-[#0065ef] text-white px-4 py-2 rounded hover:bg-[#005dd7]"
-                onClick={() => router.push('/pages/preview')}
-            >
-                &larr; Volver
-            </button>
-
             {/* Contenedor principal */}
             <div className="flex flex-col lg:flex-row bg-white rounded-2xl shadow-lg max-w-[1200px] mx-auto overflow-hidden p-6 gap-6">
-                {/* Carnet */}
-                <div className="flex justify-center items-center w-full lg:w-1/2">
-                    <div className="max-w-sm">
-                        <Carnet carnet={carnet} />
+
+                {/* CARNET + botón volver */}
+                <div className="flex flex-col gap-4 justify-start items-start w-full lg:w-1/2 relative">
+                    {/* Botón volver dentro del bloque del carnet */}
+                    <button
+                        className="w-10 h-10 flex items-center justify-center rounded-full bg-[#0065ef] text-white hover:bg-[#005dd7] transition absolute top-0 left-0 z-10"
+                        onClick={() => router.push('/pages/preview')}
+                        aria-label="Volver"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="w-5 h-5"
+                        >
+                            <path d="M15 18l-6-6 6-6" />
+                        </svg>
+                    </button>
+
+                    {/* Carnet centrado */}
+                    <div className="w-full pt-12 flex justify-center">
+                        <div className="max-w-sm">
+                            <Carnet carnet={carnet} />
+                        </div>
                     </div>
                 </div>
 
-                {/* Formulario */}
+                {/* Formulario y foto */}
                 <div className="w-full lg:w-1/2 flex flex-col gap-6 bg-[#e6f0fd] p-6 rounded-xl">
                     <h2 className="text-2xl font-bold text-center text-[#0d1b2a]">Modificar datos</h2>
 
-                    {/* Formulario principal */}
                     <FormActualizacionCarnet carnet={carnet} setCarnet={setCarnet} />
 
-                    {/* Separador visual */}
                     <hr className="my-2 border-gray-300" />
 
-                    {/* Subida de imagen */}
                     <FormActualizaFoto
                         id={carnet._id}
                         previewFoto={previewFoto}
                         setPreviewFoto={handleChangePhoto}
                     />
 
-                    {/* Botón final */}
+                    {/* Botón guardar */}
                     <div className="flex justify-center pt-2">
                         <button
                             onClick={() => document.querySelector("form")?.requestSubmit()}
