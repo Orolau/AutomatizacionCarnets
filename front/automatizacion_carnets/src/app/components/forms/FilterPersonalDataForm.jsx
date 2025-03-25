@@ -3,10 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-const API_URL = "http://localhost:3005/api/person";
 const FILTER_URL = "http://localhost:3005/api/person/filtered";
 
-// Función para normalizar texto (eliminar tildes)
 const normalizeText = (text) => {
     if (!text) return "";
     return text
@@ -15,21 +13,40 @@ const normalizeText = (text) => {
         .replace(/[\u0300-\u036f]/g, "");
 };
 
+const tiposUsuarios = ["alumno", "profesor", "personal"];
+const tiposTitulacion = ["Grado", "Máster"];
+const titulaciones = {
+    "Grado": [
+        "Grado en Diseño Digital",
+        "Grado en Ingeniería del Software",
+        "Ingeniería de software",
+        "Doble grado de Ingeniería del software y Matemáticas Computacionales",
+        "Animación"
+    ],
+    "Máster": [
+        "Máster en Programación de Videojuegos",
+        "Máster en Big Data"
+    ]
+};
+const cursos = ["1º", "2º", "3º", "4º"];
+const modalidades = ["Presencial", "Online"];
+const cargos = [
+    "Profesor", "Profesor Titular", "Administrativo",
+    "Coordinadora", "Coordinadora Académica", "Conserje", "Alumno"
+];
+const departamentos = [
+    "Ciencias de la Computación", "Ciberseguridad",
+    "Ingeniería del Software", "Animación", "Ingeniería "
+];
+
 export default function PersonalDataFiltered() {
     const router = useRouter();
-    const [filters, setFilters] = useState({});
     const [people, setPeople] = useState([]);
     const [filteredPeople, setFilteredPeople] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedPeople, setSelectedPeople] = useState([]);
-    const [tiposUsuarios, setTiposUsuarios] = useState([]);
+
     const [tipoUsuario, setTipoUsuario] = useState("");
-    const [tiposTitulacion, setTiposTitulacion] = useState([]);
-    const [titulaciones, setTitulaciones] = useState({});
-    const [cursos, setCursos] = useState([]);
-    const [cargos, setCargos] = useState([]);
-    const [departamentos, setDepartamentos] = useState([]);
-    const [modalidades, setModalidades] = useState([]);
     const [tipoTitulacion, setTipoTitulacion] = useState("");
     const [titulacion, setTitulacion] = useState("");
     const [curso, setCurso] = useState("");
@@ -37,37 +54,6 @@ export default function PersonalDataFiltered() {
     const [departamento, setDepartamento] = useState("");
     const [modalidad, setModalidad] = useState("");
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
-
-                setTiposUsuarios([...new Set(data.map(p => p.tipoUsuario).filter(Boolean))]);
-                setTiposTitulacion([...new Set(data.map(p => p.tipoTitulacion).filter(Boolean))]);
-                setCursos([...new Set(data.map(p => p.curso).filter(Boolean))]);
-                setCargos([...new Set(data.map(p => p.cargo).filter(Boolean))]);
-                setDepartamentos([...new Set(data.map(p => p.departamento).filter(Boolean))]);
-                setModalidades([...new Set(data.flatMap(p => p.modalidad).filter(Boolean))]);
-
-                const titulacionesAgrupadas = data.reduce((acc, p) => {
-                    if (p.tipoTitulacion && p.titulacion) {
-                        if (!acc[p.tipoTitulacion]) acc[p.tipoTitulacion] = [];
-                        if (!acc[p.tipoTitulacion].includes(p.titulacion)) {
-                            acc[p.tipoTitulacion].push(p.titulacion);
-                        }
-                    }
-                    return acc;
-                }, {});
-                setTitulaciones(titulacionesAgrupadas);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-        fetchData();
-    }, []);
-
-    // Filtro por nombre y apellidos en tiempo real
     useEffect(() => {
         if (searchTerm.trim() === "") {
             setFilteredPeople(people);
@@ -77,10 +63,12 @@ export default function PersonalDataFiltered() {
                 const normalizedNombre = normalizeText(person.nombre || "");
                 const normalizedApellidos = normalizeText(person.apellidos || "");
                 const fullName = `${normalizedNombre} ${normalizedApellidos}`;
-                
-                return normalizedNombre.includes(normalizedSearch) || 
-                       normalizedApellidos.includes(normalizedSearch) || 
-                       fullName.includes(normalizedSearch);
+
+                return (
+                    normalizedNombre.includes(normalizedSearch) ||
+                    normalizedApellidos.includes(normalizedSearch) ||
+                    fullName.includes(normalizedSearch)
+                );
             });
             setFilteredPeople(filtered);
         }
@@ -101,35 +89,32 @@ export default function PersonalDataFiltered() {
             const data = await response.json();
             setPeople(data);
             setFilteredPeople(data);
-            setSearchTerm(""); // Reinicia el término de búsqueda
-            setSelectedPeople([]); // Reinicia selecciones
+            setSearchTerm("");
+            setSelectedPeople([]);
         } catch (error) {
             console.error("Error fetching filtered data:", error);
         }
     };
 
-    const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value);
-    };
+    const handleSearchChange = (e) => setSearchTerm(e.target.value);
 
     const handleSelectPerson = (person) => {
         setSelectedPeople((prev) => {
-            const updatedSelection = prev.some(p => p === person || (p.id && person.id && p.id === person.id))
-                ? prev.filter(p => p !== person && (!p.id || !person.id || p.id !== person.id))
+            const exists = prev.some(p => p.id === person.id);
+            return exists
+                ? prev.filter(p => p.id !== person.id)
                 : [...prev, person];
-            return updatedSelection;
         });
     };
 
-    const isPersonSelected = (person) => {
-        return selectedPeople.some(p => p === person || (p.id && person.id && p.id === person.id));
-    };
+    const isPersonSelected = (person) =>
+        selectedPeople.some(p => p.id === person.id);
 
     const handleSelectAll = () => {
-        if (filteredPeople.every(person => isPersonSelected(person))) {
-            setSelectedPeople(prev => prev.filter(person => 
-                !filteredPeople.some(fp => fp === person || (fp.id && person.id && fp.id === person.id))
-            ));
+        if (filteredPeople.every(isPersonSelected)) {
+            setSelectedPeople(prev =>
+                prev.filter(p => !filteredPeople.some(fp => fp.id === p.id))
+            );
         } else {
             const newSelected = [...selectedPeople];
             filteredPeople.forEach(person => {
@@ -142,170 +127,172 @@ export default function PersonalDataFiltered() {
     };
 
     const handleNext = () => {
-        localStorage.setItem('selectedPeople', JSON.stringify(selectedPeople));
-        if (selectedPeople.length > 0)
-            router.push('/pages/preview');
-        else
-            alert('Selecciona al menos una persona');
+        localStorage.setItem("selectedPeople", JSON.stringify(selectedPeople));
+        if (selectedPeople.length > 0) {
+            router.push("/pages/preview");
+        } else {
+            alert("Selecciona al menos una persona");
+        }
     };
 
     return (
-        <div className="p-4 bg-white text-black">
-            <div className="p-6 bg-blue-200 rounded-xl shadow-lg mb-6">
-                <h2 className="text-xl font-semibold text-blue-800 mb-4">Filtros</h2>
+        <div className="p-6 bg-gray-100 min-h-screen">
+            {/* Contenedor Buscador + Filtros */}
+            <div className="bg-white rounded-3xl shadow-md p-6 mb-6">
+                {/* Buscador */}
+                <div className="mb-4">
+                    <div className="relative">
+                        <img
+                            src="/images/Buscador.png"
+                            alt="Buscar"
+                            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none"
+                        />
+                        <input
+                            type="text"
+                            className="w-full pl-10 py-2 border border-gray-300 rounded-2xl bg-white"
+                            placeholder="Buscar por nombre o apellidos..."
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                        />
+                    </div>
+                </div>
+
+                {/* Filtros */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <select
-                        className="w-full p-2 border border-blue-400 rounded-lg bg-white"
-                        value={tipoUsuario}
-                        onChange={(e) => setTipoUsuario(e.target.value)}
-                    >
-                        <option value="">Seleccionar tipo de usuario</option>
-                        {tiposUsuarios.map((tipo, index) => (
-                            <option key={index} value={tipo}>{tipo}</option>
-                        ))}
-                    </select>
+                    <div>
+                        <label className="block font-semibold mb-1">Tipo de usuario</label>
+                        <select
+                            className="w-full p-2 border border-gray-300 rounded-2xl bg-white"
+                            value={tipoUsuario}
+                            onChange={(e) => setTipoUsuario(e.target.value)}
+                        >
+                            <option value="">Tipo de usuario</option>
+                            {tiposUsuarios.map((tipo, index) => (
+                                <option key={index} value={tipo}>{tipo}</option>
+                            ))}
+                        </select>
+                    </div>
 
                     {tipoUsuario === "alumno" && (
                         <>
-                            <select
-                                className="w-full p-2 border border-blue-400 rounded-lg bg-white"
-                                value={curso}
-                                onChange={(e) => setCurso(e.target.value)}
-                            >
-                                <option value="">Seleccionar curso</option>
-                                {cursos.map((c, index) => (
-                                    <option key={index} value={c}>{c}</option>
-                                ))}
-                            </select>
-
-                            <select
-                                className="w-full p-2 border border-blue-400 rounded-lg bg-white"
-                                value={modalidad}
-                                onChange={(e) => setModalidad(e.target.value)}
-                            >
-                                <option value="">Seleccionar modalidad</option>
-                                {modalidades.map((mod, index) => (
-                                    <option key={index} value={mod}>{mod}</option>
-                                ))}
-                            </select>
-                            <select
-                                className="w-full p-2 border border-blue-400 rounded-lg bg-white"
-                                value={tipoTitulacion}
-                                onChange={(e) => setTipoTitulacion(e.target.value)}
-                            >
-                                <option value="">Seleccionar tipo titulación</option>
-                                {tiposTitulacion.map((mod, index) => (
-                                    <option key={index} value={mod}>{mod}</option>
-                                ))}
-                            </select>
-                            {tipoTitulacion && (
-                                <select className="w-full p-2 border rounded-md text-gray-800" value={titulacion} onChange={(e) => setTitulacion(e.target.value)}>
-                                    <option value="">Seleccionar titulación</option>
-                                    {titulaciones[tipoTitulacion]?.map((tit, index) => (
-                                        <option key={index} value={tit}>{tit}</option>
-                                    ))}
+                            <div>
+                                <label className="block font-semibold mb-1">Curso</label>
+                                <select className="w-full p-2 border border-gray-300 rounded-2xl bg-white" value={curso} onChange={(e) => setCurso(e.target.value)}>
+                                    <option value="">Seleccionar curso</option>
+                                    {cursos.map((c, index) => <option key={index} value={c}>{c}</option>)}
                                 </select>
+                            </div>
+
+                            <div>
+                                <label className="block font-semibold mb-1">Modalidad</label>
+                                <select className="w-full p-2 border border-gray-300 rounded-2xl bg-white" value={modalidad} onChange={(e) => setModalidad(e.target.value)}>
+                                    <option value="">Seleccionar modalidad</option>
+                                    {modalidades.map((mod, index) => <option key={index} value={mod}>{mod}</option>)}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block font-semibold mb-1">Tipo titulación</label>
+                                <select className="w-full p-2 border border-gray-300 rounded-2xl bg-white" value={tipoTitulacion} onChange={(e) => {
+                                    setTipoTitulacion(e.target.value);
+                                    setTitulacion("");
+                                }}>
+                                    <option value="">Tipo titulación</option>
+                                    {tiposTitulacion.map((mod, index) => <option key={index} value={mod}>{mod}</option>)}
+                                </select>
+                            </div>
+
+                            {tipoTitulacion && (
+                                <div>
+                                    <label className="block font-semibold mb-1">Titulación</label>
+                                    <select className="w-full p-2 border border-gray-300 rounded-2xl bg-white" value={titulacion} onChange={(e) => setTitulacion(e.target.value)}>
+                                        <option value="">Titulación</option>
+                                        {titulaciones[tipoTitulacion]?.map((tit, index) => <option key={index} value={tit}>{tit}</option>)}
+                                    </select>
+                                </div>
                             )}
                         </>
                     )}
 
                     {(tipoUsuario === "profesor" || tipoUsuario === "personal") && (
-                        <select
-                            className="w-full p-2 border border-blue-400 rounded-lg bg-white"
-                            value={cargo}
-                            onChange={(e) => setCargo(e.target.value)}
-                        >
-                            <option value="">Seleccionar cargo</option>
-                            {cargos.map((c, index) => (
-                                <option key={index} value={c}>{c}</option>
-                            ))}
-                        </select>
+                        <div>
+                            <label className="block font-semibold mb-1">Cargo</label>
+                            <select className="w-full p-2 border border-gray-300 rounded-2xl bg-white" value={cargo} onChange={(e) => setCargo(e.target.value)}>
+                                <option value="">Seleccionar cargo</option>
+                                {cargos.map((c, index) => <option key={index} value={c}>{c}</option>)}
+                            </select>
+                        </div>
                     )}
 
                     {tipoUsuario === "profesor" && (
-                        <select
-                            className="w-full p-2 border border-blue-400 rounded-lg bg-white"
-                            value={departamento}
-                            onChange={(e) => setDepartamento(e.target.value)}
-                        >
-                            <option value="">Seleccionar departamento</option>
-                            {departamentos.map((d, index) => (
-                                <option key={index} value={d}>{d}</option>
-                            ))}
-                        </select>
+                        <div>
+                            <label className="block font-semibold mb-1">Departamento</label>
+                            <select className="w-full p-2 border border-gray-300 rounded-2xl bg-white" value={departamento} onChange={(e) => setDepartamento(e.target.value)}>
+                                <option value="">Seleccionar departamento</option>
+                                {departamentos.map((d, index) => <option key={index} value={d}>{d}</option>)}
+                            </select>
+                        </div>
                     )}
                 </div>
+
                 <button
-                    className="w-full bg-blue-600 text-white p-3 rounded-lg mt-4 hover:bg-blue-700 transition"
+                    className="mt-6 px-6 py-2 bg-[#0065ef] text-white rounded-xl hover:bg-[#0056cc] transition w-full md:w-auto"
                     onClick={handleFilter}
                 >
                     Buscar
                 </button>
             </div>
 
-            {/* Buscador por nombre y apellidos */}
-            {people.length > 0 && (
-                <div className="p-4 bg-blue-100 rounded-xl shadow-md mb-6">
-                    <div className="flex items-center mb-2">
-                        <label className="mr-2 font-semibold text-blue-800">Buscar por nombre o apellidos:</label>
-                        <input
-                            type="text"
-                            className="flex-grow p-2 border border-blue-400 rounded-lg bg-white"
-                            placeholder="Escribe un nombre o apellido..."
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                        />
-                    </div>
-                    <p className="text-sm text-blue-600">
-                        {filteredPeople.length} {filteredPeople.length === 1 ? 'persona encontrada' : 'personas encontradas'}
-                    </p>
+
+            {/* Tabla */}
+            {filteredPeople.length > 0 && (
+                <div className="bg-white p-4 rounded-3xl shadow-md mb-6 overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead className="bg-gray-100 text-gray-700 text-left">
+                            <tr>
+                                <th className="px-4 py-3">
+                                    <button
+                                        onClick={handleSelectAll}
+                                        className="text-[#0065ef] hover:underline font-semibold"
+                                    >
+                                        {filteredPeople.every(isPersonSelected) ? "Deseleccionar todo" : "Seleccionar todo"}
+                                    </button>
+                                </th>
+                                <th className="px-4 py-3">Nombre</th>
+                                <th className="px-4 py-3">Apellidos</th>
+                                {tipoUsuario === "alumno" && <th className="px-4 py-3">Tipo Titulación</th>}
+                                {tipoUsuario === "alumno" && <th className="px-4 py-3">Titulación</th>}
+                                {tipoUsuario === "profesor" && <th className="px-4 py-3">Departamento</th>}
+                                {tipoUsuario !== "alumno" && <th className="px-4 py-3">Cargo</th>}
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {filteredPeople.map((person, index) => (
+                                <tr key={index} className="hover:bg-gray-50">
+                                    <td className="px-4 py-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={isPersonSelected(person)}
+                                            onChange={() => handleSelectPerson(person)}
+                                            className="accent-[#0065ef]"
+                                        />
+                                    </td>
+                                    <td className="px-4 py-2">{person.nombre}</td>
+                                    <td className="px-4 py-2">{person.apellidos}</td>
+                                    {tipoUsuario === "alumno" && <td className="px-4 py-2">{person.tipoTitulacion}</td>}
+                                    {tipoUsuario === "alumno" && <td className="px-4 py-2">{person.titulacion}</td>}
+                                    {tipoUsuario === "profesor" && <td className="px-4 py-2">{person.departamento}</td>}
+                                    {tipoUsuario !== "alumno" && <td className="px-4 py-2">{person.cargo}</td>}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             )}
 
-            {filteredPeople.length > 0 && (
-                <table className="w-full border-collapse border border-blue-300 mb-6">
-                    <thead>
-                        <tr className="bg-blue-200">
-                            <th className="border p-2">
-                                <button
-                                    className="text-blue-600"
-                                    onClick={handleSelectAll}
-                                >
-                                    {filteredPeople.every(person => isPersonSelected(person)) ? "Deseleccionar todo" : "Seleccionar todo"}
-                                </button>
-                            </th>
-                            <th className="border p-2">Nombre</th>
-                            <th className="border p-2">Apellidos</th>
-                            {tipoUsuario === "alumno" && <th className="border p-2">Tipo Titulación</th>}
-                            {tipoUsuario === "alumno" && <th className="border p-2">Titulación</th>}
-                            {tipoUsuario === "profesor" && <th className="border p-2">Departamento</th>}
-                            {tipoUsuario !== "alumno" && <th className="border p-2">Cargo</th>}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredPeople.map((person, index) => (
-                            <tr key={index} className="border hover:bg-blue-100">
-                                <td className="border p-2">
-                                    <input 
-                                        type="checkbox" 
-                                        checked={isPersonSelected(person)} 
-                                        onChange={() => handleSelectPerson(person)} 
-                                    />
-                                </td>
-                                <td className="border p-2">{person.nombre}</td>
-                                <td className="border p-2">{person.apellidos}</td>
-                                {tipoUsuario === "alumno" && <td className="border p-2">{person.tipoTitulacion}</td>}
-                                {tipoUsuario === "alumno" && <td className="border p-2">{person.titulacion}</td>}
-                                {tipoUsuario === "profesor" && <td className="border p-2">{person.departamento}</td>}
-                                {tipoUsuario !== "alumno" && <td className="border p-2">{person.cargo}</td>}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
-
+            {/* Botón Siguiente */}
             <button
-                className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition"
+                className="w-full md:w-auto px-6 py-3 bg-[#0065ef] text-white rounded-xl hover:bg-[#0056cc] transition mx-auto block"
                 onClick={handleNext}
                 disabled={selectedPeople.length === 0}
             >
@@ -313,5 +300,5 @@ export default function PersonalDataFiltered() {
             </button>
         </div>
     );
-    
+
 }
