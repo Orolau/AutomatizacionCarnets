@@ -102,20 +102,20 @@ export default function PersonalDataFiltered() {
 
   const handleSelectPerson = (person) => {
     setSelectedPeople((prev) => {
-      const exists = prev.some((p) => p.id === person.id);
+      const exists = prev.some((p) => p.dni === person.dni);
       return exists
-        ? prev.filter((p) => p.id !== person.id)
+        ? prev.filter((p) => p.dni !== person.dni)
         : [...prev, person];
     });
   };
 
   const isPersonSelected = (person) =>
-    selectedPeople.some((p) => p.id === person.id);
+    selectedPeople.some((p) => p.dni === person.dni);
 
   const handleSelectAll = () => {
     if (filteredPeople.every(isPersonSelected)) {
       setSelectedPeople((prev) =>
-        prev.filter((p) => !filteredPeople.some((fp) => fp.id === p.id))
+        prev.filter((p) => !filteredPeople.some((fp) => fp.dni === p.dni))
       );
     } else {
       const newSelected = [...selectedPeople];
@@ -205,11 +205,21 @@ export default function PersonalDataFiltered() {
 
       {/* Iconos de acción */}
       <div className="flex items-center gap-4 px-2 mb-4">
-        <button><img src="/images/download_icon.png" className="w-5 h-5" alt="Descargar" /></button>
-        <button><img src="/images/print_icon.png" className="w-5 h-5" alt="Imprimir" /></button>
-        <button><img src="/images/delete_icon.png" className="w-5 h-5" alt="Eliminar" /></button>
-        <button><img src="/images/add_icon.png" className="w-5 h-5" alt="Añadir" /></button>
-        <button><img src="/images/edit_icon.png" className="w-5 h-5" alt="Editar" /></button>
+        <button>
+          <img src="/images/download_icon.png" className="w-5 h-5" alt="Descargar" />
+        </button>
+        <button>
+          <img src="/images/print_icon.png" className="w-5 h-5" alt="Imprimir" />
+        </button>
+        <button>
+          <img src="/images/delete_icon.png" className="w-5 h-5" alt="Eliminar" />
+        </button>
+        <button>
+          <img src="/images/add_icon.png" className="w-5 h-5" alt="Añadir" />
+        </button>
+        <button>
+          <img src="/images/edit_icon.png" className="w-5 h-5" alt="Editar" />
+        </button>
       </div>
 
       {/* Tabla */}
