@@ -39,7 +39,7 @@ export default function VerificationForm() {
             console.log("Respuesta del backend:", response);
 
             if (response && response.mail) {
-                router.push("/pages/listaFiltrado").then(() => {
+                router.push("./finales/principal").then(() => {
                     setTimeout(() => {
                         window.location.replace("/pages/listaFiltrado");
                     }, 300);
