@@ -32,7 +32,7 @@ export default function NavbarTop({ setEstado }) {
 
         <Link href="/pages/finales/excel">
           <button className="flex items-center px-4 py-2 bg-transparent hover:text-blue-800">
-            <img src="/images/etiquetas_envio.png" alt="Icono Etiquetas" className="w-6 h-6 mr-2" />
+            <img src="/images/pagExcel.png" alt="Icono Etiquetas" className="w-6 h-6 mr-2" />
             Subir Excel
           </button>
         </Link>

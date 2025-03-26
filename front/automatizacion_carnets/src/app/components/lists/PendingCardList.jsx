@@ -1,9 +1,10 @@
 "use client";
-import { useState, useEffect } from "react";
+
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import personasData from "@/app/jsonPruebas/personasFiltrado.json";
 
-export default function PendingCardsList() {
+export default function PendingCardList() {
   const [carnets, setCarnets] = useState([]);
   const router = useRouter();
 
@@ -27,7 +28,7 @@ export default function PendingCardsList() {
   };
 
   return (
-    <div className="p-6 bg-white rounded-2xl shadow-md max-w-7xl mx-auto mt-6">
+    <div>
       <h2 className="text-2xl font-semibold text-[#0d1b2a] mb-6">
         Carnets con errores
       </h2>
