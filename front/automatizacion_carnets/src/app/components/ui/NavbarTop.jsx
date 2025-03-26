@@ -19,7 +19,7 @@ export default function NavbarTop({ setEstado }) {
         <Link href="/pages/finales/pendientes">
           <button className="flex items-center px-4 py-2 bg-transparent hover:text-blue-800">
             <img src="/images/carnets_pendientes.png" alt="Icono Carnets Pendientes" className="w-6 h-6 mr-2" />
-            Carnets Pendientes
+            Pendientes/Error
           </button>
         </Link>
 
@@ -27,6 +27,13 @@ export default function NavbarTop({ setEstado }) {
           <button className="flex items-center px-4 py-2 bg-transparent hover:text-blue-800">
             <img src="/images/etiquetas_envio.png" alt="Icono Etiquetas" className="w-6 h-6 mr-2" />
             Etiquetas de Envío
+          </button>
+        </Link>
+
+        <Link href="/pages/finales/excel">
+          <button className="flex items-center px-4 py-2 bg-transparent hover:text-blue-800">
+            <img src="/images/etiquetas_envio.png" alt="Icono Etiquetas" className="w-6 h-6 mr-2" />
+            Subir Excel
           </button>
         </Link>
       </div>
