@@ -31,7 +31,6 @@ const cargos = [
   "Coordinadora",
   "Coordinadora Académica",
   "Conserje",
-  "Alumno",
 ];
 const departamentos = [
   "Ciencias de la Computación",
@@ -140,7 +139,7 @@ export default function PersonalDataFiltered() {
   return (
     <div className="p-4 bg-white rounded-2xl shadow-md w-full">
       {/* Buscador y filtros */}
-      <div className="flex flex-col lg:flex-row items-start lg:items-end gap-4 mb-6">
+      <div className="flex flex-col lg:flex-row items-start lg:items-end gap-4 mb-6 flex-wrap">
         <div className="relative w-full lg:w-1/3">
           <input
             type="text"
@@ -169,31 +168,97 @@ export default function PersonalDataFiltered() {
           ))}
         </select>
 
-        <select
-          value={cargo}
-          onChange={(e) => setCargo(e.target.value)}
-          className="p-2 border border-gray-300 rounded-full"
-        >
-          <option value="">Cargo</option>
-          {cargos.map((c, i) => (
-            <option key={i} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
+        {/* Filtros condicionales */}
+        {tipoUsuario === "alumno" && (
+          <>
+            <select
+              value={tipoTitulacion}
+              onChange={(e) => {
+                setTipoTitulacion(e.target.value);
+                setTitulacion("");
+              }}
+              className="p-2 border border-gray-300 rounded-full"
+            >
+              <option value="">Tipo de titulación</option>
+              {tiposTitulacion.map((t, i) => (
+                <option key={i} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
 
-        <select
-          value={departamento}
-          onChange={(e) => setDepartamento(e.target.value)}
-          className="p-2 border border-gray-300 rounded-full"
-        >
-          <option value="">Seleccionar departamento</option>
-          {departamentos.map((d, i) => (
-            <option key={i} value={d}>
-              {d}
-            </option>
-          ))}
-        </select>
+            {tipoTitulacion && (
+              <select
+                value={titulacion}
+                onChange={(e) => setTitulacion(e.target.value)}
+                className="p-2 border border-gray-300 rounded-full"
+              >
+                <option value="">Titulación</option>
+                {titulaciones[tipoTitulacion].map((t, i) => (
+                  <option key={i} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            <select
+              value={curso}
+              onChange={(e) => setCurso(e.target.value)}
+              className="p-2 border border-gray-300 rounded-full"
+            >
+              <option value="">Curso</option>
+              {cursos.map((c, i) => (
+                <option key={i} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={modalidad}
+              onChange={(e) => setModalidad(e.target.value)}
+              className="p-2 border border-gray-300 rounded-full"
+            >
+              <option value="">Modalidad</option>
+              {modalidades.map((m, i) => (
+                <option key={i} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+          </>
+        )}
+
+        {(tipoUsuario === "profesor" || tipoUsuario === "personal") && (
+          <select
+            value={cargo}
+            onChange={(e) => setCargo(e.target.value)}
+            className="p-2 border border-gray-300 rounded-full"
+          >
+            <option value="">Cargo</option>
+            {cargos.map((c, i) => (
+              <option key={i} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        )}
+
+        {tipoUsuario === "profesor" && (
+          <select
+            value={departamento}
+            onChange={(e) => setDepartamento(e.target.value)}
+            className="p-2 border border-gray-300 rounded-full"
+          >
+            <option value="">Departamento</option>
+            {departamentos.map((d, i) => (
+              <option key={i} value={d}>
+                {d}
+              </option>
+            ))}
+          </select>
+        )}
 
         <button
           onClick={handleFilter}
@@ -205,21 +270,11 @@ export default function PersonalDataFiltered() {
 
       {/* Iconos de acción */}
       <div className="flex items-center gap-4 px-2 mb-4">
-        <button>
-          <img src="/images/download_icon.png" className="w-5 h-5" alt="Descargar" />
-        </button>
-        <button>
-          <img src="/images/print_icon.png" className="w-5 h-5" alt="Imprimir" />
-        </button>
-        <button>
-          <img src="/images/delete_icon.png" className="w-5 h-5" alt="Eliminar" />
-        </button>
-        <button>
-          <img src="/images/add_icon.png" className="w-5 h-5" alt="Añadir" />
-        </button>
-        <button>
-          <img src="/images/edit_icon.png" className="w-5 h-5" alt="Editar" />
-        </button>
+        <button><img src="/images/download_icon.png" className="w-5 h-5" alt="Descargar" /></button>
+        <button><img src="/images/print_icon.png" className="w-5 h-5" alt="Imprimir" /></button>
+        <button><img src="/images/delete_icon.png" className="w-5 h-5" alt="Eliminar" /></button>
+        <button><img src="/images/add_icon.png" className="w-5 h-5" alt="Añadir" /></button>
+        <button><img src="/images/edit_icon.png" className="w-5 h-5" alt="Editar" /></button>
       </div>
 
       {/* Tabla */}
@@ -240,10 +295,24 @@ export default function PersonalDataFiltered() {
                 </th>
                 <th className="px-4 py-3">Nombre</th>
                 <th className="px-4 py-3">Apellidos</th>
-                <th className="px-4 py-3">Departamento</th>
-                <th className="px-4 py-3">Cargo</th>
+
+                {tipoUsuario === "alumno" && (
+                  <>
+                    <th className="px-4 py-3">Tipo Titulación</th>
+                    <th className="px-4 py-3">Titulación</th>
+                    <th className="px-4 py-3">Curso</th>
+                  </>
+                )}
+
+                {(tipoUsuario === "profesor" || tipoUsuario === "personal") && (
+                  <>
+                    <th className="px-4 py-3">Cargo</th>
+                    <th className="px-4 py-3">Departamento</th>
+                  </>
+                )}
+
                 <th className="px-4 py-3">DNI</th>
-                <th className="px-4 py-3">Asignatura</th>
+                <th className="px-4 py-3">Modalidad</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -260,17 +329,31 @@ export default function PersonalDataFiltered() {
                   </td>
                   <td className="px-4 py-2">{person.nombre}</td>
                   <td className="px-4 py-2">{person.apellidos}</td>
-                  <td className="px-4 py-2">{person.departamento}</td>
-                  <td className="px-4 py-2">{person.cargo}</td>
-                  <td className="px-4 py-2">{person.dni || "51141604E"}</td>
-                  <td className="px-4 py-2">{person.asignatura || "Física"}</td>
+
+                  {tipoUsuario === "alumno" && (
+                    <>
+                      <td className="px-4 py-2">{person.tipoTitulacion || "-"}</td>
+                      <td className="px-4 py-2">{person.titulacion || "-"}</td>
+                      <td className="px-4 py-2">{person.curso || "-"}</td>
+                    </>
+                  )}
+
+                  {(tipoUsuario === "profesor" || tipoUsuario === "personal") && (
+                    <>
+                      <td className="px-4 py-2">{person.cargo || "-"}</td>
+                      <td className="px-4 py-2">{person.departamento || "-"}</td>
+                    </>
+                  )}
+
+                  <td className="px-4 py-2">{person.dni}</td>
+                  <td className="px-4 py-2">{person.modalidad || "-"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       )}
-
+      
       {/* Botón Siguiente */}
       <div className="mt-6 flex justify-end">
         <button
