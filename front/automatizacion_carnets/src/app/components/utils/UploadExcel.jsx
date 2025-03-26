@@ -38,22 +38,22 @@ const UploadExcel = () => {
   };
 
   return (
-    <div className="flex justify-center items-center w-full min-h-[calc(100vh-80px)] px-4">
-      <div className="w-full max-w-6xl bg-white rounded-2xl shadow-md p-6 flex flex-col gap-6 h-full">
-        
-        {/* Dropzone GRANDE */}
+    <div className="flex justify-center items-center w-full min-h-[calc(100vh-80px)] px-8 py-6">
+      <div className="w-full max-w-6xl bg-white rounded-2xl shadow-md p-8 flex flex-col gap-6 h-full">
+
+        {/* Dropzone central */}
         <label
           htmlFor="excel-upload"
-          className="flex-1 border-2 border-dashed border-gray-300 bg-[#f2f2f2] rounded-xl flex flex-col items-center justify-center text-center cursor-pointer hover:border-[#0065ef] transition min-h-[60vh]"
+          className="flex-1 border-2 border-dashed border-gray-300 bg-[#f4f4f4] rounded-xl flex flex-col items-center justify-center text-center cursor-pointer hover:border-[#0065ef] transition min-h-[60vh]"
         >
-          {/* Icono de carpeta */}
           <div className="mb-4">
             <img
-              src="https://cdn-icons-png.flaticon.com/512/3767/3767084.png"
-              alt="Carpeta"
-              className="w-20 h-20"
+              src="/images/excel_drop_icon.png"
+              alt="Subida Excel"
+              className="w-40 h-40"
             />
           </div>
+
 
           <p className="text-gray-600 text-sm">
             Arrastra un documento excel aquí <br />
