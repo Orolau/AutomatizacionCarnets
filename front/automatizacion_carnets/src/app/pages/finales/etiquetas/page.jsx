@@ -1,12 +1,17 @@
-import React from "react";
-import NavbarTop from "@/app/components/ui/NavbarTop"; 
+"use client";
 
+import EtiquetaEnvio from "@/app/components/forms/EtiquetaEnvio";
+import NavbarTop from "@/app/components/ui/NavbarTop";
 
 export default function EtiquetasPage() {
   return (
-    <><NavbarTop /><div className="p-4">
-      <h1 className="text-2xl font-bold">Etiquetas de Envío</h1>
-      <p>Esta es la página de etiquetas de envío.</p>
-    </div></>
+    <>
+      <NavbarTop />
+      <div className="bg-[#cce3ff] min-h-screen pt-0 px-2 pb-10">
+        <div className="bg-white mx-auto rounded-2xl shadow-md max-w-screen-xl p-6">
+          <EtiquetaEnvio />
+        </div>
+      </div>
+    </>
   );
 }
