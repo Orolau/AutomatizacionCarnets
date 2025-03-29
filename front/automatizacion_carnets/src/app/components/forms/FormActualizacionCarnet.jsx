@@ -3,8 +3,9 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useState, useEffect } from "react";
+import procesarIdentificador from "../utils/procesarIdentificador";
 
-export default function FormActualizacionCarnet({ carnet, setCarnet }) {
+export default function FormActualizacionCarnet({ carnet, setCarnet, updatePersonInLocalStorage }) {
     const [previewFoto, setPreviewFoto] = useState(carnet.foto);
 
     const formik = useFormik({
@@ -42,9 +43,21 @@ export default function FormActualizacionCarnet({ carnet, setCarnet }) {
                 then: (schema) => schema.required("La titulación es obligatoria"),
             }),
         }),
-        onSubmit: (values) => {
-            setCarnet({ ...values, foto: previewFoto });
-            updatePersonData(carnet._id, values);
+        onSubmit: async (values) => {
+            // Procesar el campo DNI antes de enviar los datos
+            const datosProcesados = {
+                ...values,
+                dni: procesarIdentificador(values.dni),
+                //foto: previewFoto,
+            };
+        
+            try {
+                updatePersonInLocalStorage(datosProcesados); // Actualizar localStorage
+                await updatePersonData(carnet._id, datosProcesados);
+                setCarnet(datosProcesados); // Actualizar el estado local con los datos procesados
+            } catch (error) {
+                console.error("Error al enviar los datos:", error);
+            }
         }
     });
 

@@ -1,4 +1,6 @@
 const Person = require("../models/person.js");
+const { handleHttpError } = require("../utils/handleError.js");
+const procesarIdentificador = require("../utils/handleFormatodni.js");
 const { uploadToPinata } = require("../utils/pinata");
 /**
  * @swagger
@@ -55,7 +57,7 @@ const getPeople = async (req, res) => {
         const people = await Person.find();
         res.json(people);
     } catch (error) {
-        res.status(500).json({ message: "Error obteniendo los datos" });
+        handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
     }
 };
 
@@ -129,7 +131,7 @@ const getFilteredPersons = async (req, res) => {
         const filteredPersons = await Person.find(filters); // Usar los filtros directamente en la consulta
         res.json(filteredPersons); // Devolver las personas filtradas
     } catch (error) {
-        res.status(500).json({ message: "Error en la obtención de las personas filtradas", error });
+        handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
     }
 };
 
@@ -209,9 +211,16 @@ const getFilteredPersons = async (req, res) => {
  */
 
 const createPerson = async (req, res) => {
-    const { body } = req;
-    const data = await Person.create(body);
-    res.json(data)
+    try {
+        const { body } = req;
+        const data = await Person.create(body);
+        res.json(data);
+    } catch (error) {
+        if(error.code === 11000)
+            handleHttpError(res, "PERSON_EXISTS", 409)
+        else
+            handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
+    }
 };
 
 /**
@@ -265,9 +274,17 @@ const createPerson = async (req, res) => {
  */
 
 const getPersonById = async (req, res) => {
-    const { id } = req.params;
-    const data = await Person.findOne({ "_id": id })
-    res.json(data);
+    try {
+        const { id } = req.params;
+
+        const data = await Person.findOne({ "_id": id })
+        if (!data)
+            return handleHttpError(res, "PERSON_NOT_FOUND", 404)
+        res.json(data);
+    } catch (error) {
+        handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
+    }
+
 };
 /**
  * @swagger
@@ -320,9 +337,16 @@ const getPersonById = async (req, res) => {
  */
 
 const getPersonByDNI = async (req, res) => {
-    const { dni } = req.params;
-    const data = await Person.findOne({ "dni": dni })
-    res.json(data);
+    try {
+        const { dni } = req.params;
+        const data = await Person.findOne({ "dni": dni })
+        if (!data)
+            return handleHttpError(res, "PERSON_NOT_FOUND", 404)
+        res.json(data);
+    } catch (error) {
+        handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
+    }
+
 };
 /**
  * @swagger
@@ -385,13 +409,13 @@ const getPersonByName = async (req, res) => {
         const data = await Person.findOne({ nombre, apellidos });
 
         if (!data) {
-            return res.status(404).json({ message: "Persona no encontrada" });
+            handleHttpError(res, "PERSON_NOT_FOUND", 404)
         }
 
         res.json(data);
     } catch (error) {
         console.error("Error en getPersonByName:", error.message);
-        res.status(500).json({ error: "Error al obtener la persona" });
+        handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
     }
 };
 /**
@@ -485,16 +509,19 @@ const updatePerson = async (req, res) => {
     }
 
     try {
+        if (req.body.dni) {
+            req.body.dni = procesarIdentificador(req.body.dni)
+        }
         const updatedPerson = await Person.findByIdAndUpdate(id, req.body, { new: true });
 
         if (!updatedPerson) {
-            return res.status(404).json({ error: "Persona no encontrada" });
+            handleHttpError(res, "PERSON_NOT_FOUND", 404)
         }
         console.log(updatePerson)
         res.json(updatedPerson);  // Responde con los datos actualizados
     } catch (error) {
         console.error("Error al actualizar la persona:", error);
-        res.status(500).json({ error: "Error interno del servidor" });
+        handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
     }
 };
 
@@ -548,9 +575,14 @@ const updatePerson = async (req, res) => {
  */
 
 const deletePerson = async (req, res) => {
-    const { id } = req.params;
-    const data = await Person.findByIdAndDelete(id);
-    res.json(data)
+    try {
+        const { id } = req.params;
+        const data = await Person.findByIdAndDelete(id);
+        res.json(data)
+    } catch (error) {
+        handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
+    }
+
 };
 
 /**
@@ -651,7 +683,7 @@ const uploadImageAndUpdatePerson = async (req, res) => {
         res.json({ message: "Foto actualizada correctamente", updatedPerson });
     } catch (error) {
         console.error("Error al subir la imagen y actualizar la persona:", error);
-        res.status(500).json({ message: "Error interno del servidor" });
+        handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
     }
 };
 
@@ -761,7 +793,7 @@ const createPeopleWithFile = async (req, res) => {
                 cargo: personData.cargo || undefined,  // Solo para personal y profesores
                 departamento: personData.departamento || undefined,  // Solo para profesores
                 email: personData.email,
-                dni: personData.dni,
+                dni: procesarIdentificador(personData.dni),
                 foto: personData.foto || "",
                 modalidad: personData.modalidad || "Presencial",
                 curso: personData.curso || "" // Solo para alumnos
@@ -775,8 +807,11 @@ const createPeopleWithFile = async (req, res) => {
 
         return res.status(201).json({ message: "Datos cargados correctamente", persons });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error al procesar el archivo" });
+
+        if (error.code === 11000)
+            handleHttpError(res, "PERSON_EXISTS", 409)
+        else
+            handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
     }
 };
 
@@ -878,6 +913,6 @@ module.exports = {
     getPersonByDNI,
     getPersonByName,
     uploadImageAndUpdatePerson,
-    createPeopleWithFile, 
+    createPeopleWithFile,
     putEstado
 };

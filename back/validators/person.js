@@ -10,7 +10,7 @@ const validateCreatePerson = [
     check("cargo").exists().withMessage("No cargo").isString().withMessage("Cargo debe ser string"),
     check("departamento").exists().withMessage("No departamento").isString().withMessage("Departamento debe ser string"),
     check("email").exists().withMessage("No email").isEmail().withMessage("Invalid email format"),
-    check("dni").exists().withMessage("No dni").matches(/^\d{8}[A-Z]$/).withMessage("DNI debe tener el formato 12345678X"),
+    check("dni").exists().withMessage("No dni"),//.matches(/^\d{8}[A-Z]$/).withMessage("DNI debe tener el formato 12345678X"),
     check("foto").optional().isURL().withMessage("Foto debe ser valid URL"),
     check("modalidad").exists().withMessage("No modalidad").isIn(['Presencial', 'Online']).withMessage("Modalidad debe ser 'Presencial' o 'Online'"),
     validateResults
@@ -42,7 +42,7 @@ const validateCreatePeopleWithFile = [
     check("data.*.cargo").optional().isString().withMessage("Cargo debe ser string"),
     check("data.*.departamento").optional().isString().withMessage("Departamento debe ser string"),
     check("data.*.email").exists().withMessage("Email es requerido").isEmail().withMessage("Formato de email inválido"),
-    check("data.*.dni").exists().withMessage("DNI es requerido").matches(/^\d{8}[A-Z]$/).withMessage("DNI debe tener el formato 12345678X"),
+    check("data.*.dni").exists().withMessage("DNI es requerido"),//.matches(/^\d{8}[A-Z]$/).withMessage("DNI debe tener el formato 12345678X"),
     check("data.*.foto").optional().isURL().withMessage("Foto debe ser valid URL"),
     check("data.*.modalidad").optional().isIn(['Presencial', 'Online']).withMessage("Modalidad debe ser 'Presencial' o 'Online'"),
     check("data.*.curso").optional().isString().withMessage("Curso debe ser string"),
@@ -74,7 +74,7 @@ const validateUpdatePerson = [
     check("cargo").optional().isString().withMessage("Cargo must be a string"),
     check("departamento").optional().isString().withMessage("Departamento must be a string"),
     check("email").optional().isEmail().withMessage("Invalid email format"),
-    check("dni").optional().matches(/^\d{8}[A-Z]$/).withMessage("DNI must be in the format 12345678X"),
+    check("dni").optional(),//.matches(/^\d{8}[A-Z]$/).withMessage("DNI must be in the format 12345678X"),
     check("foto").optional().isURL().withMessage("Foto must be a valid URL"),
     check("modalidad").optional().isIn(['Presencial', 'Online']).withMessage("Modalidad must be 'Presencial' or 'Online"),
     validateResults
