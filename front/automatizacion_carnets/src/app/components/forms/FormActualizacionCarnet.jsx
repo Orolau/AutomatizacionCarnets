@@ -72,8 +72,9 @@ export default function FormActualizacionCarnet({ carnet, setCarnet, updatePerso
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data)
             });
-            if (!response.ok) throw new Error("Error al actualizar los datos");
-            console.log("Datos actualizados correctamente");
+            if (!response.ok){
+                alert("Error en la actualización de los campos")
+            }
         } catch (error) {
             console.error("Error en updatePersonData:", error);
         }
@@ -104,7 +105,7 @@ export default function FormActualizacionCarnet({ carnet, setCarnet, updatePerso
                                 name={name}
                                 value={formik.values[name]}
                                 onChange={formik.handleChange}
-                                className="w-full px-4 py-2 rounded-full border bg-white focus:outline-none text-sm"
+                                className={`w-full px-4 py-2 rounded-full border bg-white focus:outline-none text-sm ${formik.errors[name] ? 'border-red-500' : ''}`}
                             >
                                 <option value="alumno">Alumno</option>
                                 <option value="profesor">Profesor</option>
@@ -116,7 +117,7 @@ export default function FormActualizacionCarnet({ carnet, setCarnet, updatePerso
                                 name={name}
                                 value={formik.values[name]}
                                 onChange={formik.handleChange}
-                                className="w-full px-4 py-2 rounded-full border bg-white focus:outline-none text-sm"
+                                className={`w-full px-4 py-2 rounded-full border bg-white focus:outline-none text-sm ${formik.errors[name] ? 'border-red-500' : ''}`}
                             />
                         )}
                         {formik.errors[name] && (
