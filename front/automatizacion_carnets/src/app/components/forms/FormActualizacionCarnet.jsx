@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 
 export default function FormActualizacionCarnet({ carnet, setCarnet }) {
     const [previewFoto, setPreviewFoto] = useState(carnet.foto);
-    const [fileToUpload, setFileToUpload] = useState(null);
 
     const formik = useFormik({
         initialValues: {
@@ -53,16 +52,6 @@ export default function FormActualizacionCarnet({ carnet, setCarnet }) {
         formik.setValues({ ...formik.values, ...carnet });
     }, [carnet]);
 
-    function handleFileChange(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => setPreviewFoto(reader.result);
-            reader.readAsDataURL(file);
-            setFileToUpload(file);
-        }
-    }
-
     const updatePersonData = async (id, data) => {
         try {
             const response = await fetch(`http://localhost:3005/api/person/${id}`, {
@@ -70,7 +59,6 @@ export default function FormActualizacionCarnet({ carnet, setCarnet }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data)
             });
-            console.log(response.body)
             if (!response.ok) throw new Error("Error al actualizar los datos");
             console.log("Datos actualizados correctamente");
         } catch (error) {
@@ -81,73 +69,49 @@ export default function FormActualizacionCarnet({ carnet, setCarnet }) {
     return (
         <form
             onSubmit={formik.handleSubmit}
-            className="flex flex-col gap-3 p-4 shadow-md rounded bg-blue-100 text-black h-[50vh] overflow-auto relative"
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
-            <h2 className="text-lg font-bold text-center mb-2">Modificar datos</h2>
+            {[
+                { label: "Nombre", name: "nombre" },
+                { label: "Apellidos", name: "apellidos" },
+                { label: "DNI", name: "dni" },
+                { label: "Tipo de Usuario", name: "tipoUsuario", type: "select" },
+                { label: "Tipo de Titulación", name: "tipoTitulacion", condition: formik.values.tipoUsuario === "alumno" },
+                { label: "Titulación", name: "titulacion", condition: formik.values.tipoUsuario === "alumno" },
+                { label: "Cargo", name: "cargo", condition: formik.values.tipoUsuario !== "alumno" },
+                { label: "Departamento", name: "departamento", condition: formik.values.tipoUsuario === "profesor" },
+            ].map(({ label, name, type, condition }) => {
+                if (condition === false) return null;
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                    <label className="text-sm font-semibold text-gray-700">Nombre:</label>
-                    <input type="text" name="nombre" value={formik.values.nombre} onChange={formik.handleChange} className="border p-2 rounded w-full text-gray-700" />
-                    {formik.errors.nombre && <p className="text-red-500 text-xs">{formik.errors.nombre}</p>}
-                </div>
-                <div>
-                    <label className="text-sm font-semibold text-gray-700">Apellidos:</label>
-                    <input type="text" name="apellidos" value={formik.values.apellidos} onChange={formik.handleChange} className="border p-2 rounded w-full text-gray-700" />
-                    {formik.errors.apellidos && <p className="text-red-500 text-xs">{formik.errors.apellidos}</p>}
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                    <label className="text-sm font-semibold text-gray-700">DNI:</label>
-                    <input type="text" name="dni" value={formik.values.dni} onChange={formik.handleChange} className="border p-2 rounded w-full text-gray-700" />
-                    {formik.errors.dni && <p className="text-red-500 text-xs">{formik.errors.dni}</p>}
-                </div>
-                <div>
-                    <label className="text-sm font-semibold text-gray-700">Tipo de Usuario:</label>
-                    <select name="tipoUsuario" value={formik.values.tipoUsuario} onChange={formik.handleChange} className="border p-2 rounded w-full text-gray-700">
-                        <option value="alumno">Alumno</option>
-                        <option value="profesor">Profesor</option>
-                        <option value="personal">Personal</option>
-                    </select>
-                </div>
-            </div>
-
-            {formik.values.tipoUsuario === 'alumno' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                        <label className="text-sm font-semibold text-gray-700">Tipo de Titulación:</label>
-                        <input type="text" name="tipoTitulacion" value={formik.values.tipoTitulacion} onChange={formik.handleChange} className="border p-2 rounded w-full text-gray-700" />
+                return (
+                    <div key={name}>
+                        <label className="text-sm font-medium text-gray-700">{label}:</label>
+                        {type === "select" ? (
+                            <select
+                                name={name}
+                                value={formik.values[name]}
+                                onChange={formik.handleChange}
+                                className="w-full px-4 py-2 rounded-full border bg-white focus:outline-none text-sm"
+                            >
+                                <option value="alumno">Alumno</option>
+                                <option value="profesor">Profesor</option>
+                                <option value="personal">Personal</option>
+                            </select>
+                        ) : (
+                            <input
+                                type="text"
+                                name={name}
+                                value={formik.values[name]}
+                                onChange={formik.handleChange}
+                                className="w-full px-4 py-2 rounded-full border bg-white focus:outline-none text-sm"
+                            />
+                        )}
+                        {formik.errors[name] && (
+                            <p className="text-xs text-red-500">{formik.errors[name]}</p>
+                        )}
                     </div>
-                    <div>
-                        <label className="text-sm font-semibold text-gray-700">Titulación:</label>
-                        <input type="text" name="titulacion" value={formik.values.titulacion} onChange={formik.handleChange} className="border p-2 rounded w-full text-gray-700" />
-                    </div>
-                </div>
-            )}
-
-            {formik.values.tipoUsuario !== 'alumno' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                        <label className="text-sm font-semibold text-gray-700">Cargo:</label>
-                        <input type="text" name="cargo" value={formik.values.cargo} onChange={formik.handleChange} className="border p-2 rounded w-full text-gray-700" />
-                    </div>
-                    {formik.values.tipoUsuario === 'profesor' && (
-                        <div>
-                            <label className="text-sm font-semibold text-gray-700">Departamento:</label>
-                            <input type="text" name="departamento" value={formik.values.departamento} onChange={formik.handleChange} className="border p-2 rounded w-full text-gray-700" />
-                        </div>
-                    )}
-                </div>
-            )}
-
-            {/* Botón fijo en la parte inferior del contenedor */}
-            <div className="absolute bottom-4 left-0 w-full flex justify-center">
-                <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-[90%] max-w-sm">
-                    Guardar Cambios
-                </button>
-            </div>
+                );
+            })}
         </form>
     );
 }

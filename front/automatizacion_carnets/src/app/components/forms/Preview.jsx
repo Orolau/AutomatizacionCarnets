@@ -11,7 +11,7 @@ const Preview = ({ registros }) => {
 
     const handleBack = () => {
         // Redirigir a la página de filtrado
-        router.push('/pages/listaFiltrado');
+        router.push('/pages/finales/principal');
     };
 
     const handleNext = () => {
