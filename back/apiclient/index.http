@@ -70,3 +70,5 @@ Content-Type: application/json
 ###
 GET http://localhost:3005/api/person/name/Carlos García
 
+### errores to mail
+GET http://localhost:3005/api/auth/notify-errors
