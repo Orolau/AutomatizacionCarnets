@@ -65,3 +65,6 @@ Content-Type: application/json
 {
     "estadoCarnet": "hecho"
 }
+
+### errores to mail
+GET http://localhost:3005/api/auth/notify-errors

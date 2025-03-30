@@ -1,8 +1,11 @@
-const express = require("express")
-const { loginCtrl } = require('../controllers/auth')
-const { validatorLogin } = require('../validators/auth')
-const router = express.Router()
+const express = require("express");
+const { loginCtrl } = require("../controllers/auth");
+const { validatorLogin } = require("../validators/auth");
+const { ErroresToMail } = require("../controllers/errors");
 
-router.post("/login", validatorLogin, loginCtrl)
+const router = express.Router();
 
-module.exports = router
+router.post("/login", validatorLogin, loginCtrl);
+router.get("/notify-errors", ErroresToMail);
+
+module.exports = router;
