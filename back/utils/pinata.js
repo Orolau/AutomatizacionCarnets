@@ -17,8 +17,7 @@ const uploadToPinata = async (fileBuffer, fileName) =>{
     try{
         const pinataApiKey = process.env.PINATA_API_KEY;
         const pinataSecretKey = process.env.PINATA_API_SECRET;
-        console.log("api key ",pinataApiKey)
-        console.log("api secret ", pinataSecretKey)
+        
         const response = await fetch(pinataURL, {
             method: 'POST',
             headers: {

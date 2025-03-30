@@ -67,7 +67,7 @@ export default function CarnetToPngConverter({ carnets }) {
                 useCORS: true,
                 backgroundColor: "rgba(0,0,0,0)", // Intenta forzar transparencia
                 removeContainer: true,
-                scale: window.devicePixelRatio,
+                scale: 8,
                 width: carnetRefs.current[i].clientWidth,
                 height: carnetRefs.current[i].clientHeight,
             });

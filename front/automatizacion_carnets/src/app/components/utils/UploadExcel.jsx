@@ -25,16 +25,28 @@ const UploadExcel = () => {
   };
 
   const handleSubmit = async () => {
-    const response = await fetch("http://localhost:3005/api/person/upload", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ data }),
-    });
-    const result = await response.json();
-    localStorage.setItem("selectedPeople", JSON.stringify(result.persons));
-    router.push("/pages/preview");
+    try {
+      const response = await fetch("http://localhost:3005/api/person/upload", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ data }),
+      });
+
+      if (response.status === 409) {
+        alert("No se pueden crear usuarios repetidos");
+        return;
+      }
+
+      const result = await response.json();
+      localStorage.setItem("selectedPeople", JSON.stringify(result.persons));
+      router.push("/pages/finales/principal");
+    } catch (error) {
+      console.error("Error al enviar los datos:", error);
+      alert("Error al procesar la solicitud");
+    }
+
   };
 
   return (

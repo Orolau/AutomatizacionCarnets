@@ -12,6 +12,7 @@ export default function ModificarCarnetIndividualPage() {
     const router = useRouter();
 
     const [previewFoto, setPreviewFoto] = useState("");
+    const [showModal, setShowModal] = useState(false);
 
     const [carnet, setCarnet] = useState({
         dni: "",
@@ -20,7 +21,7 @@ export default function ModificarCarnetIndividualPage() {
         titulacion: "",
         cargo: "",
         departamento: "",
-        foto: "/images/images.png",
+        foto: "",
         nombre: "",
         apellidos: "",
         _id: ""
@@ -34,7 +35,7 @@ export default function ModificarCarnetIndividualPage() {
     useEffect(() => {
         const fetchCarnet = async () => {
             try {
-                const response = await fetch(`http://localhost:3005/api/person/dni/${dni}`);
+                const response = await fetch(`http://localhost:3005/api/person/${dni}`);
                 if (!response.ok) throw new Error("Error al obtener datos del carnet");
 
                 const data = await response.json();
@@ -51,6 +52,31 @@ export default function ModificarCarnetIndividualPage() {
     }, [dni]);
 
     if (!dni) return <div className="p-8 text-center">Cargando...</div>;
+
+    const updatePersonInLocalStorage = (updatedCarnet) => {
+        console.log("Realizando modificaciones en local storage");
+    
+        // Obtener el array de personas de localStorage
+        const storedPeople = localStorage.getItem("selectedPeople");
+        let selectedPeople = storedPeople ? JSON.parse(storedPeople) : [];
+    
+        // Filtrar para eliminar el registro con el _id de updatedCarnet
+        selectedPeople = selectedPeople.filter(person => person._id !== updatedCarnet._id);
+    
+        // Agregar el registro actualizado
+        selectedPeople.push(updatedCarnet);
+    
+        // Eliminar el registro antiguo de localStorage
+        localStorage.removeItem("selectedPeople");
+    
+        // Guardar el array actualizado en localStorage
+        localStorage.setItem("selectedPeople", JSON.stringify(selectedPeople));
+    
+        setShowModal(true);
+    };
+    
+    
+    
 
     return (
         <div className="min-h-screen bg-[#f0f6ff] px-4 py-6 flex justify-center">
@@ -109,7 +135,7 @@ export default function ModificarCarnetIndividualPage() {
                     <div className="w-full lg:w-1/2 flex flex-col gap-6 bg-[#e6f0fd] p-6 rounded-xl">
                         <h2 className="text-2xl font-bold text-center text-[#0d1b2a]">Modificar datos</h2>
 
-                        <FormActualizacionCarnet carnet={carnet} setCarnet={setCarnet} />
+                        <FormActualizacionCarnet carnet={carnet} setCarnet={setCarnet} updatePersonInLocalStorage={updatePersonInLocalStorage}/>
 
                         <hr className="my-2 border-gray-300" />
 
@@ -131,6 +157,25 @@ export default function ModificarCarnetIndividualPage() {
                     </div>
 
                 </div>
+
+                    {showModal && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div className="bg-white p-8 rounded-2xl shadow-xl text-center flex flex-col items-center">
+                                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-3-3a1 1 0 111.414-1.414L9 11.586l6.293-6.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <p className="text-xl font-bold text-gray-600">Cambios guardados con éxito</p>
+                                <button
+                                    onClick={() => setShowModal(false)}
+                                    className="mt-6 bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-full text-lg"
+                                >
+                                    Cerrar
+                                </button>
+                            </div>
+                        </div>
+                    )}
             </div>
         </div>
     );
