@@ -6,12 +6,12 @@ const Preview = ({ registros }) => {
 
     const handleRedirect = (carnet) => {
         // Redirigir a la página de modificación pasando los datos como query parameters
-        router.push(`/pages/modify/${carnet.dni}`);
+        router.push(`/pages/modify/${carnet._id}`);
     };
 
     const handleBack = () => {
         // Redirigir a la página de filtrado
-        router.push('/pages/listaFiltrado');
+        router.push('/pages/finales/principal');
     };
 
     const handleNext = () => {

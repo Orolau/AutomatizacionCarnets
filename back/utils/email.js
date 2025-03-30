@@ -29,4 +29,21 @@ const sendVerificationEmail = async (to, code) => {
     }
 };
 
-module.exports = sendVerificationEmail;
+const sendEmail = async (to, subject, text) => {
+    const mailOptions = {
+      from: '"Carnets U-tad" <carnetsutad@gmail.com>',
+      to,
+      subject,
+      text,
+    };
+  
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`Email enviado: ${info.messageId}`);
+    } catch (error) {
+      console.error("Error al enviar email:", error);
+      throw error;
+    }
+  };
+
+module.exports = sendVerificationEmail, sendEmail;

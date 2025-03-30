@@ -15,7 +15,7 @@ export default function ModificarErrores() {
     const handleSelectStudent = (student) => {
       setSelectedStudent(student);
       setEditedData({ ...student });
-    };
+    };  
   
     const handleChange = (e) => {
       setEditedData({ ...editedData, [e.target.name]: e.target.value });

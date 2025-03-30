@@ -1,25 +1,22 @@
 "use client";
-import { useState, useEffect } from "react";
+
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import personasData from "@/app/jsonPruebas/personasFiltrado.json";
 
-export default function PendingCardsList() {
+export default function PendingCardList() {
   const [carnets, setCarnets] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
     const obtenerCarnetsFallidos = () => {
-      console.log("JSON cargado correctamente:", personasData);
-
       const carnetsConErrores = personasData
-        .filter((persona) => persona.tipo === "estudiante") // Solo estudiantes
-        .filter((persona) => !persona.imagen?.trim() || !persona.dni?.trim()) // Detecta imágenes o DNIs vacíos
+        .filter((persona) => persona.tipo === "estudiante")
+        .filter((persona) => !persona.imagen?.trim() || !persona.dni?.trim())
         .map((persona) => ({
           ...persona,
           error: !persona.imagen?.trim() ? "Falta imagen" : "DNI ilegible",
         }));
-
-      console.log("Carnets detectados con errores:", carnetsConErrores);
       setCarnets(carnetsConErrores);
     };
 
@@ -27,51 +24,66 @@ export default function PendingCardsList() {
   }, []);
 
   const handleEdit = (dni) => {
-    router.push(`/pages/userForms/edit?dni=${dni}`); // Redirige a la Página 8 para editar
+    router.push(`/pages/userForms/edit?dni=${dni}`);
   };
 
   return (
-    <div className="table-container">
-      <div>
-        <h2 className="text-xl font-bold mb-4 text-black text-center">
-          Carnets con Errores
-        </h2>
-        <table className="min-w-full bg-white border border-gray-300">
-          <thead>
-            <tr className="bg-gray-200 text-gray-700 uppercase text-sm leading-normal">
-              <th className="py-2 px-4 border">Nombre</th>
-              <th className="py-2 px-4 border">Titulación</th>
-              <th className="py-2 px-4 border">Curso</th>
-              <th className="py-2 px-4 border">Error</th>
-              <th className="py-2 px-4 border">Acción</th>
+    <div>
+      <h2 className="text-2xl font-semibold text-[#0d1b2a] mb-6">
+        Carnets con errores
+      </h2>
+
+      <div className="overflow-x-auto rounded-xl border border-gray-200">
+        <table className="min-w-full text-sm text-left">
+          <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+            <tr>
+              <th className="p-4 w-10"></th>
+              <th className="p-4 w-10"></th>
+              <th className="p-4">Nombre</th>
+              <th className="p-4">Titulación</th>
+              <th className="p-4">Curso</th>
+              <th className="p-4">Error</th>
+              <th className="p-4 text-right">Acción</th>
             </tr>
           </thead>
           <tbody>
             {carnets.length === 0 ? (
               <tr>
-                <td colSpan="5" className="text-center py-4 text-gray-500">
+                <td colSpan="7" className="text-center p-6 text-gray-400">
                   No hay carnets pendientes por fallo.
                 </td>
               </tr>
             ) : (
               carnets.map((carnet) => (
-                <tr key={carnet.dni} className="border-b hover:bg-gray-100">
-                  <td className="py-2 px-4 border text-black font-medium">
+                <tr
+                  key={carnet.dni}
+                  className="border-t hover:bg-gray-50 transition"
+                >
+                  {/* Checkbox visual */}
+                  <td className="p-4">
+                    <input type="checkbox" className="accent-blue-600" />
+                  </td>
+
+                  {/* Punto rojo */}
+                  <td className="p-4">
+                    <span className="block w-3 h-3 bg-red-500 rounded-full"></span>
+                  </td>
+
+                  {/* Datos */}
+                  <td className="p-4 text-gray-800 font-medium whitespace-nowrap">
                     {carnet.nombre} {carnet.apellidos}
                   </td>
-                  <td className="py-2 px-4 border text-black font-medium">
-                    {carnet.titulacion}
-                  </td>
-                  <td className="py-2 px-4 border text-black font-medium">
-                    {carnet.curso}
-                  </td>
-                  <td className="py-2 px-4 border text-red-500 font-bold">
+                  <td className="p-4 text-gray-700">{carnet.titulacion}</td>
+                  <td className="p-4 text-gray-700">{carnet.curso}</td>
+                  <td className="p-4 font-semibold text-red-500">
                     {carnet.error}
                   </td>
-                  <td className="py-2 px-4 border">
+
+                  {/* Botón editar */}
+                  <td className="p-4 text-right">
                     <button
                       onClick={() => handleEdit(carnet.dni)}
-                      className="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600"
+                      className="text-sm px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition"
                     >
                       Editar
                     </button>

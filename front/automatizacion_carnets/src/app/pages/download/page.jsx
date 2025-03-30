@@ -1,4 +1,5 @@
 "use client"
+import ExportExcel from '@/app/components/utils/ExportExcelPeople';
 import ListaCarnetToPngConverter from '@/app/components/utils/ListaCarnetToPng';
 import { useEffect, useState } from 'react';
 
@@ -14,6 +15,7 @@ export default function cardPage() {
 
   }, []);
   return (<div>
+    <ExportExcel />
     <ListaCarnetToPngConverter carnets={carnets} />
   </div>)
 }

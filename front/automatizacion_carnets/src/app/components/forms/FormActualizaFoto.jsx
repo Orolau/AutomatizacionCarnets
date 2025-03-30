@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 
@@ -20,53 +20,65 @@ export default function FormActualizaFoto({ previewFoto, id, setPreviewFoto }) {
                 },
             });
 
-            if (!response.ok) {
-                throw new Error("Error al actualizar la foto");
-            }
+            if (!response.ok) throw new Error("Error al actualizar la foto");
 
             const data = await response.json();
             setPreviewFoto(data.updatedPerson.foto);
-            console.log("Foto actualizada correctamente");
         } catch (error) {
             console.error("Error en handleSubmit:", error);
         }
     };
 
     return (
-        <div className="bg-blue-100 p-4 shadow-md rounded text-black flex flex-col md:flex-row items-center md:items-start gap-4">
-            {/* Vista previa de la imagen a la izquierda */}
-            {previewFoto && (
-                <div className="flex-shrink-0">
-                    <img src={previewFoto} alt="Vista previa" className="w-24 h-24 rounded-md border border-gray-300 shadow-md" />
-                </div>
-            )}
+        <div className="flex flex-col gap-4">
+            <label className="text-sm font-semibold text-gray-700">Foto de Carnet:</label>
 
-            {/* Inputs y botón a la derecha */}
-            <div className="flex flex-col gap-3 w-full">
-                <label className="text-sm font-semibold text-gray-700">Foto de Perfil:</label>
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(event) => {
-                        const file = event.target.files[0];
-                        if (file) {
-                            setFileToUpload(file);
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                                setPreviewFoto(reader.result);
-                            };
-                            reader.readAsDataURL(file);
-                        }
-                    }}
-                    className="border p-2 rounded w-full text-gray-700 bg-white"
-                />
+            <div className="flex flex-col md:flex-row gap-4 items-center">
+                <div className="w-24 h-24 border border-gray-300 rounded-lg flex items-center justify-center bg-white text-4xl text-gray-400">
+                    {previewFoto ? (
+                        <img
+                            src={previewFoto}
+                            alt="Vista previa"
+                            className="w-full h-full object-cover rounded-lg"
+                        />
+                    ) : (
+                        "👤"
+                    )}
+                </div>
+
+                <label className="flex-1 border-2 border-dashed border-gray-300 rounded-lg bg-[#f2f2f2] px-6 py-5 text-center cursor-pointer hover:border-[#005dd7] transition">
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(event) => {
+                            const file = event.target.files[0];
+                            if (file) {
+                                setFileToUpload(file);
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                    setPreviewFoto(reader.result);
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                        }}
+                        className="hidden"
+                    />
+                    <div className="flex flex-col items-center text-sm text-gray-500">
+                        <span className="text-xl mb-1">🖼️</span>
+                        <span>Arrastra una imagen o</span>
+                        <span className="text-[#0065ef] underline">sube un archivo</span>
+                    </div>
+                </label>
+            </div>
+
+            <div className="flex justify-end">
                 <button
                     onClick={handleSubmit}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 self-start">
+                    className="bg-[#0065ef] hover:bg-[#005dd7] text-white px-5 py-2 rounded-full transition"
+                >
                     Cambiar Foto
                 </button>
             </div>
         </div>
-
     );
 }
