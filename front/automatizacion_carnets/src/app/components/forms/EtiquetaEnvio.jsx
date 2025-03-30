@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { jsPDF } from "jspdf";
 import { useRouter } from "next/navigation"; // Importar useRouter
+//import Cookies from "js-cookie";
 
 const EtiquetaEnvio = () => {
     const router = useRouter(); // Usar el hook useRouter
@@ -9,7 +10,17 @@ const EtiquetaEnvio = () => {
     const [seleccionado, setSeleccionado] = useState(null);
 
     useEffect(() => {
-        axios.get("http://localhost:3005/api/person")
+
+        /*const tokenLogin = Cookies.get('authToken');
+        if (!tokenLogin) {
+            router.push('../pages/userForms/login');
+            return;
+        }*/
+        axios.get("http://localhost:3005/api/person", {
+            headers: {
+                "Content-Type": "application/json"
+            },
+        })
             .then(response => {
                 const onlineCarnets = response.data.filter(persona => persona.modalidad === "Online");
                 setCarnets(onlineCarnets);
@@ -21,14 +32,14 @@ const EtiquetaEnvio = () => {
 
     const generarEtiquetaPDF = () => {
         if (!seleccionado) return;
-        
+
         const doc = new jsPDF();
         const fechaActual = new Date().toLocaleDateString("es-ES");
         const referencia = `REF-${Math.floor(Math.random() * 100000)}`;
-        
+
         doc.setFont("helvetica", "bold");
         doc.text("ENVÍO A:", 20, 20);
-        
+
         doc.setFont("helvetica", "normal");
         doc.text(`Nombre: ${seleccionado.nombre} ${seleccionado.apellidos}`, 20, 30);
         doc.text(`Dirección: ${seleccionado.direccion}`, 20, 40);
@@ -37,7 +48,7 @@ const EtiquetaEnvio = () => {
         doc.text(`Nº Bultos: 1    Envío por: U-tad`, 20, 70);
         doc.text(`Peso kgs.: 0.3    Fecha: ${fechaActual}    Ref.: ${referencia}`, 20, 80);
         doc.text("REMITE: Universidad U-tad", 20, 100);
-        
+
         doc.save("etiqueta_envio.pdf");
     };
 
@@ -49,7 +60,7 @@ const EtiquetaEnvio = () => {
     return (
         <div className="p-4 text-black">
             {/* Botón de Atrás */}
-            <button 
+            <button
                 onClick={handleBack}
                 className="p-2 bg-gray-500 text-white rounded-md mb-4"
             >
@@ -58,20 +69,20 @@ const EtiquetaEnvio = () => {
 
             <h2 className="text-xl font-bold text-gray-900">Generar Etiqueta de Envío</h2>
             <p className="mb-4 text-gray-800">Selecciona un carnet con modalidad "Online" para generar su etiqueta de envío.</p>
-            
+
             <ul className="mb-4">
                 {carnets.map((carnet) => (
                     <li key={carnet._id} className="flex items-center gap-2 text-gray-900">
-                        <input 
-                            type="checkbox" 
-                            checked={seleccionado?._id === carnet._id} 
+                        <input
+                            type="checkbox"
+                            checked={seleccionado?._id === carnet._id}
                             onChange={() => setSeleccionado(carnet)}
                         />
                         {carnet.nombre} {carnet.apellidos} - {carnet.dni}
                     </li>
                 ))}
             </ul>
-            
+
             {seleccionado && (
                 <div className="border p-4 bg-gray-100">
                     <h3 className="font-semibold">Etiqueta de Envío</h3>

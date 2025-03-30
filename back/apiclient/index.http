@@ -1,8 +1,8 @@
 GET http://localhost:3005/api/person
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2N2FlNDNhN2JkYzc2ZDNhYTk5NjQzZWEiLCJpYXQiOjE3NDIxNTQ0MTcsImV4cCI6MTc0MjI0MDgxN30.yny6a1XzlBMVgDiJJAq0Dep173O6oypRCV2oncqdwIM
 
 ###
 GET http://localhost:3005/api/user
-
 
 ###
 GET http://localhost:3005/api/person/67aa21c50e8e631dbf097fd4

@@ -47,7 +47,7 @@ export default function VerificationForm() {
                         window.location.replace('/pages/listaFiltrado');
                     }, 300); // Le damos un poco más de tiempo para que termine la navegación
                 });
-                                
+
             }
         } catch (err) {
             console.error("Error en la verificación:", error.message);

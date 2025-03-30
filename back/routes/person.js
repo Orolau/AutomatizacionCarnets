@@ -1,12 +1,13 @@
 const express = require("express");
 const multer = require("multer");
-const {getFilteredPersons, createPerson, createPeopleWithFile, getPersonByDNI, getPersonByName, getPersonById, updatePerson, deletePerson, uploadImageAndUpdatePerson, getPeople  } = require("../controllers/person.js");
+const { getFilteredPersons, createPerson, createPeopleWithFile, getPersonByDNI, getPersonByName, getPersonById, updatePerson, deletePerson, uploadImageAndUpdatePerson, getPeople } = require("../controllers/person.js");
+const authMiddleware = require('../middleware/session.js')
 
 const router = express.Router();
 const upload = multer();
 
 router.get("/", getPeople);
-router.get("/filtered", getFilteredPersons)
+router.get("/filtered", getFilteredPersons);
 router.post("/", createPerson);
 router.post("/upload", createPeopleWithFile);
 router.get("/:id", getPersonById);

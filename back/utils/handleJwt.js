@@ -10,6 +10,7 @@ const tokenSign = (user) => {
             expiresIn: "24h"
         }
     )
+
     return sign
 }
 

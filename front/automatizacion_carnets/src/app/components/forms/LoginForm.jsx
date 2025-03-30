@@ -7,6 +7,7 @@ import "@/app/styles/LoginForm.css";
 import { useRouter } from "next/navigation";
 import { LoginFormInteract } from "@/app/api/LoginFormInteract";
 import crypto from "crypto";
+//import Cookies from 'js-cookie';
 
 /*const generarMD5 = (password) => {
     return crypto.createHash("md5").update(password).digest("hex");
@@ -38,8 +39,16 @@ export default function LoginForm() {
         console.log(respuestaServer);
         console.log(values);
 
-        if (respuestaServer === userData.mail) {
+        if (respuestaServer.user.mail === userData.mail) {
             localStorage.setItem("email", userData.mail);
+            console.log("EMAIL: ", localStorage.getItem("email"))
+            localStorage.setItem('tokenLogin', respuestaServer.token);
+            console.log("TOKEN: ", sessionStorage.getItem("tokenLogin"))
+            //Cookies.set('authToken', respuestaServer.token, { expires: 1 });
+            /*const expirationDate = new Date();
+            expirationDate.setDate(expirationDate.getDate() + 1);
+            document.cookie = `authToken=${respuestaServer.token}; path=/; samesite=strict; expires=${expirationDate.toUTCString()}`;*/
+
             router.push("./pages/verify");
         }
     };
