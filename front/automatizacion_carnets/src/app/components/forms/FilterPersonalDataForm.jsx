@@ -353,7 +353,7 @@ export default function PersonalDataFiltered() {
           </table>
         </div>
       )}
-      
+
       {/* Botón Siguiente */}
       <div className="mt-6 flex justify-end">
         <button
