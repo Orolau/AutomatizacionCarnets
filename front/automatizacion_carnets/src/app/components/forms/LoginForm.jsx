@@ -31,6 +31,10 @@ export default function LoginForm() {
 
         if (respuestaServer.user.mail === userData.mail) {
             localStorage.setItem("email", userData.mail);
+            const expiration = new Date();
+            expiration.setTime(expiration.getTime() + 24 * 60 * 60 * 1000);
+            document.cookie = `jwt=${respuestaServer.token}; expires=${expiration.toUTCString()}; path=/; samesite=strict;`;
+
             router.push("/pages/verify");
         }
     };
