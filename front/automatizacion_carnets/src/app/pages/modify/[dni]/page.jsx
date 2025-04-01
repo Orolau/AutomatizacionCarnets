@@ -136,15 +136,6 @@ export default function ModificarCarnetIndividualPage() {
                         <h2 className="text-2xl font-bold text-center text-[#0d1b2a]">Modificar datos</h2>
 
                         <FormActualizacionCarnet carnet={carnet} setCarnet={setCarnet} updatePersonInLocalStorage={updatePersonInLocalStorage}/>
-
-                        <hr className="my-2 border-gray-300" />
-
-                        <FormActualizaFoto
-                            id={carnet._id}
-                            previewFoto={previewFoto}
-                            setPreviewFoto={handleChangePhoto}
-                        />
-
                         {/* Botón guardar */}
                         <div className="flex justify-center pt-2">
                             <button
@@ -154,6 +145,15 @@ export default function ModificarCarnetIndividualPage() {
                                 Guardar Cambios
                             </button>
                         </div>
+                        <hr className="my-2 border-gray-300" />
+
+                        <FormActualizaFoto
+                            id={carnet._id}
+                            previewFoto={previewFoto}
+                            setPreviewFoto={handleChangePhoto}
+                        />
+
+                        
                     </div>
 
                 </div>

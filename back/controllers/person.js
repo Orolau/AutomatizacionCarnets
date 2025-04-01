@@ -503,7 +503,6 @@ const getPersonByName = async (req, res) => {
 const updatePerson = async (req, res) => {
     const { id } = req.params;
 
-    // Asegúrate de que 'id' no sea undefined
     if (!id) {
         return res.status(400).json({ error: "ID es requerido" });
     }

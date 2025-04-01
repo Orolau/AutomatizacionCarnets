@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function FormActualizaFoto({ previewFoto, id, setPreviewFoto }) {
+export default function FormActualizaFoto({ previewFoto, id, setPreviewFoto, updatePersonInLocalStorage }) {
     const [fileToUpload, setFileToUpload] = useState(null);
 
     const handleSubmit = async () => {
@@ -20,7 +20,23 @@ export default function FormActualizaFoto({ previewFoto, id, setPreviewFoto }) {
             if (!response.ok) throw new Error("Error al actualizar la foto");
 
             const data = await response.json();
-            setPreviewFoto(data.updatedPerson.foto);
+            const nuevaFoto = data.updatedPerson.foto;
+
+            // Actualiza la vista previa
+            setPreviewFoto(nuevaFoto);
+
+            // Actualiza la foto en localStorage
+            const storedPeople = JSON.parse(localStorage.getItem("selectedPeople")) || [];
+            const updatedPeople = storedPeople.map(person => 
+                person._id === id ? { ...person, foto: nuevaFoto } : person
+            );
+
+            localStorage.setItem("selectedPeople", JSON.stringify(updatedPeople));
+
+            // Llama a la función de actualización externa si existe
+            if (updatePersonInLocalStorage) {
+                updatePersonInLocalStorage({ _id: id, foto: nuevaFoto });
+            }
         } catch (error) {
             console.error("Error en handleSubmit:", error);
         }
