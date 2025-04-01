@@ -14,7 +14,10 @@ export default function FormActualizaFoto({ previewFoto, id, setPreviewFoto, upd
         try {
             const response = await fetch(`http://localhost:3005/api/person/updatePhoto/${id}`, {
                 method: "PUT",
-                body: formData
+                body: formData,
+                headers: {
+                    "Content-Type": "application/json",
+                },
             });
 
             if (!response.ok) throw new Error("Error al actualizar la foto");

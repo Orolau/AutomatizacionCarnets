@@ -37,7 +37,7 @@ export const LoginFormInteract = async ({ mail, passwd }) => {
         const updateResponse = await axios.put(`http://localhost:3005/api/user/verify/${encodeURIComponent(mail)}`);
         console.log("Respuesta de updateVerifying:", updateResponse.data);
 
-        return data.user.mail;
+        return data;
     } catch (error) {
         console.error("Error en la autenticación:", error.message);
         throw error;

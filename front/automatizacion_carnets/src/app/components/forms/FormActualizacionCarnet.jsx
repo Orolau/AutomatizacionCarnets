@@ -69,7 +69,9 @@ export default function FormActualizacionCarnet({ carnet, setCarnet, updatePerso
         try {
             const response = await fetch(`http://localhost:3005/api/person/${id}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify(data)
             });
             if (!response.ok){

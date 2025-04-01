@@ -4,7 +4,6 @@ authoritation: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2N2U3YmQzY2NhMjRi
 ###
 GET http://localhost:3005/api/user
 
-
 ###
 GET http://localhost:3005/api/person/67aa21c50e8e631dbf097fd4
 

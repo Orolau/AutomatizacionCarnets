@@ -19,11 +19,14 @@ const FilterForm = ({ onFilter }) => {
   const [cargos, setCargos] = useState([]);
   const [departamentos, setDepartamentos] = useState([]);
   const [modalidades, setModalidades] = useState([]);
-  
+
   // Estado para los resultados filtrados
   const [resultados, setResultados] = useState([]);
 
+  const tokenLogin = localStorage.getItem('tokenLogin');
+
   useEffect(() => {
+
     const fetchData = async () => {
       try {
         const response = await fetch(API_URL);
@@ -78,7 +81,7 @@ const FilterForm = ({ onFilter }) => {
   return (
     <div className="p-4 bg-white shadow-md rounded-lg">
       <h1 className="text-2xl font-bold mb-4 text-gray-800">Filtrar Personas</h1>
-      
+
       <select className="w-full p-2 border rounded-md text-gray-800" value={tipoUsuario} onChange={(e) => setTipoUsuario(e.target.value)}>
         <option value="">Seleccionar tipo de usuario</option>
         {tiposUsuarios.map((tipo, index) => (
@@ -103,7 +106,7 @@ const FilterForm = ({ onFilter }) => {
               ))}
             </select>
           )}
-          
+
           <select className="w-full p-2 border rounded-md text-gray-800" value={curso} onChange={(e) => setCurso(e.target.value)}>
             <option value="">Seleccionar curso</option>
             {cursos.map((cur, index) => (
@@ -121,7 +124,7 @@ const FilterForm = ({ onFilter }) => {
               <option key={index} value={c}>{c}</option>
             ))}
           </select>
-          
+
           <select className="w-full p-2 border rounded-md text-gray-800" value={departamento} onChange={(e) => setDepartamento(e.target.value)}>
             <option value="">Seleccionar departamento</option>
             {departamentos.map((dep, index) => (
