@@ -3,8 +3,9 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useState, useEffect } from "react";
+import procesarIdentificador from "../utils/procesarIdentificador";
 
-export default function FormActualizacionCarnet({ carnet, setCarnet }) {
+export default function FormActualizacionCarnet({ carnet, setCarnet, updatePersonInLocalStorage }) {
     const [previewFoto, setPreviewFoto] = useState(carnet.foto);
 
     const formik = useFormik({
@@ -42,9 +43,21 @@ export default function FormActualizacionCarnet({ carnet, setCarnet }) {
                 then: (schema) => schema.required("La titulación es obligatoria"),
             }),
         }),
-        onSubmit: (values) => {
-            setCarnet({ ...values, foto: previewFoto });
-            updatePersonData(carnet._id, values);
+        onSubmit: async (values) => {
+            // Procesar el campo DNI antes de enviar los datos
+            const datosProcesados = {
+                ...values,
+                dni: procesarIdentificador(values.dni),
+                //foto: previewFoto,
+            };
+        
+            try {
+                updatePersonInLocalStorage(datosProcesados); // Actualizar localStorage
+                await updatePersonData(carnet._id, datosProcesados);
+                setCarnet(datosProcesados); // Actualizar el estado local con los datos procesados
+            } catch (error) {
+                console.error("Error al enviar los datos:", error);
+            }
         }
     });
 
@@ -56,11 +69,14 @@ export default function FormActualizacionCarnet({ carnet, setCarnet }) {
         try {
             const response = await fetch(`http://localhost:3005/api/person/${id}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify(data)
             });
-            if (!response.ok) throw new Error("Error al actualizar los datos");
-            console.log("Datos actualizados correctamente");
+            if (!response.ok){
+                alert("Error en la actualización de los campos")
+            }
         } catch (error) {
             console.error("Error en updatePersonData:", error);
         }
@@ -91,7 +107,7 @@ export default function FormActualizacionCarnet({ carnet, setCarnet }) {
                                 name={name}
                                 value={formik.values[name]}
                                 onChange={formik.handleChange}
-                                className="w-full px-4 py-2 rounded-full border bg-white focus:outline-none text-sm"
+                                className={`w-full px-4 py-2 rounded-full border bg-white focus:outline-none text-sm ${formik.errors[name] ? 'border-red-500' : ''}`}
                             >
                                 <option value="alumno">Alumno</option>
                                 <option value="profesor">Profesor</option>
@@ -103,7 +119,7 @@ export default function FormActualizacionCarnet({ carnet, setCarnet }) {
                                 name={name}
                                 value={formik.values[name]}
                                 onChange={formik.handleChange}
-                                className="w-full px-4 py-2 rounded-full border bg-white focus:outline-none text-sm"
+                                className={`w-full px-4 py-2 rounded-full border bg-white focus:outline-none text-sm ${formik.errors[name] ? 'border-red-500' : ''}`}
                             />
                         )}
                         {formik.errors[name] && (

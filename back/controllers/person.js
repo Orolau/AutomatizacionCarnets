@@ -1,4 +1,6 @@
 const Person = require("../models/person.js");
+const { handleHttpError } = require("../utils/handleError.js");
+const procesarIdentificador = require("../utils/handleFormatodni.js");
 const { uploadToPinata } = require("../utils/pinata");
 /**
  * @swagger
@@ -55,7 +57,7 @@ const getPeople = async (req, res) => {
         const people = await Person.find();
         res.json(people);
     } catch (error) {
-        res.status(500).json({ message: "Error obteniendo los datos" });
+        handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
     }
 };
 
@@ -129,7 +131,7 @@ const getFilteredPersons = async (req, res) => {
         const filteredPersons = await Person.find(filters); // Usar los filtros directamente en la consulta
         res.json(filteredPersons); // Devolver las personas filtradas
     } catch (error) {
-        res.status(500).json({ message: "Error en la obtención de las personas filtradas", error });
+        handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
     }
 };
 
@@ -209,9 +211,16 @@ const getFilteredPersons = async (req, res) => {
  */
 
 const createPerson = async (req, res) => {
-    const { body } = req;
-    const data = await Person.create(body);
-    res.json(data)
+    try {
+        const { body } = req;
+        const data = await Person.create(body);
+        res.json(data);
+    } catch (error) {
+        if(error.code === 11000)
+            handleHttpError(res, "PERSON_EXISTS", 409)
+        else
+            handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
+    }
 };
 
 /**
@@ -265,9 +274,17 @@ const createPerson = async (req, res) => {
  */
 
 const getPersonById = async (req, res) => {
-    const { id } = req.params;
-    const data = await Person.findOne({ "_id": id })
-    res.json(data);
+    try {
+        const { id } = req.params;
+
+        const data = await Person.findOne({ "_id": id })
+        if (!data)
+            return handleHttpError(res, "PERSON_NOT_FOUND", 404)
+        res.json(data);
+    } catch (error) {
+        handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
+    }
+
 };
 /**
  * @swagger
@@ -320,9 +337,16 @@ const getPersonById = async (req, res) => {
  */
 
 const getPersonByDNI = async (req, res) => {
-    const { dni } = req.params;
-    const data = await Person.findOne({ "dni": dni })
-    res.json(data);
+    try {
+        const { dni } = req.params;
+        const data = await Person.findOne({ "dni": dni })
+        if (!data)
+            return handleHttpError(res, "PERSON_NOT_FOUND", 404)
+        res.json(data);
+    } catch (error) {
+        handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
+    }
+
 };
 /**
  * @swagger
@@ -385,13 +409,13 @@ const getPersonByName = async (req, res) => {
         const data = await Person.findOne({ nombre, apellidos });
 
         if (!data) {
-            return res.status(404).json({ message: "Persona no encontrada" });
+            handleHttpError(res, "PERSON_NOT_FOUND", 404)
         }
 
         res.json(data);
     } catch (error) {
         console.error("Error en getPersonByName:", error.message);
-        res.status(500).json({ error: "Error al obtener la persona" });
+        handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
     }
 };
 /**
@@ -479,22 +503,24 @@ const getPersonByName = async (req, res) => {
 const updatePerson = async (req, res) => {
     const { id } = req.params;
 
-    // Asegúrate de que 'id' no sea undefined
     if (!id) {
         return res.status(400).json({ error: "ID es requerido" });
     }
 
     try {
+        if (req.body.dni) {
+            req.body.dni = procesarIdentificador(req.body.dni)
+        }
         const updatedPerson = await Person.findByIdAndUpdate(id, req.body, { new: true });
 
         if (!updatedPerson) {
-            return res.status(404).json({ error: "Persona no encontrada" });
+            handleHttpError(res, "PERSON_NOT_FOUND", 404)
         }
         console.log(updatePerson)
         res.json(updatedPerson);  // Responde con los datos actualizados
     } catch (error) {
         console.error("Error al actualizar la persona:", error);
-        res.status(500).json({ error: "Error interno del servidor" });
+        handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
     }
 };
 
@@ -548,9 +574,14 @@ const updatePerson = async (req, res) => {
  */
 
 const deletePerson = async (req, res) => {
-    const { id } = req.params;
-    const data = await Person.findByIdAndDelete(id);
-    res.json(data)
+    try {
+        const { id } = req.params;
+        const data = await Person.findByIdAndDelete(id);
+        res.json(data)
+    } catch (error) {
+        handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
+    }
+
 };
 
 /**
@@ -651,10 +682,98 @@ const uploadImageAndUpdatePerson = async (req, res) => {
         res.json({ message: "Foto actualizada correctamente", updatedPerson });
     } catch (error) {
         console.error("Error al subir la imagen y actualizar la persona:", error);
-        res.status(500).json({ message: "Error interno del servidor" });
+        handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
     }
 };
 
+/**
+ * @swagger
+ * /api/person/create:
+ *   post:
+ *     summary: Crea múltiples personas en la base de datos
+ *     description: Recibe una lista de personas en el cuerpo de la solicitud y las guarda en la base de datos.
+ *     tags:
+ *       - Personas
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               data:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     tipoUsuario:
+ *                       type: string
+ *                       description: Tipo de usuario, puede ser 'alumno', 'personal' o 'profesor'.
+ *                       default: "alumno"
+ *                     nombre:
+ *                       type: string
+ *                       description: Nombre de la persona.
+ *                     apellidos:
+ *                       type: string
+ *                       description: Apellidos de la persona.
+ *                     titulacion:
+ *                       type: string
+ *                       description: Titulación de la persona (solo para alumnos).
+ *                       nullable: true
+ *                     tipoTitulacion:
+ *                       type: string
+ *                       description: Tipo de titulación (solo para alumnos).
+ *                       default: ""
+ *                     cargo:
+ *                       type: string
+ *                       description: Cargo de la persona (solo para personal y profesores).
+ *                       nullable: true
+ *                     departamento:
+ *                       type: string
+ *                       description: Departamento de la persona (solo para profesores).
+ *                       nullable: true
+ *                     email:
+ *                       type: string
+ *                       description: Correo electrónico de la persona.
+ *                       format: email
+ *                     dni:
+ *                       type: string
+ *                       description: DNI de la persona, debe seguir el formato 12345678X.
+ *                     foto:
+ *                       type: string
+ *                       description: URL de la foto de la persona.
+ *                       nullable: true
+ *                       default: ""
+ *                     modalidad:
+ *                       type: string
+ *                       description: Modalidad en la que se encuentra la persona ('Presencial' o 'Online').
+ *                       default: "Presencial"
+ *                     curso:
+ *                       type: string
+ *                       description: Curso de la persona (solo para alumnos).
+ *                       nullable: true
+ *                       default: ""
+ *     responses:
+ *       201:
+ *         description: Datos cargados correctamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de éxito.
+ *                   example: "Datos cargados correctamente"
+ *                 persons:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Person'
+ *       400:
+ *         description: Error de validación de los datos proporcionados.
+ *       500:
+ *         description: Error en el servidor al procesar los datos.
+ */
 const createPeopleWithFile = async (req, res) => {
     try {
         const { data } = req.body; // Datos provenientes del frontend
@@ -673,7 +792,7 @@ const createPeopleWithFile = async (req, res) => {
                 cargo: personData.cargo || undefined,  // Solo para personal y profesores
                 departamento: personData.departamento || undefined,  // Solo para profesores
                 email: personData.email,
-                dni: personData.dni,
+                dni: procesarIdentificador(personData.dni),
                 foto: personData.foto || "",
                 modalidad: personData.modalidad || "Presencial",
                 curso: personData.curso || "" // Solo para alumnos
@@ -687,12 +806,65 @@ const createPeopleWithFile = async (req, res) => {
 
         return res.status(201).json({ message: "Datos cargados correctamente", persons });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error al procesar el archivo" });
+
+        if (error.code === 11000)
+            handleHttpError(res, "PERSON_EXISTS", 409)
+        else
+            handleHttpError(res, "INTERNAL_SERVER_ERROR", 500)
     }
 };
 
-// Actualizar el estado de un carnet
+
+/**
+ * @swagger
+ * /api/person/estado/{dni}:
+ *   put:
+ *     summary: Actualizar el estado de un carnet
+ *     description: Cambia el estado del carnet de una persona (puede ser "hecho" o "pendiente"). Si el estado cambia de "pendiente" a "hecho", se incrementa el número de carnets.
+ *     tags:
+ *       - Personas
+ *     parameters:
+ *       - name: dni
+ *         in: path
+ *         description: DNI de la persona a la que se le va a actualizar el estado del carnet.
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "12345678X"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               estadoCarnet:
+ *                 type: string
+ *                 description: El estado del carnet. Puede ser "hecho" o "pendiente".
+ *                 enum:
+ *                   - hecho
+ *                   - pendiente
+ *     responses:
+ *       200:
+ *         description: El estado del carnet ha sido actualizado correctamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 dni:
+ *                   type: string
+ *                   description: El DNI de la persona actualizada.
+ *                 estadoCarnet:
+ *                   type: string
+ *                   description: El nuevo estado del carnet de la persona.
+ *       400:
+ *         description: Estado inválido proporcionado en el cuerpo de la solicitud.
+ *       404:
+ *         description: Persona no encontrada con el DNI proporcionado.
+ *       500:
+ *         description: Error interno del servidor.
+ */
 const putEstado = async (req, res) => {
     try {
         const { dni } = req.params;
@@ -729,6 +901,7 @@ const putEstado = async (req, res) => {
     }
 };
 
+
 module.exports = {
     getPeople,
     getFilteredPersons,
@@ -739,6 +912,6 @@ module.exports = {
     getPersonByDNI,
     getPersonByName,
     uploadImageAndUpdatePerson,
-    createPeopleWithFile, 
+    createPeopleWithFile,
     putEstado
 };

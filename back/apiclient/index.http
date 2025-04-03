@@ -1,8 +1,8 @@
 GET http://localhost:3005/api/person
+authoritation: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2N2U3YmQzY2NhMjRiYTg2NDdhZjIyN2QiLCJyb2xlIjoidXNlciIsImlhdCI6MTc0MzI0MDUwOCwiZXhwIjoxNzQzMjQ3NzA4fQ.lODWti1eJph0pmh0V4P36Mg8B-G0Cip0E68e26XPXww
 
 ###
 GET http://localhost:3005/api/user
-
 
 ###
 GET http://localhost:3005/api/person/67aa21c50e8e631dbf097fd4
@@ -65,3 +65,9 @@ Content-Type: application/json
 {
     "estadoCarnet": "hecho"
 }
+
+###
+GET http://localhost:3005/api/person/name/Carlos García
+
+### errores to mail
+GET http://localhost:3005/api/auth/notify-errors
