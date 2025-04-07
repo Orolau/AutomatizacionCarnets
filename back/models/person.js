@@ -20,6 +20,11 @@ const PersonScheme = new mongoose.Schema(
             enum: ["Grado", "Ciclo superior", "Máster", ""],
             default: ""
         },
+        curso:{
+            type: String,
+            enum: ["1º", "2º", "3º", "4º", "5º", ""],
+            default: ""
+        },
         cargo: {
             type: String
         },
@@ -41,6 +46,16 @@ const PersonScheme = new mongoose.Schema(
             type: String,
             enum: ["Presencial", "Online"],
             default: "Presencial"
+        },
+        estadoCarnet: {
+            type: String,
+            enum: ["hecho", "pendiente"],
+            required: true,
+            default: "pendiente"
+        },
+        numeroCarnets: {
+            type: Number,
+            default: 0
         }
     },
     {

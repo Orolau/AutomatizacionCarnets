@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import JsBarcode from 'jsbarcode';
 import logoU from '@/../../public/images/logoU-tad_U.png';
 import logoUtad from '@/../../public/images/logoU-tad.png';
+import procesarIdentificador from './utils/procesarIdentificador';
 
 
 export default function Carnet({ carnet, fondoTransparente=false }) {
@@ -11,7 +12,7 @@ export default function Carnet({ carnet, fondoTransparente=false }) {
     useEffect(() => {
         if (carnet.dni && barcodeRef.current) {
             barcodeRef.current.innerHTML = ""; // Vaciar el SVG antes de generar el código de barras
-            JsBarcode(barcodeRef.current, carnet.dni, {
+            JsBarcode(barcodeRef.current,carnet.dni, {
                 format: "CODE128",
                 displayValue: false,
                 width: 2,
@@ -20,7 +21,7 @@ export default function Carnet({ carnet, fondoTransparente=false }) {
             });
         }
         console.log(carnet.foto)
-    }, [carnet.dni, fondoTransparente]);
+    }, [carnet._id, fondoTransparente]);
 
     return (
         <div className={`w-[340px] h-[214px] ${fondoTransparente ? 'bg-transparent' : 'bg-AzulUtad'} text-black rounded-lg p-4 font-sans relative`} 

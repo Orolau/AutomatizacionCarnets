@@ -1,8 +1,8 @@
 GET http://localhost:3005/api/person
+authoritation: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2N2U3YmQzY2NhMjRiYTg2NDdhZjIyN2QiLCJyb2xlIjoidXNlciIsImlhdCI6MTc0MzI0MDUwOCwiZXhwIjoxNzQzMjQ3NzA4fQ.lODWti1eJph0pmh0V4P36Mg8B-G0Cip0E68e26XPXww
 
 ###
 GET http://localhost:3005/api/user
-
 
 ###
 GET http://localhost:3005/api/person/67aa21c50e8e631dbf097fd4
@@ -35,19 +35,39 @@ Content-Type: application/json
 {}
 
 
-### Obtener todos los carnets
-GET http://localhost:3005/api/estado
-
-
-### Obtener solo los terminados
-GET http://localhost:3005/api/estado/hecho
-
-
-### Cambiar estado de un carnet
-PUT http://localhost:3005/api/estado/45678901E
+###
+POST http://localhost:3005/api/auth/login HTTP/1.1
 Content-Type: application/json
 
 {
-    "estado": "hecho"
+    "mail": "carnetsutad@gmail.com",
+    "passwd": "carnetsUtad123"
 }
 
+
+//Es necesario comprobar si existe el estadoCarnet y (añadirlo a un documento "logs"). Cuando se descargue el carnet, cambiar a "hecho" y sumar al numeroCarnets
+
+### Obtener todos los carnets
+GET http://localhost:3005/api/person/
+
+###
+PUT http://localhost:3005/api/person/dni/12345678A
+Content-Type: application/json
+
+{
+    "estadoCarnet": "pendiente"
+}
+
+###
+PUT http://localhost:3005/api/person/dni/12345678A
+Content-Type: application/json
+
+{
+    "estadoCarnet": "hecho"
+}
+
+###
+GET http://localhost:3005/api/person/name/Carlos García
+
+### errores to mail
+GET http://localhost:3005/api/auth/notify-errors

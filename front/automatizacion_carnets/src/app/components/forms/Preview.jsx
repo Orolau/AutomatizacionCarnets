@@ -6,20 +6,49 @@ const Preview = ({ registros }) => {
 
     const handleRedirect = (carnet) => {
         // Redirigir a la página de modificación pasando los datos como query parameters
-        router.push(`/pages/modify/${carnet.dni}`)
+        router.push(`/pages/modify/${carnet._id}`);
+    };
+
+    const handleBack = () => {
+        // Redirigir a la página de filtrado
+        router.push('/pages/finales/principal');
+    };
+
+    const handleNext = () => {
+        // Redirigir a la página de descargas
+        router.push('/pages/download');
     };
 
     return (
-        <div className="flex flex-wrap gap-4 justify-center ">
-            {registros.map((registro) => (
-                <div
-                    key={registro.dni}
-                    onClick={() => handleRedirect(registro)}
-                    className="cursor-pointer"
+        <div>
+            {/* Botones de navegación */}
+            <div className="flex justify-between mb-4">
+                <button 
+                    onClick={handleBack}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md"
                 >
-                    <Carnet carnet={registro} />
-                </div>
-            ))}
+                    Volver a Filtrado
+                </button>
+                <button 
+                    onClick={handleNext}
+                    className="bg-green-500 text-white px-4 py-2 rounded-md"
+                >
+                    Ir a Descargas
+                </button>
+            </div>
+
+            {/* Lista de registros */}
+            <div className="flex flex-wrap gap-4 justify-center">
+                {registros.map((registro) => (
+                    <div
+                        key={registro.dni}
+                        onClick={() => handleRedirect(registro)}
+                        className="cursor-pointer"
+                    >
+                        <Carnet carnet={registro} />
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };

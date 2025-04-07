@@ -3,14 +3,9 @@
 import { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import "@/app/styles/LoginForm.css";
 import { useRouter } from "next/navigation";
 import { LoginFormInteract } from "@/app/api/LoginFormInteract";
-import crypto from "crypto";
-
-const generarMD5 = (password) => {
-    return crypto.createHash("md5").update(password).digest("hex");
-};
+import Image from "next/image";
 
 const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -22,70 +17,94 @@ const validationSchema = Yup.object().shape({
 export default function LoginForm() {
     const router = useRouter();
 
-    const [userInfo, setUserInfo] = useState({
+    const [userInfo] = useState({
         email: "",
         password: "",
     });
 
     const handleSubmit = async (values) => {
-        console.log("Hola");
-        const passwordHash = generarMD5(values.password);
         const userData = {
-            email: values.email,
-            passwordHash: passwordHash,
+            mail: values.email,
+            passwd: values.password,
         };
-        console.log(userData.password);
         const respuestaServer = await LoginFormInteract(userData);
-        console.log(respuestaServer);
-        console.log(values);
 
-        if (respuestaServer === userData.email) {
-            localStorage.setItem("email", userData.email);
-            router.push("./pages/verify");
+        if (respuestaServer.user.mail === userData.mail) {
+            localStorage.setItem("email", userData.mail);
+            const expiration = new Date();
+            expiration.setTime(expiration.getTime() + 24 * 60 * 60 * 1000);
+            document.cookie = `jwt=${respuestaServer.token}; expires=${expiration.toUTCString()}; path=/; samesite=strict;`;
+
+            router.push("/pages/verify");
         }
     };
 
     return (
-        <div className="p-4 bg-white text-black min-h-screen flex items-center justify-center">
-            <div className="p-6 bg-blue-200 rounded-xl shadow-lg w-full max-w-md">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-stone-300">
+            {/* Logo en la esquina superior izquierda */}
+            <div className="absolute top-5 left-5">
+                <Image src="/images/Logo-U-tad 1.png" alt="U-Tad Logo" width={125} height={75} />
+            </div>
+
+            {/* Formulario de inicio de sesión */}
+            <div className="bg-blue-100 p-8 rounded-2xl shadow-xl w-full max-w-md text-center">
+                <h1 className="text-2xl font-bold text-gray-800 mb-6">Iniciar Sesión</h1>
                 <Formik
                     initialValues={userInfo}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
                 >
                     {() => (
-                        <Form className="flex flex-col">
-                            <h1 className="text-xl font-semibold text-blue-800 mb-4 text-center">
-                                Login to your account
-                            </h1>
-                            <div className="mb-4">
+                        <Form className="space-y-4">
+                            <div className="relative">
+                                {/* Icono de correo */}
+                                <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                    <Image
+                                        src="/images/email-icon.png" // Ruta de la imagen de correo
+                                        alt="Correo"
+                                        width={20} // Ajusta el tamaño según lo necesites
+                                        height={20}
+                                    />
+                                </div>
                                 <Field
                                     name="email"
                                     type="email"
-                                    placeholder="Email"
-                                    className="w-full p-2 border border-blue-400 rounded-lg bg-white"
+                                    placeholder="Correo electrónico"
+                                    className="w-full p-3 pl-10 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500"
                                 />
                                 <ErrorMessage name="email" component="div" className="text-red-600 text-sm mt-1" />
                             </div>
-                            <div className="mb-4">
+                            <div className="relative">
+                                {/* Icono de contraseña */}
+                                <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                    <Image
+                                        src="/images/password-icon.png" // Ruta de la imagen de contraseña
+                                        alt="Contraseña"
+                                        width={20} // Ajusta el tamaño según lo necesites
+                                        height={20}
+                                    />
+                                </div>
                                 <Field
                                     name="password"
                                     type="password"
-                                    placeholder="Password"
-                                    className="w-full p-2 border border-blue-400 rounded-lg bg-white"
+                                    placeholder="Contraseña"
+                                    className="w-full p-3 pl-10 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500"
                                 />
                                 <ErrorMessage name="password" component="div" className="text-red-600 text-sm mt-1" />
                             </div>
                             <button
                                 type="submit"
-                                className="w-full bg-blue-600 text-white p-3 rounded-lg mt-2 hover:bg-blue-700 transition"
+                                className="w-full bg-blue-600 text-white p-3 rounded-full font-bold hover:bg-blue-700 transition"
                             >
-                                Sign in with email
+                                Iniciar sesión
                             </button>
+                            <p className="text-gray-600 text-sm cursor-pointer hover:underline">
+                                Olvidé la contraseña
+                            </p>
                         </Form>
                     )}
                 </Formik>
             </div>
         </div>
-    );    
+    );
 }
