@@ -1,0 +1,36 @@
+/* body {
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: whitesmoke;
+    height: 100vh;
+}
+
+.inputLogin {
+    width: 300px;
+    background-color: rgb(226, 225, 225);
+    margin-bottom: 20px;
+    color: black;
+}
+
+.titulo {
+    color: black;
+    font-size: x-large;
+}
+
+.passwordContainer {
+    position: relative;
+}
+
+.inputLogin {
+    width: 100%;
+    padding-right: 40px;
+}
+
+.viewPassword {
+    position: absolute;
+    top: 5%;
+    right: 6px;
+    z-index: 10;
+} */

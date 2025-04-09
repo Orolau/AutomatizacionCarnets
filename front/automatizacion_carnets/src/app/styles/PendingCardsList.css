@@ -1,0 +1,76 @@
+/* Asegurar que la tabla siempre tenga el mismo tamaño y esté centrada */
+.table-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Centrar en pantalla */
+    background-color: #f8f8f8; /* Fondo similar al de la imagen */
+  }
+  
+  table {
+    width: 80%; /* Controlar el ancho */
+    max-width: 900px; /* No más grande que 900px */
+    border-collapse: collapse;
+    background-color: white; /* Fondo blanco */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+    border-radius: 10px; /* Bordes redondeados */
+  }
+  
+  /* Encabezados */
+  th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: black;
+    padding: 12px;
+  }
+  
+  /* Celdas */
+  td {
+    color: black !important;
+    font-weight: 600;
+    background-color: white !important;
+    opacity: 1 !important;
+    padding: 12px;
+    text-align: center;
+  }
+  
+  /* Resaltar errores */
+  .text-red-500 {
+    color: red;
+    font-weight: bold;
+  }
+  
+  /* Asegurar que toda la fila tenga visibilidad */
+  tr {
+    background-color: white !important;
+  }
+  
+  /* Evitar opacidad baja */
+  tr td {
+    color: black !important;
+    opacity: 1 !important;
+  }
+  
+  /* Efecto hover */
+  tr:hover {
+    background-color: #f1f1f1 !important;
+  }
+  
+  /* Botón Editar */
+  button {
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
