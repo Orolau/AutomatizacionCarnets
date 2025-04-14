@@ -498,40 +498,45 @@ export default function PersonalDataFiltered() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredPeople.map((person, index) => (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={isPersonSelected(person)}
-                      onChange={() => handleSelectPerson(person)}
-                      className="accent-[#0065ef]"
-                    />
-                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                  </td>
-                  <td className="px-4 py-2">{person.nombre}</td>
-                  <td className="px-4 py-2">{person.apellidos}</td>
+  {filteredPeople.map((person, index) => (
+    <tr
+      key={index}
+      className="hover:bg-gray-50 cursor-pointer"
+      onDoubleClick={() => router.push(`/pages/modify/${person.dni}`)}
+    >
+      <td className="px-4 py-2 flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={isPersonSelected(person)}
+          onChange={() => handleSelectPerson(person)}
+          className="accent-[#0065ef]"
+        />
+        <div className="w-3 h-3 rounded-full bg-green-500"></div>
+      </td>
+      <td className="px-4 py-2">{person.nombre}</td>
+      <td className="px-4 py-2">{person.apellidos}</td>
 
-                  {tipoUsuario === "alumno" && (
-                    <>
-                      <td className="px-4 py-2">{person.tipoTitulacion || "-"}</td>
-                      <td className="px-4 py-2">{person.titulacion || "-"}</td>
-                      <td className="px-4 py-2">{person.curso || "-"}</td>
-                    </>
-                  )}
+      {tipoUsuario === "alumno" && (
+        <>
+          <td className="px-4 py-2">{person.tipoTitulacion || "-"}</td>
+          <td className="px-4 py-2">{person.titulacion || "-"}</td>
+          <td className="px-4 py-2">{person.curso || "-"}</td>
+        </>
+      )}
 
-                  {(tipoUsuario === "profesor" || tipoUsuario === "personal") && (
-                    <>
-                      <td className="px-4 py-2">{person.cargo || "-"}</td>
-                      <td className="px-4 py-2">{person.departamento || "-"}</td>
-                    </>
-                  )}
+      {(tipoUsuario === "profesor" || tipoUsuario === "personal") && (
+        <>
+          <td className="px-4 py-2">{person.cargo || "-"}</td>
+          <td className="px-4 py-2">{person.departamento || "-"}</td>
+        </>
+      )}
 
-                  <td className="px-4 py-2">{person.dni}</td>
-                  <td className="px-4 py-2">{person.modalidad || "-"}</td>
-                </tr>
-              ))}
-            </tbody>
+      <td className="px-4 py-2">{person.dni}</td>
+      <td className="px-4 py-2">{person.modalidad || "-"}</td>
+    </tr>
+  ))}
+</tbody>
+
           </table>
         </div>
       )}
