@@ -6,7 +6,6 @@ import html2canvas from "html2canvas";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import * as XLSX from 'xlsx';
-import Carnet from "../Carnet";
 
 const FILTER_URL = "http://localhost:3005/api/person/filtered";
 
@@ -60,6 +59,30 @@ export default function PersonalDataFiltered() {
   const [departamento, setDepartamento] = useState("");
   const [modalidad, setModalidad] = useState("");
 
+  const [sortField, setSortField] = useState("");
+  const [sortDirection, setSortDirection] = useState("asc"); // 'asc' o 'desc'
+
+  const [filtrosListos, setFiltrosListos] = useState(false);
+
+  useEffect(() => {
+    const filtrosGuardados = JSON.parse(localStorage.getItem("filtrosCarnets"));
+    if (filtrosGuardados) {
+      setTipoUsuario(filtrosGuardados.tipoUsuario || "");
+      setTipoTitulacion(filtrosGuardados.tipoTitulacion || "");
+      setTitulacion(filtrosGuardados.titulacion || "");
+      setCurso(filtrosGuardados.curso || "");
+      setCargo(filtrosGuardados.cargo || "");
+      setDepartamento(filtrosGuardados.departamento || "");
+      setModalidad(filtrosGuardados.modalidad || "");
+    }
+    setFiltrosListos(true);
+  }, []);
+
+  useEffect(() => {
+    if (filtrosListos) {
+      handleFilter();
+    }
+  }, [filtrosListos]);
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setFilteredPeople(people);
@@ -80,6 +103,7 @@ export default function PersonalDataFiltered() {
   }, [searchTerm, people]);
 
   const handleFilter = async () => {
+    localStorage.setItem("filtrosCarnets", JSON.stringify({ tipoUsuario, tipoTitulacion, titulacion, curso, cargo, departamento, modalidad }));
     const params = new URLSearchParams();
     if (tipoUsuario) params.append("tipoUsuario", tipoUsuario);
     if (tipoTitulacion) params.append("tipoTitulacion", tipoTitulacion);
@@ -300,6 +324,15 @@ export default function PersonalDataFiltered() {
     saveAs(blob, "logs_carnets.txt");
   };
 
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
   return (
     <div className="p-4 bg-white rounded-2xl shadow-md w-full">
       {/* Buscador y filtros */}
@@ -318,6 +351,18 @@ export default function PersonalDataFiltered() {
             className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none"
           />
         </div>
+
+      {/* Botón Siguiente reubicado */}
+      <div className="mt-4 flex justify-end w-full">
+        <button
+          onClick={handleNext}
+          className="bg-[#0065ef] hover:bg-[#0056cc] text-white px-6 py-2 rounded-full font-semibold transition"
+          disabled={selectedPeople.length === 0}
+        >
+          Siguiente
+        </button>
+      </div>
+
 
         <select
           value={tipoUsuario}
@@ -432,36 +477,49 @@ export default function PersonalDataFiltered() {
         </button>
       </div>
 
+      {/* Botones de acción estilo claro con icono + texto */}
       <div className="flex items-center gap-4 px-2 mb-4">
-        {/* Carnets fondo visible */}
-        <button onClick={() => descargarCarnetsComoPNG(false)} title="Carnets con fondo visible" >
-          <img src="/images/print_icon.png" className="w-5 h-5" alt="Imprimir visible" />
+        <button
+          onClick={() => descargarCarnetsComoPNG(true)}
+          title="Descargar carnets fondo transparente"
+          className="flex items-center gap-2 px-4 py-1.5 bg-blue-100 rounded-full text-sm text-gray-700 hover:bg-blue-200 transition"
+        >
+          <img src="/images/download_icon.png" className="w-4 h-4" alt="Transparente" />
+          Transparente
         </button>
 
-        {/* Carnets fondo transparente */}
-        <button onClick={() => descargarCarnetsComoPNG(true)} title="Carnets con fondo transparente" >
-          <img src="/images/download_icon.png" className="w-5 h-5" alt="Imprimir transparente" />
+        <button
+          onClick={() => descargarCarnetsComoPNG(false)}
+          title="Descargar carnets fondo visible"
+          className="flex items-center gap-2 px-4 py-1.5 bg-blue-100 rounded-full text-sm text-gray-700 hover:bg-blue-200 transition"
+        >
+          <img src="/images/print_icon.png" className="w-4 h-4" alt="Visible" />
+          Visible
         </button>
 
-        {/* Exportar Excel e imágenes */}
-        <button onClick={exportarDatosEImagenes} title="Exportar datos e imágenes" >
-          <img src="/images/datos.png" className="w-5 h-5" alt="Exportar Excel" />
+        <button
+          onClick={exportarDatosEImagenes}
+          title="Exportar datos e imágenes"
+          className="flex items-center gap-2 px-4 py-1.5 bg-blue-100 rounded-full text-sm text-gray-700 hover:bg-blue-200 transition"
+        >
+          <img src="/images/datos.png" className="w-4 h-4" alt="Exportar Excel" />
+          Exportar
         </button>
 
-        {/* Descargar logs */}
-        <button onClick={descargarLogs} title="Descargar logs" >
-          <img src="/images/logs.png" className="w-5 h-5" alt="Logs" />
-        </button>
-
-        {/* Otros botones sin funcionalidad aún */}
-        <button title="opciones (pendiente)">
-          <img src="/images/edit_icon.png" className="w-5 h-5" alt="Eliminar" />
+        <button
+          onClick={descargarLogs}
+          title="Descargar logs"
+          className="flex items-center gap-2 px-4 py-1.5 bg-blue-100 rounded-full text-sm text-gray-700 hover:bg-blue-200 transition"
+        >
+          <img src="/images/logs.png" className="w-4 h-4" alt="Logs" />
+          Logs
         </button>
       </div>
 
-      {/* Tabla */}
-      {filteredPeople.length > 0 && (
-        <div className="overflow-x-auto rounded-xl border border-gray-200">
+
+      {/* Tabla o mensaje vacío */}
+      {filteredPeople.length > 0 ? (
+        <div className="overflow-x-auto rounded-xl border border-gray-200 max-h-[500px] overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead className="bg-gray-100 text-gray-700 text-left">
               <tr>
@@ -475,82 +533,100 @@ export default function PersonalDataFiltered() {
                       : "Seleccionar todo"}
                   </button>
                 </th>
-                <th className="px-4 py-3">Nombre</th>
-                <th className="px-4 py-3">Apellidos</th>
-
-                {tipoUsuario === "alumno" && (
-                  <>
-                    <th className="px-4 py-3">Tipo Titulación</th>
-                    <th className="px-4 py-3">Titulación</th>
-                    <th className="px-4 py-3">Curso</th>
-                  </>
-                )}
-
-                {(tipoUsuario === "profesor" || tipoUsuario === "personal") && (
-                  <>
-                    <th className="px-4 py-3">Cargo</th>
-                    <th className="px-4 py-3">Departamento</th>
-                  </>
-                )}
-
-                <th className="px-4 py-3">DNI</th>
-                <th className="px-4 py-3">Modalidad</th>
+                {[
+                  { label: "Nombre", key: "nombre" },
+                  { label: "Apellidos", key: "apellidos" },
+                  ...(tipoUsuario === "alumno"
+                    ? [
+                      { label: "Tipo Titulación", key: "tipoTitulacion" },
+                      { label: "Titulación", key: "titulacion" },
+                      { label: "Curso", key: "curso" },
+                    ]
+                    : tipoUsuario === "profesor" || tipoUsuario === "personal"
+                      ? [
+                        { label: "Cargo", key: "cargo" },
+                        { label: "Departamento", key: "departamento" },
+                      ]
+                      : []),
+                  { label: "DNI", key: "dni" },
+                  { label: "Modalidad", key: "modalidad" },
+                ].map((col) => (
+                  <th key={col.key} className="px-4 py-3 cursor-pointer select-none" onClick={() => handleSort(col.key)}>
+                    <div className="flex items-center gap-1">
+                      {col.label}
+                      {sortField === col.key && (
+                        <span>{sortDirection === "asc" ? "▲" : "▼"}</span>
+                      )}
+                    </div>
+                  </th>
+                ))}
               </tr>
             </thead>
+
             <tbody className="divide-y divide-gray-100">
-  {filteredPeople.map((person, index) => (
-    <tr
-      key={index}
-      className="hover:bg-gray-50 cursor-pointer"
-      onDoubleClick={() => router.push(`/pages/modify/${person.dni}`)}
-    >
-      <td className="px-4 py-2 flex items-center gap-2">
-        <input
-          type="checkbox"
-          checked={isPersonSelected(person)}
-          onChange={() => handleSelectPerson(person)}
-          className="accent-[#0065ef]"
-        />
-        <div className="w-3 h-3 rounded-full bg-green-500"></div>
-      </td>
-      <td className="px-4 py-2">{person.nombre}</td>
-      <td className="px-4 py-2">{person.apellidos}</td>
+              {[...filteredPeople]
+                .sort((a, b) => {
+                  const aVal = a[sortField] ?? "";
+                  const bVal = b[sortField] ?? "";
 
-      {tipoUsuario === "alumno" && (
-        <>
-          <td className="px-4 py-2">{person.tipoTitulacion || "-"}</td>
-          <td className="px-4 py-2">{person.titulacion || "-"}</td>
-          <td className="px-4 py-2">{person.curso || "-"}</td>
-        </>
-      )}
+                  if (typeof aVal === "number" && typeof bVal === "number") {
+                    return sortDirection === "asc" ? aVal - bVal : bVal - aVal;
+                  }
 
-      {(tipoUsuario === "profesor" || tipoUsuario === "personal") && (
-        <>
-          <td className="px-4 py-2">{person.cargo || "-"}</td>
-          <td className="px-4 py-2">{person.departamento || "-"}</td>
-        </>
-      )}
+                  return sortDirection === "asc"
+                    ? String(aVal).localeCompare(String(bVal))
+                    : String(bVal).localeCompare(String(aVal));
+                })
+                .map((person, index) => (
+                  <tr
+                    key={index}
+                    onClick={() => handleSelectPerson(person)}
+                    className={`transition-all duration-200 ease-in-out rounded-md cursor-pointer ${isPersonSelected(person)
+                      ? "bg-blue-50"
+                      : "hover:bg-gray-50 hover:scale-[1.01] hover:shadow-md"
+                      }`}
+                  >
+                    <td className="px-4 py-2 flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={isPersonSelected(person)}
+                        onChange={() => handleSelectPerson(person)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="accent-[#0065ef]"
+                      />
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    </td>
+                    <td className="px-4 py-2">{person.nombre}</td>
+                    <td className="px-4 py-2">{person.apellidos}</td>
 
-      <td className="px-4 py-2">{person.dni}</td>
-      <td className="px-4 py-2">{person.modalidad || "-"}</td>
-    </tr>
-  ))}
-</tbody>
+                    {tipoUsuario === "alumno" && (
+                      <>
+                        <td className="px-4 py-2">{person.tipoTitulacion || "-"}</td>
+                        <td className="px-4 py-2">{person.titulacion || "-"}</td>
+                        <td className="px-4 py-2">{person.curso || "-"}</td>
+                      </>
+                    )}
 
+                    {(tipoUsuario === "profesor" || tipoUsuario === "personal") && (
+                      <>
+                        <td className="px-4 py-2">{person.cargo || "-"}</td>
+                        <td className="px-4 py-2">{person.departamento || "-"}</td>
+                      </>
+                    )}
+
+                    <td className="px-4 py-2">{person.dni}</td>
+                    <td className="px-4 py-2">{person.modalidad || "-"}</td>
+                  </tr>
+                ))}
+            </tbody>
           </table>
         </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center min-h-[400px] mt-10 text-center text-gray-500">
+          <img src="/images/flecha.png" alt="Flecha indicador" className="mb-4 w-[150px] h-auto" />
+          <p className="text-xl font-semibold">Busca o selecciona tipo de usuario</p>
+        </div>
       )}
-
-      {/* Botón Siguiente */}
-      <div className="mt-6 flex justify-end">
-        <button
-          onClick={handleNext}
-          className="bg-[#0065ef] hover:bg-[#0056cc] text-white px-6 py-2 rounded-full font-semibold transition"
-          disabled={selectedPeople.length === 0}
-        >
-          Siguiente
-        </button>
-      </div>
     </div>
   );
 }
