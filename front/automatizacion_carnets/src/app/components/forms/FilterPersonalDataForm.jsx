@@ -352,6 +352,18 @@ export default function PersonalDataFiltered() {
           />
         </div>
 
+      {/* Botón Siguiente reubicado */}
+      <div className="mt-4 flex justify-end w-full">
+        <button
+          onClick={handleNext}
+          className="bg-[#0065ef] hover:bg-[#0056cc] text-white px-6 py-2 rounded-full font-semibold transition"
+          disabled={selectedPeople.length === 0}
+        >
+          Siguiente
+        </button>
+      </div>
+
+
         <select
           value={tipoUsuario}
           onChange={(e) => setTipoUsuario(e.target.value)}
