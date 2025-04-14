@@ -62,6 +62,27 @@ export default function PersonalDataFiltered() {
   const [sortField, setSortField] = useState("");
   const [sortDirection, setSortDirection] = useState("asc"); // 'asc' o 'desc'
 
+  const [filtrosListos, setFiltrosListos] = useState(false);
+
+  useEffect(() => {
+    const filtrosGuardados = JSON.parse(localStorage.getItem("filtrosCarnets"));
+    if (filtrosGuardados) {
+      setTipoUsuario(filtrosGuardados.tipoUsuario || "");
+      setTipoTitulacion(filtrosGuardados.tipoTitulacion || "");
+      setTitulacion(filtrosGuardados.titulacion || "");
+      setCurso(filtrosGuardados.curso || "");
+      setCargo(filtrosGuardados.cargo || "");
+      setDepartamento(filtrosGuardados.departamento || "");
+      setModalidad(filtrosGuardados.modalidad || "");
+    }
+    setFiltrosListos(true);
+  }, []);
+
+  useEffect(() => {
+    if (filtrosListos) {
+      handleFilter();
+    }
+  }, [filtrosListos]);
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setFilteredPeople(people);
@@ -82,6 +103,7 @@ export default function PersonalDataFiltered() {
   }, [searchTerm, people]);
 
   const handleFilter = async () => {
+    localStorage.setItem("filtrosCarnets", JSON.stringify({ tipoUsuario, tipoTitulacion, titulacion, curso, cargo, departamento, modalidad }));
     const params = new URLSearchParams();
     if (tipoUsuario) params.append("tipoUsuario", tipoUsuario);
     if (tipoTitulacion) params.append("tipoTitulacion", tipoTitulacion);
