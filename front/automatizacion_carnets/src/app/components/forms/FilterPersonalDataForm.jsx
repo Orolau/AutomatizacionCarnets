@@ -324,7 +324,12 @@ export default function PersonalDataFiltered() {
     saveAs(blob, "logs_carnets.txt");
   };
 
-  const handleSort = (field) => {
+  
+  const handleEditPerson = (dni) => {
+    router.push(`/pages/modify/${dni}`);
+  };
+
+const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
@@ -580,7 +585,7 @@ export default function PersonalDataFiltered() {
                 .map((person, index) => (
                   <tr
                     key={index}
-                    onClick={() => handleSelectPerson(person)}
+                    onClick={() => handleSelectPerson(person)} onDoubleClick={() => handleEditPerson(person.dni)}
                     className={`transition-all duration-200 ease-in-out rounded-md cursor-pointer ${isPersonSelected(person)
                       ? "bg-blue-50"
                       : "hover:bg-gray-50 hover:scale-[1.01] hover:shadow-md"
