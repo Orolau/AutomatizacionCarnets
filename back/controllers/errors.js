@@ -21,7 +21,7 @@ const ErroresToMail = async (req, res) => {
       const email = person.email;
 
       //console.log("Revisando usuario:", person.nombre, person.apellidos);
-      logTexto += `Revisando usuario: ${person.nombre} ${person.apellidos} - ${email}\n`;
+      logTexto += `Revisando usuario: ${person.nombre} ${person.apellidos}\n`;
 
       if (!email || !email.includes("@")) {
         //console.log("Usuario sin correo válido.\n");
