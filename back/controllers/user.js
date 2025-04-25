@@ -1,5 +1,5 @@
 const { userModel } = require('../models/index.js')
-const sendVerificationEmail = require('../utils/email.js');
+const { sendVerificationEmail } = require('../utils/email.js');
 
 /**
  * @swagger
