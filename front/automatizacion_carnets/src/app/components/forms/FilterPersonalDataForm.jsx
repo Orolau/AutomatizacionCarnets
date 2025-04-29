@@ -6,8 +6,9 @@ import html2canvas from "html2canvas";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import * as XLSX from 'xlsx';
+import JsBarcode from "jsbarcode";
+import { fetchFilteredPeople, generateAndDownloadLogs } from "@/app/api/api";
 
-const FILTER_URL = "http://localhost:3005/api/person/filtered";
 
 const normalizeText = (text) => {
   if (!text) return "";
@@ -83,27 +84,26 @@ export default function PersonalDataFiltered() {
   }, [searchTerm, people]);
 
   const handleFilter = async () => {
-    const params = new URLSearchParams();
-    if (tipoUsuario) params.append("tipoUsuario", tipoUsuario);
-    if (tipoTitulacion) params.append("tipoTitulacion", tipoTitulacion);
-    if (titulacion) params.append("titulacion", titulacion);
-    if (curso) params.append("curso", curso);
-    if (cargo) params.append("cargo", cargo);
-    if (departamento) params.append("departamento", departamento);
-    if (modalidad && tipoUsuario === "alumno")
-      params.append("modalidad", modalidad);
+    const params = {};
+    if (tipoUsuario) params.tipoUsuario = tipoUsuario;
+    if (tipoTitulacion) params.tipoTitulacion = tipoTitulacion;
+    if (titulacion) params.titulacion = titulacion;
+    if (curso) params.curso = curso;
+    if (cargo) params.cargo = cargo;
+    if (departamento) params.departamento = departamento;
+    if (modalidad && tipoUsuario === "alumno") params.modalidad = modalidad;
 
     try {
-      const response = await fetch(`${FILTER_URL}?${params.toString()}`);
-      const data = await response.json();
+      const data = await fetchFilteredPeople(params);
       setPeople(data);
       setFilteredPeople(data);
       setSearchTerm("");
       setSelectedPeople([]);
     } catch (error) {
-      console.error("Error fetching filtered data:", error);
+      console.error("Error al filtrar personas:", error);
     }
   };
+
 
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
 
@@ -132,15 +132,6 @@ export default function PersonalDataFiltered() {
         }
       });
       setSelectedPeople(newSelected);
-    }
-  };
-
-  const handleNext = () => {
-    localStorage.setItem("selectedPeople", JSON.stringify(selectedPeople));
-    if (selectedPeople.length > 0) {
-      router.push("/pages/preview");
-    } else {
-      alert("Selecciona al menos una persona");
     }
   };
 
@@ -263,23 +254,20 @@ export default function PersonalDataFiltered() {
   const descargarLogs = async () => {
     try {
       setIsCargando(true);
-  
-      const res = await fetch("http://localhost:3005/api/auth/notify-errors");
-      const data = await res.json();
-  
-      if (!res.ok) throw new Error(data.error || "Error ejecutando revisión");
+      const data = await generateAndDownloadLogs();
   
       const blob = new Blob([data.logs], { type: "text/plain;charset=utf-8" });
       saveAs(blob, "logs_correos_enviados.txt");
   
       alert(data.message);
     } catch (error) {
-      console.error("Error al generar los logs o enviar correos:", error);
+      console.error("Error al generar logs o enviar correos:", error);
       alert("Hubo un error al ejecutar la acción. Revisa la consola.");
     } finally {
       setIsCargando(false);
     }
   };
+  
 
   const handleSort = (field) => {
     if (sortField === field) {

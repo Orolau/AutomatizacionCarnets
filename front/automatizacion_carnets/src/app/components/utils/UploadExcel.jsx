@@ -3,9 +3,9 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { useRouter } from "next/navigation";
+import { uploadExcelData } from "@/app/api/api";
 
 const UploadExcel = () => {
-  const [file, setFile] = useState(null);
   const [data, setData] = useState([]);
   const router = useRouter();
 
@@ -26,27 +26,15 @@ const UploadExcel = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch("http://localhost:3005/api/person/upload", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ data }),
-      });
-
-      if (response.status === 409) {
-        alert("No se pueden crear usuarios repetidos");
-        return;
-      }
-
-      const result = await response.json();
+      const result = await uploadExcelData(data);
       localStorage.setItem("selectedPeople", JSON.stringify(result.persons));
       router.push("/pages/finales/principal");
     } catch (error) {
       console.error("Error al enviar los datos:", error);
-      alert("Error al procesar la solicitud");
+      alert(error.message || "Error al procesar la solicitud");
     }
   };
+  
 
   return (
     <div className="flex justify-center items-center w-full min-h-[calc(100vh-80px)] px-8 py-6">
