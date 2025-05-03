@@ -1,4 +1,4 @@
-/* Estilos generales del contenedoR */
+/*
 .contenedorFiltro {
   background-color: white;
   padding: 20px;
@@ -8,16 +8,16 @@
   margin: auto;
   text-align: center;
 }
-
-/* Estilo del título */
+*/
+/* Estilo del título *//*
 .titulo {
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 15px;
   color: black;
-}
-
-/* Estilos para los inputs */
+}*/
+/*
+/* Estilos para los inputs *//*
 .inputFiltro {
   width: 100%;
   padding: 10px;
@@ -27,7 +27,7 @@
   font-size: 1rem;
 }
 
-/* Botón de búsqueda */
+/* Botón de búsqueda *//*
 .btnFiltro {
   background-color: #1664eb;
   color: white;

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { jsPDF } from "jspdf";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import { fetchOnlinePeople } from "@/app/api/api";
 
 const EtiquetaEnvio = () => {
   const [carnets, setCarnets] = useState([]);
@@ -14,15 +14,11 @@ const EtiquetaEnvio = () => {
   const [sortDirection, setSortDirection] = useState("asc");
 
   useEffect(() => {
-    axios.get("http://localhost:3005/api/person")
-      .then(response => {
-        const onlineCarnets = response.data.filter(persona => persona.modalidad === "Online");
-        setCarnets(onlineCarnets);
-      })
-      .catch(error => {
-        console.error("Error al obtener los carnets: ", error);
-      });
+    fetchOnlinePeople()
+      .then(setCarnets)
+      .catch(error => console.error("Error al obtener los carnets: ", error));
   }, []);
+
 
   const toggleSeleccion = (persona) => {
     if (seleccionados.some(sel => sel._id === persona._id)) {
