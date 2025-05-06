@@ -6,8 +6,9 @@ import html2canvas from "html2canvas";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import * as XLSX from 'xlsx';
+import JsBarcode from "jsbarcode";
+import { fetchFilteredPeople, generateAndDownloadLogs } from "@/app/api/api";
 
-const FILTER_URL = "http://localhost:3005/api/person/filtered";
 
 const normalizeText = (text) => {
   if (!text) return "";
@@ -50,6 +51,7 @@ export default function PersonalDataFiltered() {
   const [filteredPeople, setFilteredPeople] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPeople, setSelectedPeople] = useState([]);
+  const [isCargando, setIsCargando] = useState(false);
 
   const [tipoUsuario, setTipoUsuario] = useState("");
   const [tipoTitulacion, setTipoTitulacion] = useState("");
@@ -103,7 +105,6 @@ export default function PersonalDataFiltered() {
   }, [searchTerm, people]);
 
   const handleFilter = async () => {
-    localStorage.setItem("filtrosCarnets", JSON.stringify({ tipoUsuario, tipoTitulacion, titulacion, curso, cargo, departamento, modalidad }));
     const params = new URLSearchParams();
     if (tipoUsuario) params.append("tipoUsuario", tipoUsuario);
     if (tipoTitulacion) params.append("tipoTitulacion", tipoTitulacion);
@@ -115,16 +116,16 @@ export default function PersonalDataFiltered() {
       params.append("modalidad", modalidad);
 
     try {
-      const response = await fetch(`${FILTER_URL}?${params.toString()}`);
-      const data = await response.json();
+      const data = await fetchFilteredPeople(params);
       setPeople(data);
       setFilteredPeople(data);
       setSearchTerm("");
       setSelectedPeople([]);
     } catch (error) {
-      console.error("Error fetching filtered data:", error);
+      console.error("Error al filtrar personas:", error);
     }
   };
+
 
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
 
@@ -153,15 +154,6 @@ export default function PersonalDataFiltered() {
         }
       });
       setSelectedPeople(newSelected);
-    }
-  };
-
-  const handleNext = () => {
-    localStorage.setItem("selectedPeople", JSON.stringify(selectedPeople));
-    if (selectedPeople.length > 0) {
-      router.push("/pages/preview");
-    } else {
-      alert("Selecciona al menos una persona");
     }
   };
 
@@ -281,48 +273,23 @@ export default function PersonalDataFiltered() {
     saveAs(zipBlob, "Personas_Fotos.zip");
   };
 
-  const descargarLogs = () => {
-    let logs = "=== Carnets Impresos ===\n";
-
-    selectedPeople.forEach((carnet) => {
-      if (carnet.estado === "hecho") {
-        logs += `Nombre: ${carnet.nombre} ${carnet.apellidos}\n`;
-        logs += `DNI: ${carnet.dni}\n`;
-        logs += `Departamento: ${carnet.departamento}\n`;
-        logs += `Cargo: ${carnet.cargo}\n`;
-        logs += `Correo: ${carnet.correo}\n`;
-        logs += `Número de Carnets Impresos: ${carnet.numeroCarnets}\n`;
-        logs += "-----------------------------\n";
-      }
-    });
-
-    logs += "\n=== Carnets con Errores ===\n";
-
-    selectedPeople.forEach((carnet) => {
-      let errores = [];
-      const camposObligatorios = ["nombre", "apellidos", "dni", "departamento", "cargo", "correo", "direccion", "titulacion", "anio_comienzo", "curso"];
-      camposObligatorios.forEach((campo) => {
-        if (!carnet[campo]) errores.push(campo);
-      });
-
-      if (errores.length > 0) {
-        logs += `Nombre: ${carnet.nombre || "N/A"} ${carnet.apellidos || "N/A"}\n`;
-        logs += `DNI: ${carnet.dni || "N/A"}\n`;
-        logs += `Departamento: ${carnet.departamento || "N/A"}\n`;
-        logs += `Cargo: ${carnet.cargo || "N/A"}\n`;
-        logs += `Correo: ${carnet.correo || "N/A"}\n`;
-        logs += `Dirección: ${carnet.direccion || "N/A"}\n`;
-        logs += `Titulación: ${carnet.titulacion || "N/A"}\n`;
-        logs += `Año de Comienzo: ${carnet.anio_comienzo || "N/A"}\n`;
-        logs += `Curso: ${carnet.curso || "N/A"}\n`;
-        logs += `Errores detectados: ${errores.join(", ")}\n`;
-        logs += "-----------------------------\n";
-      }
-    });
-
-    const blob = new Blob([logs], { type: "text/plain;charset=utf-8" });
-    saveAs(blob, "logs_carnets.txt");
+  const descargarLogs = async () => {
+    try {
+      setIsCargando(true);
+      const data = await generateAndDownloadLogs();
+  
+      const blob = new Blob([data.logs], { type: "text/plain;charset=utf-8" });
+      saveAs(blob, "logs_correos_enviados.txt");
+  
+      alert(data.message);
+    } catch (error) {
+      console.error("Error al generar logs o enviar correos:", error);
+      alert("Hubo un error al ejecutar la acción. Revisa la consola.");
+    } finally {
+      setIsCargando(false);
+    }
   };
+  
 
   
   const handleEditPerson = (dni) => {
@@ -630,6 +597,20 @@ const handleSort = (field) => {
         <div className="flex flex-col items-center justify-center min-h-[400px] mt-10 text-center text-gray-500">
           <img src="/images/flecha.png" alt="Flecha indicador" className="mb-4 w-[150px] h-auto" />
           <p className="text-xl font-semibold">Busca o selecciona tipo de usuario</p>
+        </div>
+      )}
+
+      {isCargando && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-xl shadow-lg text-center w-full max-w-sm">
+            <h2 className="text-lg font-bold mb-2">Enviando correos...</h2>
+            <p className="text-sm text-gray-600">Por favor, espera unos segundos.</p>
+
+            {/* Barra de carga simple */}
+            <div className="mt-6 w-full bg-gray-200 rounded-full h-3">
+              <div className="h-3 rounded-full bg-blue-500 animate-pulse" style={{ width: "100%" }}></div>
+            </div>
+          </div>
         </div>
       )}
     </div>

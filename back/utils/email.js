@@ -46,4 +46,4 @@ const sendEmail = async (to, subject, text) => {
     }
   };
 
-module.exports = sendVerificationEmail, sendEmail;
+  module.exports = { sendVerificationEmail, sendEmail  };
