@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Carnet from "@/app/components/Carnet";
 import FormActualizacionCarnet from "@/app/components/forms/FormActualizacionCarnet";
@@ -9,7 +9,8 @@ import FormActualizaFoto from "@/app/components/forms/FormActualizaFoto";
 import { fetchPersonByDni } from "@/app/api/api";
 
 export default function ModificarCarnetIndividualPage() {
-    const { dni } = useParams();
+    const searchParams = useSearchParams();
+    const dni = searchParams.get("dni");
     const router = useRouter();
 
     const [previewFoto, setPreviewFoto] = useState("");
