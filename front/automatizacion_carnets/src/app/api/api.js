@@ -40,7 +40,7 @@ export async function uploadExcelData(data) {
 }
 
 export async function fetchPersonByDni(dni) {
-    const response = await fetch(`http://localhost:3005/api/person/${dni}`);
+    const response = await fetch(`http://localhost:3005/api/person/dni/${dni}`);
 
     if (!response.ok) {
         throw new Error("Error al obtener los datos del carnet");

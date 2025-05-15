@@ -2,29 +2,43 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import personasData from "@/app/jsonPruebas/personasFiltrado.json";
+
+const API_URL = "http://localhost:3005/api/person";
+const FILTER_URL = `${API_URL}/filtered?estadoCarnet=pendiente`;
 
 export default function PendingCardList() {
   const [carnets, setCarnets] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
-    const obtenerCarnetsFallidos = () => {
-      const carnetsConErrores = personasData
-        .filter((persona) => persona.tipo === "estudiante")
-        .filter((persona) => !persona.imagen?.trim() || !persona.dni?.trim())
-        .map((persona) => ({
+    const obtenerCarnetsFallidos = async () => {
+      try {
+        const response = await fetch(FILTER_URL);
+        if (!response.ok) {
+          throw new Error(response.statusText);
+        }
+        const data = await response.json();
+
+        const carnetsPendientes = data.map((persona) => ({
           ...persona,
-          error: !persona.imagen?.trim() ? "Falta imagen" : "DNI ilegible",
+          error: !persona.foto?.trim()
+            ? "Falta imagen"
+            : !persona.dni?.trim()
+              ? "DNI ilegible"
+              : "Estado pendiente",
         }));
-      setCarnets(carnetsConErrores);
+
+        setCarnets(carnetsPendientes);
+      } catch (err) {
+        console.error("Error cargando carnets: ", err);
+      }
     };
 
     obtenerCarnetsFallidos();
   }, []);
 
   const handleEdit = (dni) => {
-    router.push(`/pages/userForms/edit?dni=${dni}`);
+    router.push(`/pages/modify/edit?dni=${dni}`);
   };
 
   return (
