@@ -176,7 +176,11 @@ const getFilteredPersons = async (req, res) => {
  *                 type: string
  *                 enum: [Presencial, Online]
  *     responses:
- *       201:
+ *       409:
+ *          description: La persona ya existe
+ *       403:
+ *          description: Error de validación.  Los datos introducidos contienen errores
+ *       200:
  *         description: Persona creada correctamente
  *         content:
  *           application/json:
@@ -271,6 +275,8 @@ const createPerson = async (req, res) => {
  *                   enum: [Presencial, Online]
  *       404:
  *         description: Persona no encontrada
+ *      403:
+ *         description: Error en el formato. DNI inválido
  */
 
 const getPersonById = async (req, res) => {
@@ -334,6 +340,8 @@ const getPersonById = async (req, res) => {
  *                   enum: [Presencial, Online]
  *       404:
  *         description: Persona no encontrada
+ *       403:
+ *         description: Error en el formato. DNI inválido
  */
 
 const getPersonByDNI = async (req, res) => {
@@ -396,6 +404,8 @@ const getPersonByDNI = async (req, res) => {
  *                   enum: [Presencial, Online]
  *       404:
  *         description: Persona no encontrada
+ *       403:
+ *         description: Error en el formato. Nombre inválido
  */
 
 const getPersonByName = async (req, res) => {
@@ -409,7 +419,7 @@ const getPersonByName = async (req, res) => {
         const data = await Person.findOne({ nombre, apellidos });
 
         if (!data) {
-            handleHttpError(res, "PERSON_NOT_FOUND", 404)
+            return handleHttpError(res, "PERSON_NOT_FOUND", 404)
         }
 
         res.json(data);
@@ -514,9 +524,8 @@ const updatePerson = async (req, res) => {
         const updatedPerson = await Person.findByIdAndUpdate(id, req.body, { new: true });
 
         if (!updatedPerson) {
-            handleHttpError(res, "PERSON_NOT_FOUND", 404)
+            return handleHttpError(res, "PERSON_NOT_FOUND", 404)
         }
-        console.log(updatePerson)
         res.json(updatedPerson);  // Responde con los datos actualizados
     } catch (error) {
         console.error("Error al actualizar la persona:", error);
@@ -769,7 +778,7 @@ const uploadImageAndUpdatePerson = async (req, res) => {
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Person'
- *       400:
+ *       403:
  *         description: Error de validación de los datos proporcionados.
  *       500:
  *         description: Error en el servidor al procesar los datos.
@@ -869,10 +878,6 @@ const putEstado = async (req, res) => {
     try {
         const { dni } = req.params;
         const { estadoCarnet } = req.body;
-
-        if (!["hecho", "pendiente"].includes(estadoCarnet)) {
-            return res.status(400).json({ mensaje: "Estado inválido" });
-        }
 
         const persona = await Person.findOne({ dni });
 

@@ -18,7 +18,7 @@ router.delete("/:id", validatePersonId, deletePerson);
 router.get("/dni/:dni", validatePersonDNI, getPersonByDNI);
 router.get("/name/:nombreCompleto", validatePersonName, getPersonByName);
 router.put("/updatePhoto/:id", uploadMiddlewareMemory.single("foto"), uploadImageAndUpdatePerson);
-router.put("/dni/:dni", validatePutEstado, putEstado);
+router.put("/estado/:dni", validatePutEstado, putEstado);
 
 
 
