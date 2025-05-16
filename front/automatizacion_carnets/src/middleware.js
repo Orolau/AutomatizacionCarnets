@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
-export function middleware(request) {
+const { verifyToken } = require('../../../back/utils/handleJwt.js');
+
+export async function middleware(request) {
 
     const token = request.cookies.get('jwt')?.value;
 
@@ -14,9 +16,16 @@ export function middleware(request) {
     if (!token) {
         return NextResponse.redirect(new URL('/', request.url));
     }
-    return NextResponse.next();
+
+    try {
+        const respuestaVerify = verifyToken(token);
+        return NextResponse.next();
+    } catch (error) {
+        return NextResponse.redirect(new URL('/', request.url));
+    }
 }
 
 export const config = {
     matcher: ['/((?!api|_next/static|_next/image|.*\\..*).*)'],
+    runtime: "nodejs",
 };
