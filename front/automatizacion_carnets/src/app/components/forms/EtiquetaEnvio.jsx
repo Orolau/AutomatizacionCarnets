@@ -149,14 +149,17 @@ const EtiquetaEnvio = () => {
                   className="hover:bg-gray-50 hover:scale-[1.01] hover:shadow-md transition-all duration-200 ease-in-out cursor-pointer"
                 >
                   <td className="px-4 py-2">
-                    <input
-                      type="checkbox"
-                      checked={seleccionados.some(sel => sel._id === carnet._id)}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        toggleSeleccion(carnet);
-                      }}
-                    />
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={seleccionados.some(sel => sel._id === carnet._id)}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          toggleSeleccion(carnet);
+                        }}
+                      />
+                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                    </div>
                   </td>
                   <td className="px-4 py-2">{carnet.nombre}</td>
                   <td className="px-4 py-2">{carnet.apellidos}</td>
