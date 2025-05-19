@@ -96,8 +96,8 @@ export default function NavbarTop() {
           onClick={handlePerfilClick}
         />
         {correoVisible && (
-          <div className="absolute top-full right-0 mt-1 bg-white text-sm text-gray-800 border border-gray-300 rounded px-3 py-1 shadow-md whitespace-nowrap z-10">
-            {correo}
+          <div className="absolute top-full right-0 mt-1 bg-white text-sm text-gray-800 border border-gray-300 rounded px-3 py-2 shadow-md whitespace-nowrap z-10 flex flex-col items-start space-y-2">
+            <span>{correo}</span>
             <button
               onClick={handleLogout}
               className="text-red-600 hover:text-white hover:bg-red-600 border border-red-600 rounded px-3 py-1 transition duration-200"
