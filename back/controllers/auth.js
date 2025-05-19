@@ -1,6 +1,6 @@
 const userModel = require("../models/user")
 const { handleHttpError } = require("../utils/handleError.js")
-const { tokenSign } = require("../utils/handleJwt.js")
+const { tokenSign, verifyToken } = require("../utils/handleJwt.js")
 const { matchedData } = require('express-validator')
 const { encrypt, compare } = require("../utils/handlePassword")
 
@@ -61,7 +61,7 @@ const loginCtrl = async (req, res) => {
             handleHttpError(res, "INVALID_PASSWORD", 401)
             return
         }
-        user.set("passwd", undefined, { strict: false }) //Si no queremos que se muestre el hash en la respuesta
+        user.set("passwd", undefined, { strict: false })
         const data = {
             token: await tokenSign(user),
             user
@@ -73,4 +73,18 @@ const loginCtrl = async (req, res) => {
     }
 }
 
-module.exports = { loginCtrl }
+const verify = async (req, res) => {
+    const authHeader = req.headers.authorization || "";
+    const token = authHeader.replace(/^Bearer\s+/i, "");
+    if (!token) {
+        return res.status(401).json({ valid: false, msg: "Token ausente" });
+    }
+    try {
+        const decoded = verifyToken(token);
+        return res.status(200).json({ valid: true, user: decoded });
+    } catch {
+        return res.status(401).json({ valid: false, msg: "Token inválido" });
+    }
+}
+
+module.exports = { loginCtrl, verify }
