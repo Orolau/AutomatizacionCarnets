@@ -215,6 +215,10 @@ export default function PersonalDataFiltered() {
   };
 
   const descargarCarnetsComoPNG = async (fondoTransparente = false) => {
+    if(selectedPeople.length === 0){
+      alert("Selecciona los registros que quieres descargar primero")
+      return;
+    }
     const zip = new JSZip();
     const canvasContainer = document.createElement("div");
     canvasContainer.style.position = "absolute";
