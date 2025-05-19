@@ -8,15 +8,14 @@ const FILTER_URL = `${API_URL}/filtered?estadoCarnet=pendiente`;
 
 export default function PendingCardList() {
   const [carnets, setCarnets] = useState([]);
+  const [selectedDNI, setSelectedDNI] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
     const obtenerCarnetsFallidos = async () => {
       try {
         const response = await fetch(FILTER_URL);
-        if (!response.ok) {
-          throw new Error(response.statusText);
-        }
+        if (!response.ok) throw new Error(response.statusText);
         const data = await response.json();
 
         const carnetsPendientes = data.map((persona) => ({
@@ -41,29 +40,50 @@ export default function PendingCardList() {
     router.push(`/pages/modify/edit?dni=${dni}`);
   };
 
-  return (
-    <div>
-      <h2 className="text-2xl font-semibold text-[#0d1b2a] mb-6">
-        Carnets con errores
-      </h2>
+  const isSelected = (dni) => selectedDNI.includes(dni);
 
-      <div className="overflow-x-auto rounded-xl border border-gray-200">
-        <table className="min-w-full text-sm text-left">
-          <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+  const toggleSelection = (dni) => {
+    setSelectedDNI((prev) =>
+      prev.includes(dni) ? prev.filter((d) => d !== dni) : [...prev, dni]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (carnets.every((c) => selectedDNI.includes(c.dni))) {
+      setSelectedDNI([]);
+    } else {
+      setSelectedDNI(carnets.map((c) => c.dni));
+    }
+  };
+
+  return (
+    <div className="p-4 bg-white rounded-2xl shadow-md w-full">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 max-h-[500px] overflow-y-auto">
+        <table className="min-w-full text-sm text-left divide-y divide-gray-200">
+          <thead className="bg-gray-100 text-gray-700 text-left">
             <tr>
-              <th className="p-4 w-10"></th>
-              <th className="p-4 w-10"></th>
-              <th className="p-4">Nombre</th>
-              <th className="p-4">Titulación</th>
-              <th className="p-4">Curso</th>
-              <th className="p-4">Error</th>
-              <th className="p-4 text-right">Acción</th>
+              <th className="px-4 py-3">
+                <button
+                  onClick={toggleSelectAll}
+                  className="text-[#0065ef] hover:underline font-semibold"
+                >
+                  {carnets.length > 0 &&
+                    carnets.every((c) => selectedDNI.includes(c.dni))
+                    ? "Deseleccionar todo"
+                    : "Seleccionar todo"}
+                </button>
+              </th>
+              <th className="px-4 py-3">Nombre</th>
+              <th className="px-4 py-3">Titulación</th>
+              <th className="px-4 py-3">Curso</th>
+              <th className="px-4 py-3">Error</th>
+              <th className="px-4 py-3 text-right">Acción</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-100">
             {carnets.length === 0 ? (
               <tr>
-                <td colSpan="7" className="text-center p-6 text-gray-400">
+                <td colSpan="6" className="text-center p-6 text-gray-400">
                   No hay carnets pendientes por fallo.
                 </td>
               </tr>
@@ -71,32 +91,38 @@ export default function PendingCardList() {
               carnets.map((carnet) => (
                 <tr
                   key={carnet.dni}
-                  className="border-t hover:bg-gray-50 transition"
+                  onClick={() => toggleSelection(carnet.dni)}
+                  className={`transition-all duration-200 ease-in-out rounded-md cursor-pointer ${isSelected(carnet.dni)
+                      ? "bg-blue-50"
+                      : "hover:bg-gray-50 hover:scale-[1.01] hover:shadow-md"
+                    }`}
                 >
-                  {/* Checkbox visual */}
-                  <td className="p-4">
-                    <input type="checkbox" className="accent-blue-600" />
+                  <td className="px-4 py-2 flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={isSelected(carnet.dni)}
+                      onChange={() => toggleSelection(carnet.dni)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="accent-[#0065ef]"
+                    />
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
                   </td>
-
-                  {/* Punto rojo */}
-                  <td className="p-4">
-                    <span className="block w-3 h-3 bg-red-500 rounded-full"></span>
-                  </td>
-
-                  {/* Datos */}
-                  <td className="p-4 text-gray-800 font-medium whitespace-nowrap">
+                  <td className="px-4 py-2 text-gray-800 font-medium whitespace-nowrap">
                     {carnet.nombre} {carnet.apellidos}
                   </td>
-                  <td className="p-4 text-gray-700">{carnet.titulacion}</td>
-                  <td className="p-4 text-gray-700">{carnet.curso}</td>
-                  <td className="p-4 font-semibold text-red-500">
+                  <td className="px-4 py-2 text-gray-700">
+                    {carnet.titulacion || "-"}
+                  </td>
+                  <td className="px-4 py-2 text-gray-700">{carnet.curso || "-"}</td>
+                  <td className="px-4 py-2 font-semibold text-red-500">
                     {carnet.error}
                   </td>
-
-                  {/* Botón editar */}
-                  <td className="p-4 text-right">
+                  <td className="px-4 py-2 text-right">
                     <button
-                      onClick={() => handleEdit(carnet.dni)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEdit(carnet.dni);
+                      }}
                       className="text-sm px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition"
                     >
                       Editar
