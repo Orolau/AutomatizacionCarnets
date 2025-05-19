@@ -2,11 +2,13 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function NavbarTop() {
   const pathname = usePathname();
+  const router = useRouter();
   const isActive = (path) => pathname === path;
+  
 
   const [correoVisible, setCorreoVisible] = useState(false);
   const [correo, setCorreo] = useState("");
@@ -42,6 +44,11 @@ export default function NavbarTop() {
     } catch (error) {
       console.error("Error al obtener el correo:", error);
     }
+  };
+
+  const handleLogout = () => {
+    document.cookie = "jwt=; Max-Age=0; path=/;";
+    router.push("http://localhost:3000");
   };
 
   return (
@@ -91,6 +98,12 @@ export default function NavbarTop() {
         {correoVisible && (
           <div className="absolute top-full right-0 mt-1 bg-white text-sm text-gray-800 border border-gray-300 rounded px-3 py-1 shadow-md whitespace-nowrap z-10">
             {correo}
+            <button
+              onClick={handleLogout}
+              className="text-red-600 hover:text-white hover:bg-red-600 border border-red-600 rounded px-3 py-1 transition duration-200"
+            >
+              Logout
+            </button>
           </div>
         )}
       </div>
