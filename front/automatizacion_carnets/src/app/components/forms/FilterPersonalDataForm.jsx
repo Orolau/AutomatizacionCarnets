@@ -133,39 +133,42 @@ export default function PersonalDataFiltered() {
     }
   }, [searchTerm, people]);
 
-  const handleFilter = async () => {
-<<<<<<<<< Temporary merge branch 1
-    localStorage.setItem("filtrosCarnets", JSON.stringify({ tipoUsuario, tipoTitulacion, titulacion, curso, cargo, departamento, modalidad }));
-    const params = new URLSearchParams();
-    if (tipoUsuario) params.append("tipoUsuario", tipoUsuario);
-    if (tipoTitulacion) params.append("tipoTitulacion", tipoTitulacion);
-    if (titulacion) params.append("titulacion", titulacion);
-    if (curso) params.append("curso", curso);
-    if (cargo) params.append("cargo", cargo);
-    if (departamento) params.append("departamento", departamento);
-    if (modalidad && tipoUsuario === "alumno")
-      params.append("modalidad", modalidad);
-=========
-    const params = {};
-    if (tipoUsuario) params.tipoUsuario = tipoUsuario;
-    if (tipoTitulacion) params.tipoTitulacion = tipoTitulacion;
-    if (titulacion) params.titulacion = titulacion;
-    if (curso) params.curso = curso;
-    if (cargo) params.cargo = cargo;
-    if (departamento) params.departamento = departamento;
-    if (modalidad && tipoUsuario === "alumno") params.modalidad = modalidad;
->>>>>>>>> Temporary merge branch 2
+  const onSubmit = async (formData) => {
+  const cleanedData = { ...formData };
 
-    try {
-      const data = await fetchFilteredPeople(params);
-      setPeople(data);
-      setFilteredPeople(data);
-      setSearchTerm("");
-      setSelectedPeople([]);
-    } catch (error) {
-      console.error("Error al filtrar personas:", error);
-    }
-  };
+  // Elimina los campos que no aplican según tipoUsuario
+  if (cleanedData.tipoUsuario !== "alumno") {
+    delete cleanedData.tipoTitulacion;
+    delete cleanedData.titulacion;
+    delete cleanedData.curso;
+    delete cleanedData.modalidad;
+  }
+  if (cleanedData.tipoUsuario !== "profesor" && cleanedData.tipoUsuario !== "personal") {
+    delete cleanedData.cargo;
+  }
+  if (cleanedData.tipoUsuario !== "profesor") {
+    delete cleanedData.departamento;
+  }
+
+  console.log("✅ Datos limpiados que se envían al backend:", cleanedData);
+
+  const params = new URLSearchParams();
+  Object.entries(cleanedData).forEach(([key, value]) => {
+    if (value) params.append(key, value);
+  });
+
+  try {
+    const response = await fetch(`${FILTER_URL}?${params.toString()}`);
+    const data = await response.json();
+    console.log("✅ Respuesta del backend:", data);
+    setPeople(data);
+    setFilteredPeople(data);
+    setSearchTerm("");
+    setSelectedPeople([]);
+  } catch (error) {
+    console.error("❌ Error fetching filtered data:", error);
+  }
+};
 
 
   const handleSelectPerson = (person) => {
