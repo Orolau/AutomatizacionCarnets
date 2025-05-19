@@ -5,14 +5,15 @@ const validateCreatePerson = [
     check("tipoUsuario").exists().withMessage("No tipoUsuario").isIn(['alumno', 'personal', 'profesor']).withMessage("tipoUsuario debe ser 'alumno', 'personal', or 'profesor'"),
     check("nombre").exists().withMessage("No nombre").isString().withMessage("Nombre debe ser string"),
     check("apellidos").exists().withMessage("No apellidos").isString().withMessage("Apellidos debe ser string"),
-    check("titulacion").exists().withMessage("No titulacion").isString().withMessage("Titulacion debe ser string"),
-    check("tipoTitulacion").exists().withMessage("No tipoTitulacion").isIn(['Grado', 'Ciclo superior', 'Máster', '']).withMessage("tipoTitulacion debe ser 'Grado', 'Ciclo superior', 'Máster', o string vacio"),
-    check("cargo").exists().withMessage("No cargo").isString().withMessage("Cargo debe ser string"),
-    check("departamento").exists().withMessage("No departamento").isString().withMessage("Departamento debe ser string"),
+    check("titulacion").optional().isString().withMessage("Titulacion debe ser string"),
+    check("tipoTitulacion").optional().isIn(['Grado', 'Ciclo superior', 'Máster', '']).withMessage("tipoTitulacion debe ser 'Grado', 'Ciclo superior', 'Máster', o string vacio"),
+    check("cargo").optional().isString().withMessage("Cargo debe ser string"),
+    check("departamento").optional().isString().withMessage("Departamento debe ser string"),
     check("email").exists().withMessage("No email").isEmail().withMessage("Invalid email format"),
     check("dni").exists().withMessage("No dni"),//.matches(/^\d{8}[A-Z]$/).withMessage("DNI debe tener el formato 12345678X"),
     check("foto").optional().isURL().withMessage("Foto debe ser valid URL"),
     check("modalidad").exists().withMessage("No modalidad").isIn(['Presencial', 'Online']).withMessage("Modalidad debe ser 'Presencial' o 'Online'"),
+    check("curso").optional().isIn(["1º", "2º", "3º", "4º", "5º", ""]).withMessage("curso inválido"),
     validateResults
 ];
 
@@ -77,6 +78,7 @@ const validateUpdatePerson = [
     check("dni").optional(),//.matches(/^\d{8}[A-Z]$/).withMessage("DNI must be in the format 12345678X"),
     check("foto").optional().isURL().withMessage("Foto must be a valid URL"),
     check("modalidad").optional().isIn(['Presencial', 'Online']).withMessage("Modalidad must be 'Presencial' or 'Online"),
+    check("curso").optional().isIn(["1º", "2º", "3º", "4º", "5º", ""]).withMessage("curso inválido"),
     validateResults
   ];
   

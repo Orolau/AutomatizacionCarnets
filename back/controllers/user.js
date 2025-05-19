@@ -1,5 +1,5 @@
 const { userModel } = require('../models/index.js')
-const sendVerificationEmail = require('../utils/email.js');
+const { sendVerificationEmail } = require('../utils/email.js');
 
 /**
  * @swagger
@@ -38,14 +38,53 @@ const sendVerificationEmail = require('../utils/email.js');
 
 const getItems = async (req, res) => {
     const data = await userModel.find({});
-    console.log(data)
     res.send({ data });
 }
+/**
+ * @swagger
+ * /api/user/verify/{email}:
+ *   put:
+ *     summary: Inicia el proceso de verificación de email
+ *     description: Marca al usuario como en proceso de verificación y le envía un código de verificación por email.
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: email
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Correo electrónico del usuario
+ *     responses:
+ *       200:
+ *         description: Usuario actualizado con código de verificación
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                 mail:
+ *                   type: string
+ *                 verificando:
+ *                   type: boolean
+ *                 verifyCode:
+ *                   type: integer
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *       404:
+ *         description: Usuario no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ */
 
 const updateVerifying = async (req, res) => {
 
     const email = req.params.email;
-    console.log(email)
     const code = Math.floor(Math.random() * 900000) + 100000;
     const data = await userModel.findOneAndUpdate(
         { mail: email },
@@ -55,11 +94,56 @@ const updateVerifying = async (req, res) => {
     if (!data) {
         return res.status(404).json({ message: 'Usuario no encontrado' });
     }
-
-    console.log("Datos updateVerifying:", data)
     await sendVerificationEmail(email, code);
     res.json(data)
 }
+/**
+ * @swagger
+ * /api/user/verified:
+ *   put:
+ *     summary: Verifica el código enviado al email
+ *     description: Valida el código de verificación del usuario y marca la cuenta como verificada.
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: usuario@example.com
+ *               code:
+ *                 type: integer
+ *                 example: 123456
+ *     responses:
+ *       200:
+ *         description: Verificación completada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                 mail:
+ *                   type: string
+ *                 verificando:
+ *                   type: boolean
+ *                 verifyCode:
+ *                   type: integer
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *       404:
+ *         description: Email o código incorrecto, o el usuario no está en proceso de verificación
+ *       500:
+ *         description: Error interno del servidor
+ */
 
 const updateVerified = async (req, res) => {
     try {

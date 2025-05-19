@@ -20,11 +20,8 @@ const sendVerificationEmail = async (to, code) => {
     };
 
     try {
-        console.log("Enviando correo a:", to, "con código:", code);
         const info = await transporter.sendMail(mailOptions);
-        console.log("Email enviado: %s", info.messageId);
     } catch (error) {
-        console.error("Error al enviar email:", error);
         throw error;
     }
 };
@@ -39,11 +36,10 @@ const sendEmail = async (to, subject, text) => {
   
     try {
       const info = await transporter.sendMail(mailOptions);
-      console.log(`Email enviado: ${info.messageId}`);
     } catch (error) {
       console.error("Error al enviar email:", error);
       throw error;
     }
   };
 
-module.exports = sendVerificationEmail, sendEmail;
+  module.exports = { sendVerificationEmail, sendEmail  };

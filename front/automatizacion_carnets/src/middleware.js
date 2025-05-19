@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 
+const { verifyToken } = require('../../../back/utils/handleJwt.js');
+
 export function middleware(request) {
 
     const token = request.cookies.get('jwt')?.value;
 
-    console.log("Token en middleware:", token);
 
     const { pathname } = request.nextUrl;
 

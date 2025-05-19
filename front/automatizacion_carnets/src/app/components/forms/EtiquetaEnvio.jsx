@@ -1,26 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { jsPDF } from "jspdf";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import { fetchOnlinePeople } from "@/app/api/api";
 
 const EtiquetaEnvio = () => {
   const [carnets, setCarnets] = useState([]);
   const [seleccionados, setSeleccionados] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortField, setSortField] = useState("");
+  const [sortDirection, setSortDirection] = useState("asc");
 
   useEffect(() => {
-    axios.get("http://localhost:3005/api/person")
-      .then(response => {
-        const onlineCarnets = response.data.filter(persona => persona.modalidad === "Online");
-        setCarnets(onlineCarnets);
-      })
-      .catch(error => {
-        console.error("Error al obtener los carnets: ", error);
-      });
+    fetchOnlinePeople()
+      .then(setCarnets)
+      .catch(error => console.error("Error al obtener los carnets: ", error));
   }, []);
+
 
   const toggleSeleccion = (persona) => {
     if (seleccionados.some(sel => sel._id === persona._id)) {
@@ -45,7 +43,6 @@ const EtiquetaEnvio = () => {
 
     doc.setFont("helvetica", "bold");
     doc.text("ENVÍO A:", 20, 20);
-
     doc.setFont("helvetica", "normal");
     doc.text(`Nombre: ${persona.nombre} ${persona.apellidos}`, 20, 30);
     doc.text(`Dirección: ${persona.direccion}`, 20, 40);
@@ -60,7 +57,6 @@ const EtiquetaEnvio = () => {
 
   const imprimirSeleccionados = async () => {
     if (seleccionados.length === 0) return;
-
     if (seleccionados.length === 1) {
       const pdfBlob = await generarPDF(seleccionados[0]);
       saveAs(pdfBlob, "etiqueta_envio.pdf");
@@ -76,10 +72,28 @@ const EtiquetaEnvio = () => {
     }
   };
 
-  const carnetsFiltrados = carnets.filter(persona => {
-    const fullName = `${persona.nombre} ${persona.apellidos}`.toLowerCase();
-    return fullName.includes(searchTerm.toLowerCase());
-  });
+  const carnetsFiltrados = carnets
+    .filter(persona => {
+      const fullName = `${persona.nombre} ${persona.apellidos}`.toLowerCase();
+      return fullName.includes(searchTerm.toLowerCase());
+    })
+    .sort((a, b) => {
+      if (!sortField) return 0;
+      const valA = a[sortField]?.toString().toLowerCase() || "";
+      const valB = b[sortField]?.toString().toLowerCase() || "";
+      if (valA < valB) return sortDirection === "asc" ? -1 : 1;
+      if (valA > valB) return sortDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -95,63 +109,73 @@ const EtiquetaEnvio = () => {
           />
           <button
             onClick={imprimirSeleccionados}
-            title="Imprimir etiquetas"
+            className="flex items-center gap-2 px-4 py-1.5 bg-blue-100 rounded-full text-sm text-gray-700 hover:bg-blue-200 transition"
           >
-            <img src="/images/print_icon.png" alt="Imprimir" className="w-6 h-6" />
+            <img src="/images/print_icon.png" alt="Imprimir" className="w-4 h-4" />
+            Descargar etiquetas
           </button>
         </div>
 
         {/* Tabla */}
-        <table className="min-w-full text-sm text-gray-900">
-          <thead className="border-b bg-white">
-            <tr>
-              <th className="px-4 py-2">
-                <button
-                  onClick={seleccionarTodo}
-                  className="text-[#0065ef] hover:underline text-sm"
-                >
-                  {seleccionados.length === carnetsFiltrados.length ? "Deseleccionar todo" : "Seleccionar todo"}
-                </button>
-              </th>
-              <th className="px-4 py-2"></th>
-              <th className="px-4 py-2">Nombre</th>
-              <th className="px-4 py-2">Apellidos</th>
-              <th className="px-4 py-2">Titulación</th>
-              <th className="px-4 py-2">Cargo</th>
-              <th className="px-4 py-2">DNI</th>
-              <th className="px-4 py-2">Dirección</th>
-              <th className="px-4 py-2">Email</th>
-              <th className="px-4 py-2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {carnetsFiltrados.map((carnet) => (
-              <tr key={carnet._id} className="border-t hover:bg-gray-100">
-                <td className="px-4 py-2">
-                  <input
-                    type="checkbox"
-                    checked={seleccionados.some(sel => sel._id === carnet._id)}
-                    onChange={() => toggleSeleccion(carnet)}
-                  />
-                </td>
-                <td className="px-4 py-2">
-                  <div className="w-3 h-3 rounded-full bg-blue-500 mx-auto" />
-                </td>
-                <td className="px-4 py-2">{carnet.nombre}</td>
-                <td className="px-4 py-2">{carnet.apellidos}</td>
-                <td className="px-4 py-2">{carnet.titulacion}</td>
-                <td className="px-4 py-2">{carnet.cargo}</td>
-                <td className="px-4 py-2">{carnet.dni}</td>
-                <td className="px-4 py-2">{carnet.direccion}</td>
-                <td className="px-4 py-2">{carnet.correo}</td>
-                <td className="px-4 py-2"></td>
+        <div className="overflow-x-auto max-h-[500px] overflow-y-scroll border border-gray-200 rounded-xl">
+          <table className="min-w-full text-sm text-gray-900">
+            <thead className="bg-gray-100 sticky top-0 z-10">
+              <tr>
+                <th className="px-4 py-2">
+                  <button
+                    onClick={seleccionarTodo}
+                    className="text-[#0065ef] hover:underline font-semibold text-sm"
+                  >
+                    {seleccionados.length === carnetsFiltrados.length ? "Deseleccionar todo" : "Seleccionar todo"}
+                  </button>
+                </th>
+                {["nombre", "apellidos", "titulacion", "cargo", "dni", "direccion", "correo"].map((field, i) => (
+                  <th
+                    key={i}
+                    onClick={() => handleSort(field)}
+                    className="px-4 py-2 cursor-pointer select-none hover:underline text-gray-700"
+                  >
+                    {field.charAt(0).toUpperCase() + field.slice(1)}
+                    {sortField === field && (sortDirection === "asc" ? " ▲" : " ▼")}
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {carnetsFiltrados.map((carnet) => (
+                <tr
+                  key={carnet._id}
+                  onClick={() => toggleSeleccion(carnet)}
+                  className="hover:bg-gray-50 hover:scale-[1.01] hover:shadow-md transition-all duration-200 ease-in-out cursor-pointer"
+                >
+                  <td className="px-4 py-2">
+                    <input
+                      type="checkbox"
+                      checked={seleccionados.some(sel => sel._id === carnet._id)}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        toggleSeleccion(carnet);
+                      }}
+                    />
+                  </td>
+                  <td className="px-4 py-2">{carnet.nombre}</td>
+                  <td className="px-4 py-2">{carnet.apellidos}</td>
+                  <td className="px-4 py-2">{carnet.titulacion}</td>
+                  <td className="px-4 py-2">{carnet.cargo}</td>
+                  <td className="px-4 py-2">{carnet.dni}</td>
+                  <td className="px-4 py-2">{carnet.direccion}</td>
+                  <td className="px-4 py-2">{carnet.correo}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         {carnetsFiltrados.length === 0 && (
-          <p className="text-center text-gray-500 mt-4">No hay carnets en modalidad online.</p>
+          <div className="text-center text-gray-500 mt-10 min-h-[300px]">
+            <img src="/images/flecha.png" className="mx-auto mb-4 w-[150px]" alt="Flecha" />
+            <p className="text-xl font-semibold">No hay carnets en modalidad online.</p>
+          </div>
         )}
       </div>
     </div>

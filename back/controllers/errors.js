@@ -1,5 +1,5 @@
 const Person = require("../models/person");
-const  sendEmail  = require("../utils/email");
+const { sendEmail } = require("../utils/email");
 
 const ErroresToMail = async (req, res) => {
   const REQUIRED_FIELDS = [
@@ -10,20 +10,20 @@ const ErroresToMail = async (req, res) => {
     "direccion",
     "foto",
     "modalidad",
-    "anio_comienzo"
   ];
 
   try {
     const people = await Person.find();
     let enviados = 0;
+    let logTexto = ""; 
 
     for (const person of people) {
-      const correo = person.correo || person.email;
+      const email = person.email;
 
-      console.log("🧪 Revisando usuario:", person.nombre, person.apellidos, "-", correo);
+      logTexto += `Revisando usuario: ${person.nombre} ${person.apellidos}\n`;
 
-      if (!correo || !correo.includes("@")) {
-        console.log("❌ Usuario sin correo válido, se omite.\n");
+      if (!email || !email.includes("@")) {
+        logTexto += `Usuario ${person.nombre} ${person.apellidos} sin correo válido: \n`;
         continue; // Saltamos este usuario
       }
 
@@ -36,7 +36,7 @@ const ErroresToMail = async (req, res) => {
           (Array.isArray(value) && value.length === 0);
 
         if (isMissing) {
-          console.log(`❗ Falta el campo "${field}" →`, value);
+          logTexto += `Falta el campo "${field}" → ${value}\n`;
         }
 
         return isMissing;
@@ -61,24 +61,28 @@ Gracias,
 Equipo de Administración de Carnets
         `;
 
-        console.log(`📬 Enviando correo a: ${correo}`);
-        console.log("📋 Campos faltantes:", missing);
+        logTexto += `Enviando correo a: ${email}\n`;
+        logTexto += `Campos faltantes: [ ${missing.join(", ")} ]\n`;
 
         await sendEmail(
-          correo,
+          email,
           "Faltan datos en tu ficha de carnet",
           message
         );
 
+        logTexto += `Email enviado\n\n`;
+        logTexto += `--------------------------------------------------\n\n`;
         enviados++;
       } else {
-        console.log("✅ Todos los datos están completos para este usuario.\n");
+        logTexto += "Todos los datos están completos para este usuario.\n\n";
       }
     }
 
-    res.status(200).json({ message: `Correos enviados a ${enviados} usuarios con datos incompletos.` });
+    res.status(200).json({
+      message: `Correos enviados a ${enviados} usuarios con datos incompletos.`,
+      logs: logTexto
+    });
   } catch (err) {
-    console.error("❌ Error al enviar correos:", err);
     res.status(500).json({ error: "Error interno al enviar correos." });
   }
 };
