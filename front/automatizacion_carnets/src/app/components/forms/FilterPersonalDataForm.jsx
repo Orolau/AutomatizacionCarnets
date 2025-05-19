@@ -215,6 +215,10 @@ export default function PersonalDataFiltered() {
   };
 
   const descargarCarnetsComoPNG = async (fondoTransparente = false) => {
+    if(selectedPeople.length === 0){
+      alert("Selecciona los registros que quieres descargar primero")
+      return;
+    }
     const zip = new JSZip();
     const canvasContainer = document.createElement("div");
     canvasContainer.style.position = "absolute";
@@ -627,7 +631,7 @@ export default function PersonalDataFiltered() {
                     </div>
                   </th>
                 ))}
-                <th className="px-4 py-3">Acciones</th> { }
+                <th className="px-4 py-3">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
