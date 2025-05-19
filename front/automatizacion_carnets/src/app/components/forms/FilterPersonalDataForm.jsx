@@ -222,6 +222,39 @@ export default function PersonalDataFiltered() {
     });
   };
 
+  function validarDatosRegistro(foto, dni, nombre, apellidos) {
+    let esValido = true;
+
+    // Validar que la foto esté presente
+    if (!foto || foto==="") {
+      esValido = false;
+    }
+    
+
+    // Validar el formato del DNI (8 números y una letra válida)
+    const dniRegex = /^(\d{8})([A-Z])$/i;
+    const letras = "TRWAGMYFPDXBNJZSQVHLCKE";
+    const match = dni.match(dniRegex);
+
+    if (!match) {
+      esValido = false;
+    }
+
+    // Validar nombre y apellidos: solo letras y espacios
+    const textoRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+
+    if (!nombre || !textoRegex.test(nombre)) {
+      esValido = false;
+    }
+
+    if (!apellidos || !textoRegex.test(apellidos)) {
+      esValido = false;
+    }
+
+    return esValido;
+  }
+
+
   const isPersonSelected = (person) =>
     selectedPeople.some((p) => p.dni === person.dni);
 
@@ -559,7 +592,12 @@ export default function PersonalDataFiltered() {
                         onClick={(e) => e.stopPropagation()}
                         className="accent-[#0065ef]"
                       />
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <div
+                        className={`w-3 h-3 rounded-full ${validarDatosRegistro(person.foto, person.dni, person.nombre, person.apellidos)
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                          }`}
+                      ></div>
                     </td>
                     <td className="px-4 py-2">{person.nombre}</td>
                     <td className="px-4 py-2">{person.apellidos}</td>
