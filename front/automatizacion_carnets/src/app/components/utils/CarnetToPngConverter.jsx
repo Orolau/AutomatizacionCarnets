@@ -50,7 +50,6 @@ export default function CarnetToJpgConverter({ carnet }) {
     }, [imagesLoaded]);
 
     const convertToImage = () => {
-        console.log("Estado de isReady:", isReady);
         if (isReady && carnetRef.current) {
             setTimeout(() => {
                 html2canvas(carnetRef.current, {

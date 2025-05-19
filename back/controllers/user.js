@@ -38,7 +38,6 @@ const { sendVerificationEmail } = require('../utils/email.js');
 
 const getItems = async (req, res) => {
     const data = await userModel.find({});
-    console.log(data)
     res.send({ data });
 }
 /**
@@ -86,7 +85,6 @@ const getItems = async (req, res) => {
 const updateVerifying = async (req, res) => {
 
     const email = req.params.email;
-    console.log(email)
     const code = Math.floor(Math.random() * 900000) + 100000;
     const data = await userModel.findOneAndUpdate(
         { mail: email },
@@ -96,8 +94,6 @@ const updateVerifying = async (req, res) => {
     if (!data) {
         return res.status(404).json({ message: 'Usuario no encontrado' });
     }
-
-    console.log("Datos updateVerifying:", data)
     await sendVerificationEmail(email, code);
     res.json(data)
 }

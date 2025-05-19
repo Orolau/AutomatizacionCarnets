@@ -3,7 +3,6 @@ import axios from "axios";
 export const LoginFormInteract = async ({ mail, passwd }) => {
     try {
         /*const response = await axios.get("http://localhost:3005/api/user");
-        console.log("Respuesta de la API:", response.data);
 
         const usuarios = Array.isArray(response.data.data) ? response.data.data : [];
 
@@ -35,8 +34,6 @@ export const LoginFormInteract = async ({ mail, passwd }) => {
         const data = await response.json();
 
         const updateResponse = await axios.put(`http://localhost:3005/api/user/verify/${encodeURIComponent(mail)}`);
-        console.log("Respuesta de updateVerifying:", updateResponse.data);
-
         return data;
     } catch (error) {
         console.error("Error en la autenticación:", error.message);

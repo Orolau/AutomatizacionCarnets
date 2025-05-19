@@ -53,7 +53,6 @@ export default function ModificarCarnetIndividualPage() {
     if (!dni) return <div className="p-8 text-center">Cargando...</div>;
 
     const updatePersonInLocalStorage = (updatedCarnet) => {
-        console.log("Realizando modificaciones en local storage");
 
         // Obtener el array de personas de localStorage
         const storedPeople = localStorage.getItem("selectedPeople");

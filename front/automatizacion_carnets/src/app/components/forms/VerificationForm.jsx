@@ -35,8 +35,6 @@ export default function VerificationForm() {
         const email = localStorage.getItem("email");
         try {
             const response = await VerificationFormInteract(code, email);
-            console.log("Código ingresado:", code);
-            console.log("Respuesta del backend:", response);
 
             if (response && response.mail) {
                 router.push("./finales/principal").then(() => {

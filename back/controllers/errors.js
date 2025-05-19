@@ -20,11 +20,9 @@ const ErroresToMail = async (req, res) => {
     for (const person of people) {
       const email = person.email;
 
-      //console.log("Revisando usuario:", person.nombre, person.apellidos);
       logTexto += `Revisando usuario: ${person.nombre} ${person.apellidos}\n`;
 
       if (!email || !email.includes("@")) {
-        //console.log("Usuario sin correo válido.\n");
         logTexto += `Usuario ${person.nombre} ${person.apellidos} sin correo válido: \n`;
         continue; // Saltamos este usuario
       }
@@ -38,7 +36,6 @@ const ErroresToMail = async (req, res) => {
           (Array.isArray(value) && value.length === 0);
 
         if (isMissing) {
-          //console.log(`Falta el campo "${field}" →`, value);
           logTexto += `Falta el campo "${field}" → ${value}\n`;
         }
 
@@ -64,8 +61,6 @@ Gracias,
 Equipo de Administración de Carnets
         `;
 
-        //console.log(`Enviando correo a: ${email}`);
-        //console.log("Campos faltantes:", missing);
         logTexto += `Enviando correo a: ${email}\n`;
         logTexto += `Campos faltantes: [ ${missing.join(", ")} ]\n`;
 
@@ -79,7 +74,6 @@ Equipo de Administración de Carnets
         logTexto += `--------------------------------------------------\n\n`;
         enviados++;
       } else {
-        console.log("Todos los datos están completos para este usuario.\n");
         logTexto += "Todos los datos están completos para este usuario.\n\n";
       }
     }
@@ -89,7 +83,6 @@ Equipo de Administración de Carnets
       logs: logTexto
     });
   } catch (err) {
-    //console.error("Error al enviar correos:", err);
     res.status(500).json({ error: "Error interno al enviar correos." });
   }
 };

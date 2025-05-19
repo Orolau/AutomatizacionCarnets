@@ -20,7 +20,6 @@ export default function Carnet({ carnet, fondoTransparente = false }) {
                 background: fondoTransparente ? "transparent" : "white"
             });
         }
-        console.log(carnet.foto)
     }, [carnet._id, fondoTransparente]);
 
     return (
