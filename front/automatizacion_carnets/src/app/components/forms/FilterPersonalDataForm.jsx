@@ -627,7 +627,7 @@ export default function PersonalDataFiltered() {
                     </div>
                   </th>
                 ))}
-                <th className="px-4 py-3">Acciones</th> { }
+                <th className="px-4 py-3">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
