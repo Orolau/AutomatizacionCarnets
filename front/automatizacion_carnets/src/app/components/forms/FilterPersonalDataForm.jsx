@@ -9,6 +9,8 @@ import html2canvas from "html2canvas";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
+import JsBarcode from "jsbarcode";
+
 
 const FILTER_URL = "http://localhost:3005/api/person/filtered";
 
@@ -210,6 +212,72 @@ export default function PersonalDataFiltered() {
     } catch (error) {
       console.error("Error fetching filtered data:", error);
     }
+  };
+
+  const descargarCarnetsComoPNG = async (fondoTransparente = false) => {
+    const zip = new JSZip();
+    const canvasContainer = document.createElement("div");
+    canvasContainer.style.position = "absolute";
+    canvasContainer.style.top = "-9999px";
+    canvasContainer.style.left = "-9999px";
+    document.body.appendChild(canvasContainer);
+
+    for (let i = 0; i < selectedPeople.length; i++) {
+      const person = selectedPeople[i];
+
+      // Generar HTML manual del carnet
+      canvasContainer.innerHTML = `
+        <div id="carnet-temp" style="width: 340px; height: 214px; font-family: sans-serif; position: relative; background-color: ${fondoTransparente ? 'transparent' : '#003366'}; color: black; border-radius: 8px; padding: 16px;">
+          <div style="position: absolute; top: 16px; left: 16px; width: 80px; height: 100px;">
+            <img src="${person.foto}" style="width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+          <div style="position: absolute; top: 28px; left: 120px; width: 180px; font-size: 12px;">
+            ${!fondoTransparente ? '<p style="font-size:10px;color:white;">U-TAD CENTRO DIGITAL</p><br/>' : ''}
+            <p style="font-weight: bold;">${person.nombre} ${person.apellidos}</p>
+            <p style="font-weight: bold;">${person.tipoUsuario === 'alumno'
+          ? `${person.tipoTitulacion} ${person.titulacion}`
+          : person.tipoUsuario === 'profesor'
+            ? `${person.cargo} ${person.departamento}`
+            : person.cargo
+        }</p>
+          </div>
+          <div style="position: absolute; bottom: 8px; right: 8px;">
+            <svg id="barcode-${i}" class="barcode" style="width: 200px;"></svg>
+          </div>
+        </div>
+      `;
+
+      const barcode = canvasContainer.querySelector(`#barcode-${i}`);
+      if (barcode) {
+        JsBarcode(barcode, person.dni || "", {
+          format: "CODE128",
+          displayValue: false,
+          width: 2,
+          height: 25,
+          background: fondoTransparente ? "transparent" : "white",
+        });
+      }
+
+      const canvas = await html2canvas(canvasContainer.querySelector("#carnet-temp"), {
+        backgroundColor: fondoTransparente ? "transparent" : "white",
+        useCORS: true,
+        scale: 8
+      });
+
+      await new Promise((resolve) => {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const fileName = `carnet_${person.nombre}_${person.apellidos}.png`;
+            zip.file(fileName, blob);
+          }
+          resolve();
+        }, "image/png");
+      });
+    }
+
+    document.body.removeChild(canvasContainer);
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    saveAs(zipBlob, `Carnets_${fondoTransparente ? "transparente" : "visible"}.zip`);
   };
 
 
