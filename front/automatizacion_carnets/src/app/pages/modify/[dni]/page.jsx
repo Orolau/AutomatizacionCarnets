@@ -84,7 +84,7 @@ export default function ModificarCarnetIndividualPage() {
                 <div className="w-full bg-blue-100 p-3 flex items-center justify-between">
 
                     {/* Botón volver */}
-                    <button onClick={() => router.push('/pages/preview')} aria-label="Volver">
+                    <button onClick={() => router.push('/pages/finales/principal')} aria-label="Volver">
                         <Image
                             src="/images/arrow-back-outline.png"
                             alt="Volver"
