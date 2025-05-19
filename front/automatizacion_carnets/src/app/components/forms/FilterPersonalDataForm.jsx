@@ -65,7 +65,7 @@ const titulaciones = {
     "SMSCH",
   ],
   Máster: [
-    "Máster en Programación de Videojuegos", 
+    "Máster en Programación de Videojuegos",
     "Máster en Big Data",
     "Máster Universitario en tecnologías digitales para el arte",
     "Máster Universitario en Computación Gráfica, Realidad Virtual y Simulación + Título Propio en IA",
@@ -159,39 +159,39 @@ export default function PersonalDataFiltered() {
   }, [searchTerm, people]);
 
   const onSubmit = async (formData) => {
-  const cleanedData = { ...formData };
+    const cleanedData = { ...formData };
 
-  // Elimina los campos que no aplican según tipoUsuario
-  if (cleanedData.tipoUsuario !== "alumno") {
-    delete cleanedData.tipoTitulacion;
-    delete cleanedData.titulacion;
-    delete cleanedData.curso;
-    delete cleanedData.modalidad;
-  }
-  if (cleanedData.tipoUsuario !== "profesor" && cleanedData.tipoUsuario !== "personal") {
-    delete cleanedData.cargo;
-  }
-  if (cleanedData.tipoUsuario !== "profesor") {
-    delete cleanedData.departamento;
-  }
+    // Elimina los campos que no aplican según tipoUsuario
+    if (cleanedData.tipoUsuario !== "alumno") {
+      delete cleanedData.tipoTitulacion;
+      delete cleanedData.titulacion;
+      delete cleanedData.curso;
+      delete cleanedData.modalidad;
+    }
+    if (cleanedData.tipoUsuario !== "profesor" && cleanedData.tipoUsuario !== "personal") {
+      delete cleanedData.cargo;
+    }
+    if (cleanedData.tipoUsuario !== "profesor") {
+      delete cleanedData.departamento;
+    }
 
 
-  const params = new URLSearchParams();
-  Object.entries(cleanedData).forEach(([key, value]) => {
-    if (value) params.append(key, value);
-  });
+    const params = new URLSearchParams();
+    Object.entries(cleanedData).forEach(([key, value]) => {
+      if (value) params.append(key, value);
+    });
 
-  try {
-    const response = await fetch(`${FILTER_URL}?${params.toString()}`);
-    const data = await response.json();
-    setPeople(data);
-    setFilteredPeople(data);
-    setSearchTerm("");
-    setSelectedPeople([]);
-  } catch (error) {
-    console.error("Error fetching filtered data:", error);
-  }
-};
+    try {
+      const response = await fetch(`${FILTER_URL}?${params.toString()}`);
+      const data = await response.json();
+      setPeople(data);
+      setFilteredPeople(data);
+      setSearchTerm("");
+      setSelectedPeople([]);
+    } catch (error) {
+      console.error("Error fetching filtered data:", error);
+    }
+  };
 
 
   const handleSelectPerson = (person) => {
@@ -202,6 +202,39 @@ export default function PersonalDataFiltered() {
         : [...prev, person];
     });
   };
+
+  function validarDatosRegistro(foto, dni, nombre, apellidos) {
+    let esValido = true;
+
+    // Validar que la foto esté presente
+    if (!foto || foto==="") {
+      esValido = false;
+    }
+    
+
+    // Validar el formato del DNI (8 números y una letra válida)
+    const dniRegex = /^(\d{8})([A-Z])$/i;
+    const letras = "TRWAGMYFPDXBNJZSQVHLCKE";
+    const match = dni.match(dniRegex);
+
+    if (!match) {
+      esValido = false;
+    }
+
+    // Validar nombre y apellidos: solo letras y espacios
+    const textoRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+
+    if (!nombre || !textoRegex.test(nombre)) {
+      esValido = false;
+    }
+
+    if (!apellidos || !textoRegex.test(apellidos)) {
+      esValido = false;
+    }
+
+    return esValido;
+  }
+
 
   const isPersonSelected = (person) =>
     selectedPeople.some((p) => p.dni === person.dni);
@@ -222,7 +255,7 @@ export default function PersonalDataFiltered() {
     }
   };
 
-  
+
 
   const exportarDatosEImagenes = async () => {
     const zip = new JSZip();
@@ -250,8 +283,8 @@ export default function PersonalDataFiltered() {
         person.tipoUsuario === "alumno"
           ? `${person.tipoTitulacion} ${person.titulacion}`
           : person.tipoUsuario === "profesor"
-          ? `${person.cargo} ${person.departamento}`
-          : person.cargo;
+            ? `${person.cargo} ${person.departamento}`
+            : person.cargo;
 
       const nombreCompleto = `${person.nombre} ${person.apellidos}`;
       const imageInfo = imageData.find((img) => img.dni === person.dni);
@@ -425,7 +458,7 @@ export default function PersonalDataFiltered() {
           </button>
         </div>
       </form>
-      
+
 
       <div className="flex items-center gap-4 px-2 mb-4">
         <button
@@ -481,16 +514,16 @@ export default function PersonalDataFiltered() {
                   { label: "Apellidos", key: "apellidos" },
                   ...(tipoUsuario === "alumno"
                     ? [
-                        { label: "Tipo Titulación", key: "tipoTitulacion" },
-                        { label: "Titulación", key: "titulacion" },
-                        { label: "Curso", key: "curso" },
-                      ]
+                      { label: "Tipo Titulación", key: "tipoTitulacion" },
+                      { label: "Titulación", key: "titulacion" },
+                      { label: "Curso", key: "curso" },
+                    ]
                     : tipoUsuario === "profesor" || tipoUsuario === "personal"
-                    ? [
+                      ? [
                         { label: "Cargo", key: "cargo" },
                         { label: "Departamento", key: "departamento" },
                       ]
-                    : []),
+                      : []),
                   { label: "DNI", key: "dni" },
                   { label: "Modalidad", key: "modalidad" },
                 ].map((col) => (
@@ -527,11 +560,10 @@ export default function PersonalDataFiltered() {
                   <tr
                     key={index}
                     onClick={() => handleSelectPerson(person)}
-                    className={`transition-all duration-200 ease-in-out rounded-md cursor-pointer ${
-                      isPersonSelected(person)
-                        ? "bg-blue-50"
-                        : "hover:bg-gray-50 hover:scale-[1.01] hover:shadow-md"
-                    }`}
+                    className={`transition-all duration-200 ease-in-out rounded-md cursor-pointer ${isPersonSelected(person)
+                      ? "bg-blue-50"
+                      : "hover:bg-gray-50 hover:scale-[1.01] hover:shadow-md"
+                      }`}
                   >
                     <td className="px-4 py-2 flex items-center gap-2">
                       <input
@@ -541,7 +573,12 @@ export default function PersonalDataFiltered() {
                         onClick={(e) => e.stopPropagation()}
                         className="accent-[#0065ef]"
                       />
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <div
+                        className={`w-3 h-3 rounded-full ${validarDatosRegistro(person.foto, person.dni, person.nombre, person.apellidos)
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                          }`}
+                      ></div>
                     </td>
                     <td className="px-4 py-2">{person.nombre}</td>
                     <td className="px-4 py-2">{person.apellidos}</td>
@@ -600,4 +637,3 @@ export default function PersonalDataFiltered() {
   );
 }
 
-  
