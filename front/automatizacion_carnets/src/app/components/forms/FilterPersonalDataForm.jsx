@@ -150,7 +150,6 @@ export default function PersonalDataFiltered() {
     delete cleanedData.departamento;
   }
 
-  console.log("✅ Datos limpiados que se envían al backend:", cleanedData);
 
   const params = new URLSearchParams();
   Object.entries(cleanedData).forEach(([key, value]) => {
@@ -160,13 +159,12 @@ export default function PersonalDataFiltered() {
   try {
     const response = await fetch(`${FILTER_URL}?${params.toString()}`);
     const data = await response.json();
-    console.log("✅ Respuesta del backend:", data);
     setPeople(data);
     setFilteredPeople(data);
     setSearchTerm("");
     setSelectedPeople([]);
   } catch (error) {
-    console.error("❌ Error fetching filtered data:", error);
+    console.error("Error fetching filtered data:", error);
   }
 };
 
