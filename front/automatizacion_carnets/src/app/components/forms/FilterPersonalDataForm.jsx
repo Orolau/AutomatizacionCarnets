@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import html2canvas from "html2canvas";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
-import * as XLSX from 'xlsx';
-import JsBarcode from "jsbarcode";
-import { fetchFilteredPeople, generateAndDownloadLogs } from "@/app/api/api";
+import * as XLSX from "xlsx";
 
+const FILTER_URL = "http://localhost:3005/api/person/filtered";
 
 const normalizeText = (text) => {
   if (!text) return "";
@@ -45,6 +47,33 @@ const departamentos = [
   "Ingeniería ",
 ];
 
+const schema = yup.object().shape({
+  tipoUsuario: yup.string().required("Selecciona un tipo de usuario"),
+  tipoTitulacion: yup.string().when("tipoUsuario", {
+    is: "alumno",
+    then: (schema) => schema.required("Selecciona tipo de titulación"),
+  }),
+  titulacion: yup.string().when("tipoUsuario", {
+    is: "alumno",
+    then: (schema) => schema.required("Selecciona titulación"),
+  }),
+  curso: yup.string().when("tipoUsuario", {
+    is: "alumno",
+    then: (schema) => schema.required("Selecciona curso"),
+  }),
+  modalidad: yup.string().when("tipoUsuario", {
+    is: "alumno",
+    then: (schema) => schema.required("Selecciona modalidad"),
+  }),
+  cargo: yup.string().when("tipoUsuario", {
+    is: (val) => val === "profesor" || val === "personal",
+    then: (schema) => schema.required("Selecciona cargo"),
+  }),
+  departamento: yup.string().when("tipoUsuario", {
+    is: "profesor",
+    then: (schema) => schema.required("Selecciona departamento"),
+  }),
+});
 export default function PersonalDataFiltered() {
   const router = useRouter();
   const [people, setPeople] = useState([]);
@@ -52,39 +81,39 @@ export default function PersonalDataFiltered() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPeople, setSelectedPeople] = useState([]);
   const [isCargando, setIsCargando] = useState(false);
-
-  const [tipoUsuario, setTipoUsuario] = useState("");
-  const [tipoTitulacion, setTipoTitulacion] = useState("");
-  const [titulacion, setTitulacion] = useState("");
-  const [curso, setCurso] = useState("");
-  const [cargo, setCargo] = useState("");
-  const [departamento, setDepartamento] = useState("");
-  const [modalidad, setModalidad] = useState("");
-
   const [sortField, setSortField] = useState("");
-  const [sortDirection, setSortDirection] = useState("asc"); // 'asc' o 'desc'
+  const [sortDirection, setSortDirection] = useState("asc");
 
-  const [filtrosListos, setFiltrosListos] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      tipoUsuario: "",
+      tipoTitulacion: "",
+      titulacion: "",
+      curso: "",
+      cargo: "",
+      departamento: "",
+      modalidad: "",
+    },
+  });
+
+  const tipoUsuario = watch("tipoUsuario");
+  const tipoTitulacion = watch("tipoTitulacion");
 
   useEffect(() => {
-    const filtrosGuardados = JSON.parse(localStorage.getItem("filtrosCarnets"));
-    if (filtrosGuardados) {
-      setTipoUsuario(filtrosGuardados.tipoUsuario || "");
-      setTipoTitulacion(filtrosGuardados.tipoTitulacion || "");
-      setTitulacion(filtrosGuardados.titulacion || "");
-      setCurso(filtrosGuardados.curso || "");
-      setCargo(filtrosGuardados.cargo || "");
-      setDepartamento(filtrosGuardados.departamento || "");
-      setModalidad(filtrosGuardados.modalidad || "");
-    }
-    setFiltrosListos(true);
-  }, []);
-
-  useEffect(() => {
-    if (filtrosListos) {
-      handleFilter();
-    }
-  }, [filtrosListos]);
+    const filtrosGuardados =
+      typeof window !== "undefined"
+        ? JSON.parse(localStorage.getItem("filtrosCarnets")) || {}
+        : {};
+    reset(filtrosGuardados);
+  }, [reset]);
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setFilteredPeople(people);
@@ -105,6 +134,8 @@ export default function PersonalDataFiltered() {
   }, [searchTerm, people]);
 
   const handleFilter = async () => {
+<<<<<<<<< Temporary merge branch 1
+    localStorage.setItem("filtrosCarnets", JSON.stringify({ tipoUsuario, tipoTitulacion, titulacion, curso, cargo, departamento, modalidad }));
     const params = new URLSearchParams();
     if (tipoUsuario) params.append("tipoUsuario", tipoUsuario);
     if (tipoTitulacion) params.append("tipoTitulacion", tipoTitulacion);
@@ -114,6 +145,16 @@ export default function PersonalDataFiltered() {
     if (departamento) params.append("departamento", departamento);
     if (modalidad && tipoUsuario === "alumno")
       params.append("modalidad", modalidad);
+=========
+    const params = {};
+    if (tipoUsuario) params.tipoUsuario = tipoUsuario;
+    if (tipoTitulacion) params.tipoTitulacion = tipoTitulacion;
+    if (titulacion) params.titulacion = titulacion;
+    if (curso) params.curso = curso;
+    if (cargo) params.cargo = cargo;
+    if (departamento) params.departamento = departamento;
+    if (modalidad && tipoUsuario === "alumno") params.modalidad = modalidad;
+>>>>>>>>> Temporary merge branch 2
 
     try {
       const data = await fetchFilteredPeople(params);
@@ -126,8 +167,6 @@ export default function PersonalDataFiltered() {
     }
   };
 
-
-  const handleSearchChange = (e) => setSearchTerm(e.target.value);
 
   const handleSelectPerson = (person) => {
     setSelectedPeople((prev) => {
@@ -157,70 +196,13 @@ export default function PersonalDataFiltered() {
     }
   };
 
-  const descargarCarnetsComoPNG = async (fondoTransparente = false) => {
-    const zip = new JSZip();
-    const canvasContainer = document.createElement("div");
-    canvasContainer.style.position = "absolute";
-    canvasContainer.style.top = "-9999px";
-    canvasContainer.style.left = "-9999px";
-    document.body.appendChild(canvasContainer);
-
-    for (let i = 0; i < selectedPeople.length; i++) {
-      const person = selectedPeople[i];
-
-      // Generar HTML manual del carnet
-      canvasContainer.innerHTML = `
-        <div id="carnet-temp" style="width: 340px; height: 214px; font-family: sans-serif; position: relative; background-color: ${fondoTransparente ? 'transparent' : '#003366'}; color: black; border-radius: 8px; padding: 16px;">
-          <div style="position: absolute; top: 16px; left: 16px; width: 80px; height: 100px;">
-            <img src="${person.foto}" style="width: 100%; height: 100%; object-fit: cover;" />
-          </div>
-          <div style="position: absolute; top: 28px; left: 120px; width: 180px; font-size: 12px;">
-            ${!fondoTransparente ? '<p style="font-size:10px;color:white;">U-TAD CENTRO DIGITAL</p><br/>' : ''}
-            <p style="font-weight: bold;">${person.nombre} ${person.apellidos}</p>
-            <p style="font-weight: bold;">${person.tipoUsuario === 'alumno'
-          ? `${person.tipoTitulacion} ${person.titulacion}`
-          : person.tipoUsuario === 'profesor'
-            ? `${person.cargo} ${person.departamento}`
-            : person.cargo
-        }</p>
-          </div>
-          <div style="position: absolute; bottom: 8px; right: 8px;">
-            <svg id="barcode-${i}" class="barcode" style="width: 200px;"></svg>
-          </div>
-        </div>
-      `;
-
-      const barcode = canvasContainer.querySelector(`#barcode-${i}`);
-      if (barcode) {
-        JsBarcode(barcode, person.dni || "", {
-          format: "CODE128",
-          displayValue: false,
-          width: 2,
-          height: 25,
-          background: fondoTransparente ? "transparent" : "white",
-        });
-      }
-
-      const canvas = await html2canvas(canvasContainer.querySelector("#carnet-temp"), {
-        backgroundColor: fondoTransparente ? "transparent" : "white",
-        useCORS: true,
-        scale: 8
-      });
-
-      await new Promise((resolve) => {
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const fileName = `carnet_${person.nombre}_${person.apellidos}.png`;
-            zip.file(fileName, blob);
-          }
-          resolve();
-        }, "image/png");
-      });
+  const handleNext = () => {
+    localStorage.setItem("selectedPeople", JSON.stringify(selectedPeople));
+    if (selectedPeople.length > 0) {
+      router.push("/pages/preview");
+    } else {
+      alert("Selecciona al menos una persona");
     }
-
-    document.body.removeChild(canvasContainer);
-    const zipBlob = await zip.generateAsync({ type: "blob" });
-    saveAs(zipBlob, `Carnets_${fondoTransparente ? "transparente" : "visible"}.zip`);
   };
 
   const exportarDatosEImagenes = async () => {
@@ -245,9 +227,10 @@ export default function PersonalDataFiltered() {
     const imageData = await Promise.all(imagePromises);
 
     const data = selectedPeople.map((person) => {
-      const ocupacion = person.tipoUsuario === "alumno"
-        ? `${person.tipoTitulacion} ${person.titulacion}`
-        : person.tipoUsuario === "profesor"
+      const ocupacion =
+        person.tipoUsuario === "alumno"
+          ? `${person.tipoTitulacion} ${person.titulacion}`
+          : person.tipoUsuario === "profesor"
           ? `${person.cargo} ${person.departamento}`
           : person.cargo;
 
@@ -257,16 +240,16 @@ export default function PersonalDataFiltered() {
 
       return {
         "Nombre Completo": nombreCompleto,
-        "Ocupación": ocupacion,
-        "DNI": person.dni,
-        "Foto": fotoFileName
+        Ocupación: ocupacion,
+        DNI: person.dni,
+        Foto: fotoFileName,
       };
     });
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Personas");
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
 
     zip.file("personas.xlsx", excelBuffer);
     const zipBlob = await zip.generateAsync({ type: "blob" });
@@ -276,20 +259,20 @@ export default function PersonalDataFiltered() {
   const descargarLogs = async () => {
     try {
       setIsCargando(true);
-      const data = await generateAndDownloadLogs();
-  
+      const res = await fetch("http://localhost:3005/api/auth/notify-errors");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error ejecutando revisión");
+
       const blob = new Blob([data.logs], { type: "text/plain;charset=utf-8" });
       saveAs(blob, "logs_correos_enviados.txt");
-  
       alert(data.message);
     } catch (error) {
-      console.error("Error al generar logs o enviar correos:", error);
+      console.error("Error al generar los logs o enviar correos:", error);
       alert("Hubo un error al ejecutar la acción. Revisa la consola.");
     } finally {
       setIsCargando(false);
     }
   };
-  
 
   
   const handleEditPerson = (dni) => {
@@ -304,27 +287,130 @@ const handleSort = (field) => {
       setSortDirection("asc");
     }
   };
-
   return (
     <div className="p-4 bg-white rounded-2xl shadow-md w-full">
-      {/* Buscador y filtros */}
-      <div className="flex flex-col lg:flex-row items-start lg:items-end gap-4 mb-6 flex-wrap">
-        <div className="relative w-full lg:w-1/3">
-          <input
-            type="text"
-            className="w-full pl-10 py-2 border border-gray-300 rounded-full"
-            placeholder="Buscar persona"
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
-          <img
-            src="/images/Buscador.png"
-            alt="Buscar"
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none"
-          />
-        </div>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex flex-col lg:flex-row items-start lg:items-end gap-4 mb-6 flex-wrap">
+          <div className="relative w-full lg:w-1/3">
+            <input
+              type="text"
+              className="w-full pl-10 py-2 border border-gray-300 rounded-full"
+              placeholder="Buscar persona"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <img
+              src="/images/Buscador.png"
+              alt="Buscar"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none"
+            />
+          </div>
 
-      {/* Botón Siguiente reubicado */}
+          <select {...register("tipoUsuario")} className="p-2 border rounded-full">
+            <option value="">Tipo de usuario</option>
+            {tiposUsuarios.map((t, i) => (
+              <option key={i} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+          {errors.tipoUsuario && (
+            <p className="text-red-500 text-sm">{errors.tipoUsuario.message}</p>
+          )}
+
+          {tipoUsuario === "alumno" && (
+            <>
+              <select {...register("tipoTitulacion")} className="p-2 border rounded-full">
+                <option value="">Tipo de titulación</option>
+                {tiposTitulacion.map((t, i) => (
+                  <option key={i} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+              {errors.tipoTitulacion && (
+                <p className="text-red-500 text-sm">{errors.tipoTitulacion.message}</p>
+              )}
+
+              <select {...register("titulacion")} className="p-2 border rounded-full">
+                <option value="">Titulación</option>
+                {tipoTitulacion &&
+                  titulaciones[tipoTitulacion]?.map((t, i) => (
+                    <option key={i} value={t}>
+                      {t}
+                    </option>
+                  ))}
+              </select>
+              {errors.titulacion && (
+                <p className="text-red-500 text-sm">{errors.titulacion.message}</p>
+              )}
+
+              <select {...register("curso")} className="p-2 border rounded-full">
+                <option value="">Curso</option>
+                {cursos.map((c, i) => (
+                  <option key={i} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+              {errors.curso && (
+                <p className="text-red-500 text-sm">{errors.curso.message}</p>
+              )}
+
+              <select {...register("modalidad")} className="p-2 border rounded-full">
+                <option value="">Modalidad</option>
+                {modalidades.map((m, i) => (
+                  <option key={i} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+              {errors.modalidad && (
+                <p className="text-red-500 text-sm">{errors.modalidad.message}</p>
+              )}
+            </>
+          )}
+
+          {(tipoUsuario === "profesor" || tipoUsuario === "personal") && (
+            <>
+              <select {...register("cargo")} className="p-2 border rounded-full">
+                <option value="">Cargo</option>
+                {cargos.map((c, i) => (
+                  <option key={i} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+              {errors.cargo && (
+                <p className="text-red-500 text-sm">{errors.cargo.message}</p>
+              )}
+            </>
+          )}
+
+          {tipoUsuario === "profesor" && (
+            <>
+              <select {...register("departamento")} className="p-2 border rounded-full">
+                <option value="">Departamento</option>
+                {departamentos.map((d, i) => (
+                  <option key={i} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+              {errors.departamento && (
+                <p className="text-red-500 text-sm">{errors.departamento.message}</p>
+              )}
+            </>
+          )}
+
+          <button
+            type="submit"
+            className="bg-[#0065ef] text-white px-6 py-2 rounded-full hover:bg-[#0056cc] transition"
+          >
+            Buscar
+          </button>
+        </div>
+      </form>
       <div className="mt-4 flex justify-end w-full">
         <button
           onClick={handleNext}
@@ -335,125 +421,9 @@ const handleSort = (field) => {
         </button>
       </div>
 
-
-        <select
-          value={tipoUsuario}
-          onChange={(e) => setTipoUsuario(e.target.value)}
-          className="p-2 border border-gray-300 rounded-full"
-        >
-          <option value="">Tipo de usuario</option>
-          {tiposUsuarios.map((t, i) => (
-            <option key={i} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
-
-        {/* Filtros condicionales */}
-        {tipoUsuario === "alumno" && (
-          <>
-            <select
-              value={tipoTitulacion}
-              onChange={(e) => {
-                setTipoTitulacion(e.target.value);
-                setTitulacion("");
-              }}
-              className="p-2 border border-gray-300 rounded-full"
-            >
-              <option value="">Tipo de titulación</option>
-              {tiposTitulacion.map((t, i) => (
-                <option key={i} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-
-            {tipoTitulacion && (
-              <select
-                value={titulacion}
-                onChange={(e) => setTitulacion(e.target.value)}
-                className="p-2 border border-gray-300 rounded-full"
-              >
-                <option value="">Titulación</option>
-                {titulaciones[tipoTitulacion].map((t, i) => (
-                  <option key={i} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-            )}
-
-            <select
-              value={curso}
-              onChange={(e) => setCurso(e.target.value)}
-              className="p-2 border border-gray-300 rounded-full"
-            >
-              <option value="">Curso</option>
-              {cursos.map((c, i) => (
-                <option key={i} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={modalidad}
-              onChange={(e) => setModalidad(e.target.value)}
-              className="p-2 border border-gray-300 rounded-full"
-            >
-              <option value="">Modalidad</option>
-              {modalidades.map((m, i) => (
-                <option key={i} value={m}>
-                  {m}
-                </option>
-              ))}
-            </select>
-          </>
-        )}
-
-        {(tipoUsuario === "profesor" || tipoUsuario === "personal") && (
-          <select
-            value={cargo}
-            onChange={(e) => setCargo(e.target.value)}
-            className="p-2 border border-gray-300 rounded-full"
-          >
-            <option value="">Cargo</option>
-            {cargos.map((c, i) => (
-              <option key={i} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        )}
-
-        {tipoUsuario === "profesor" && (
-          <select
-            value={departamento}
-            onChange={(e) => setDepartamento(e.target.value)}
-            className="p-2 border border-gray-300 rounded-full"
-          >
-            <option value="">Departamento</option>
-            {departamentos.map((d, i) => (
-              <option key={i} value={d}>
-                {d}
-              </option>
-            ))}
-          </select>
-        )}
-
-        <button
-          onClick={handleFilter}
-          className="bg-[#0065ef] text-white px-6 py-2 rounded-full hover:bg-[#0056cc] transition"
-        >
-          Buscar
-        </button>
-      </div>
-
-      {/* Botones de acción estilo claro con icono + texto */}
       <div className="flex items-center gap-4 px-2 mb-4">
         <button
           onClick={() => descargarCarnetsComoPNG(true)}
-          title="Descargar carnets fondo transparente"
           className="flex items-center gap-2 px-4 py-1.5 bg-blue-100 rounded-full text-sm text-gray-700 hover:bg-blue-200 transition"
         >
           <img src="/images/download_icon.png" className="w-4 h-4" alt="Transparente" />
@@ -462,7 +432,6 @@ const handleSort = (field) => {
 
         <button
           onClick={() => descargarCarnetsComoPNG(false)}
-          title="Descargar carnets fondo visible"
           className="flex items-center gap-2 px-4 py-1.5 bg-blue-100 rounded-full text-sm text-gray-700 hover:bg-blue-200 transition"
         >
           <img src="/images/print_icon.png" className="w-4 h-4" alt="Visible" />
@@ -471,7 +440,6 @@ const handleSort = (field) => {
 
         <button
           onClick={exportarDatosEImagenes}
-          title="Exportar datos e imágenes"
           className="flex items-center gap-2 px-4 py-1.5 bg-blue-100 rounded-full text-sm text-gray-700 hover:bg-blue-200 transition"
         >
           <img src="/images/datos.png" className="w-4 h-4" alt="Exportar Excel" />
@@ -480,7 +448,6 @@ const handleSort = (field) => {
 
         <button
           onClick={descargarLogs}
-          title="Descargar logs"
           className="flex items-center gap-2 px-4 py-1.5 bg-blue-100 rounded-full text-sm text-gray-700 hover:bg-blue-200 transition"
         >
           <img src="/images/logs.png" className="w-4 h-4" alt="Logs" />
@@ -488,8 +455,6 @@ const handleSort = (field) => {
         </button>
       </div>
 
-
-      {/* Tabla o mensaje vacío */}
       {filteredPeople.length > 0 ? (
         <div className="overflow-x-auto rounded-xl border border-gray-200 max-h-[500px] overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
@@ -510,20 +475,24 @@ const handleSort = (field) => {
                   { label: "Apellidos", key: "apellidos" },
                   ...(tipoUsuario === "alumno"
                     ? [
-                      { label: "Tipo Titulación", key: "tipoTitulacion" },
-                      { label: "Titulación", key: "titulacion" },
-                      { label: "Curso", key: "curso" },
-                    ]
+                        { label: "Tipo Titulación", key: "tipoTitulacion" },
+                        { label: "Titulación", key: "titulacion" },
+                        { label: "Curso", key: "curso" },
+                      ]
                     : tipoUsuario === "profesor" || tipoUsuario === "personal"
-                      ? [
+                    ? [
                         { label: "Cargo", key: "cargo" },
                         { label: "Departamento", key: "departamento" },
                       ]
-                      : []),
+                    : []),
                   { label: "DNI", key: "dni" },
                   { label: "Modalidad", key: "modalidad" },
                 ].map((col) => (
-                  <th key={col.key} className="px-4 py-3 cursor-pointer select-none" onClick={() => handleSort(col.key)}>
+                  <th
+                    key={col.key}
+                    className="px-4 py-3 cursor-pointer select-none"
+                    onClick={() => handleSort(col.key)}
+                  >
                     <div className="flex items-center gap-1">
                       {col.label}
                       {sortField === col.key && (
@@ -534,7 +503,6 @@ const handleSort = (field) => {
                 ))}
               </tr>
             </thead>
-
             <tbody className="divide-y divide-gray-100">
               {[...filteredPeople]
                 .sort((a, b) => {
@@ -552,7 +520,7 @@ const handleSort = (field) => {
                 .map((person, index) => (
                   <tr
                     key={index}
-                    onClick={() => handleSelectPerson(person)} onDoubleClick={() => handleEditPerson(person.dni)}
+                    onClick={() => handleSelectPerson(person)}
                     className={`transition-all duration-200 ease-in-out rounded-md cursor-pointer ${isPersonSelected(person)
                       ? "bg-blue-50"
                       : "hover:bg-gray-50 hover:scale-[1.01] hover:shadow-md"
@@ -595,8 +563,14 @@ const handleSort = (field) => {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center min-h-[400px] mt-10 text-center text-gray-500">
-          <img src="/images/flecha.png" alt="Flecha indicador" className="mb-4 w-[150px] h-auto" />
-          <p className="text-xl font-semibold">Busca o selecciona tipo de usuario</p>
+          <img
+            src="/images/flecha.png"
+            alt="Flecha indicador"
+            className="mb-4 w-[150px] h-auto"
+          />
+          <p className="text-xl font-semibold">
+            Busca o selecciona tipo de usuario
+          </p>
         </div>
       )}
 
@@ -606,9 +580,11 @@ const handleSort = (field) => {
             <h2 className="text-lg font-bold mb-2">Enviando correos...</h2>
             <p className="text-sm text-gray-600">Por favor, espera unos segundos.</p>
 
-            {/* Barra de carga simple */}
             <div className="mt-6 w-full bg-gray-200 rounded-full h-3">
-              <div className="h-3 rounded-full bg-blue-500 animate-pulse" style={{ width: "100%" }}></div>
+              <div
+                className="h-3 rounded-full bg-blue-500 animate-pulse"
+                style={{ width: "100%" }}
+              ></div>
             </div>
           </div>
         </div>
@@ -616,3 +592,5 @@ const handleSort = (field) => {
     </div>
   );
 }
+
+  
