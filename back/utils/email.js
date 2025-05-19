@@ -20,6 +20,7 @@ const sendVerificationEmail = async (to, code) => {
     };
 
     try {
+        console.log("Enviando correo a:", to, "con código:", code);
         const info = await transporter.sendMail(mailOptions);
     } catch (error) {
         throw error;
