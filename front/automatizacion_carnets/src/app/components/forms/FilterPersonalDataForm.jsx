@@ -567,7 +567,7 @@ export default function PersonalDataFiltered() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          alert(`Editar persona con DNI: ${person.dni}`);
+                          router.push(`/pages/modify/edit?dni=${person.dni}`);
                         }}
                         className="text-blue-600 hover:text-blue-800 font-semibold text-sm"
                       >
