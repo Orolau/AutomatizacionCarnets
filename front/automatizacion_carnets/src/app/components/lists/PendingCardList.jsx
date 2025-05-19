@@ -3,9 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const API_URL = "http://localhost:3005/api/person";
-const FILTER_URL = `${API_URL}/filtered?estadoCarnet=pendiente`;
-
 export default function PendingCardList() {
   const [carnetsConError, setCarnetsConError] = useState([]);
   const [selectedDNI, setSelectedDNI] = useState([]);
@@ -29,7 +26,7 @@ export default function PendingCardList() {
       let errorMsg = null;
       if (!foto) {
         errorMsg = "Falta imagen";
-      } else if (!dni) {
+      } else if (!dni || dni.length !== 9) {
         errorMsg = "DNI ilegible";
       }
 
@@ -44,39 +41,7 @@ export default function PendingCardList() {
   const handleEdit = (dni) => {
     router.push(`/pages/modify/edit?dni=${dni}`);
   };
-  /*const [carnets, setCarnets] = useState([]);
-  const [selectedDNI, setSelectedDNI] = useState([]);
-  const router = useRouter();
- 
-  useEffect(() => {
-    const obtenerCarnetsFallidos = async () => {
-      try {
-        const response = await fetch(FILTER_URL);
-        if (!response.ok) throw new Error(response.statusText);
-        const data = await response.json();
- 
-        const carnetsPendientes = data.map((persona) => ({
-          ...persona,
-          error: !persona.foto?.trim()
-            ? "Falta imagen"
-            : !persona.dni?.trim()
-              ? "DNI ilegible"
-              : "Estado pendiente",
-        }));
- 
-        setCarnets(carnetsPendientes);
-      } catch (err) {
-        console.error("Error cargando carnets: ", err);
-      }
-    };
- 
-    obtenerCarnetsFallidos();
-  }, []);
- 
-  const handleEdit = (dni) => {
-    router.push(`/pages/modify/edit?dni=${dni}`);
-  };
- */
+
   const isSelected = (dni) => selectedDNI.includes(dni);
 
   const toggleSelection = (dni) => {
@@ -99,16 +64,7 @@ export default function PendingCardList() {
         <table className="min-w-full text-sm text-left divide-y divide-gray-200">
           <thead className="bg-gray-100 text-gray-700 text-left">
             <tr>
-              <th className="px-4 py-3">
-                <button
-                  className="text-[#0065ef] hover:underline font-semibold"
-                >
-                  {carnetsConError.length > 0 &&
-                    carnetsConError.every((c) => selectedDNI.includes(c.dni))
-                    ? "Deseleccionar todo"
-                    : "Seleccionar todo"}
-                </button>
-              </th>
+              <th className="px-4 py-3"></th>
               <th className="px-4 py-3">Nombre</th>
               <th className="px-4 py-3">Titulación</th>
               <th className="px-4 py-3">Curso</th>
@@ -134,14 +90,7 @@ export default function PendingCardList() {
                     }`}
                 >
                   <td className="px-4 py-2 flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={isSelected(carnet.dni)}
-                      onChange={() => toggleSelection(carnet.dni)}
-                      onClick={(e) => e.stopPropagation()}
-                      className="accent-[#0065ef]"
-                    />
-                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div className="ml-5 w-3 h-3 rounded-full bg-red-500"></div>
                   </td>
                   <td className="px-4 py-2 text-gray-800 font-medium whitespace-nowrap">
                     {carnet.nombre} {carnet.apellidos}
