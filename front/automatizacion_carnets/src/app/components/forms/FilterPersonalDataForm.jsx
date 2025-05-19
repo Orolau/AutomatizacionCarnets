@@ -22,14 +22,14 @@ const tiposTitulacion = ["Grado", "Máster"];
 const titulaciones = {
   Grado: [
     "Grado en Diseño Digital",
-    "Grado en Ingeniería del Software",
+    "INSO",
     "Ingeniería de software",
     "Doble grado de Ingeniería del software y Matemáticas Computacionales",
     "Animación",
   ],
   Máster: ["Máster en Programación de Videojuegos", "Máster en Big Data"],
 };
-const cursos = ["1º", "2º", "3º", "4º"];
+const cursos = ["1º", "2º", "3º", "4º", ];
 const modalidades = ["Presencial", "Online"];
 const cargos = [
   "Profesor",
