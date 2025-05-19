@@ -72,7 +72,7 @@ const titulaciones = {
     "Máster Universitario en Producción de Animación, Efectos visuales y Videojuegos",
   ],
 };
-const cursos = ["1º", "2º", "3º", "4º"];
+const cursos = ["1º", "2º", "3º", "4º", "5º"];
 const modalidades = ["Presencial", "Online"];
 const cargos = [
   "Profesor",
@@ -92,30 +92,12 @@ const departamentos = [
 
 const schema = yup.object().shape({
   tipoUsuario: yup.string().required("Selecciona un tipo de usuario"),
-  tipoTitulacion: yup.string().when("tipoUsuario", {
-    is: "alumno",
-    then: (schema) => schema.required("Selecciona tipo de titulación"),
-  }),
-  titulacion: yup.string().when("tipoUsuario", {
-    is: "alumno",
-    then: (schema) => schema.required("Selecciona titulación"),
-  }),
-  curso: yup.string().when("tipoUsuario", {
-    is: "alumno",
-    then: (schema) => schema.required("Selecciona curso"),
-  }),
-  modalidad: yup.string().when("tipoUsuario", {
-    is: "alumno",
-    then: (schema) => schema.required("Selecciona modalidad"),
-  }),
-  cargo: yup.string().when("tipoUsuario", {
-    is: (val) => val === "profesor" || val === "personal",
-    then: (schema) => schema.required("Selecciona cargo"),
-  }),
-  departamento: yup.string().when("tipoUsuario", {
-    is: "profesor",
-    then: (schema) => schema.required("Selecciona departamento"),
-  }),
+  tipoTitulacion: yup.string(),
+  titulacion: yup.string(),
+  curso: yup.string(),
+  modalidad: yup.string(),
+  cargo: yup.string(),
+  departamento: yup.string(),
 });
 export default function PersonalDataFiltered() {
   const router = useRouter();
@@ -240,14 +222,7 @@ export default function PersonalDataFiltered() {
     }
   };
 
-  const handleNext = () => {
-    localStorage.setItem("selectedPeople", JSON.stringify(selectedPeople));
-    if (selectedPeople.length > 0) {
-      router.push("/pages/preview");
-    } else {
-      alert("Selecciona al menos una persona");
-    }
-  };
+  
 
   const exportarDatosEImagenes = async () => {
     const zip = new JSZip();
@@ -450,15 +425,7 @@ export default function PersonalDataFiltered() {
           </button>
         </div>
       </form>
-      <div className="mt-4 flex justify-end w-full">
-        <button
-          onClick={handleNext}
-          className="bg-[#0065ef] hover:bg-[#0056cc] text-white px-6 py-2 rounded-full font-semibold transition"
-          disabled={selectedPeople.length === 0}
-        >
-          Siguiente
-        </button>
-      </div>
+      
 
       <div className="flex items-center gap-4 px-2 mb-4">
         <button
