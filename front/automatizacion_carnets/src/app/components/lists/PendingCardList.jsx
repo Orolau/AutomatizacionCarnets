@@ -7,17 +7,54 @@ const API_URL = "http://localhost:3005/api/person";
 const FILTER_URL = `${API_URL}/filtered?estadoCarnet=pendiente`;
 
 export default function PendingCardList() {
-  const [carnets, setCarnets] = useState([]);
+  const [carnetsConError, setCarnetsConError] = useState([]);
   const [selectedDNI, setSelectedDNI] = useState([]);
   const router = useRouter();
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = localStorage.getItem("filteredPeople");
+    if (!raw) return;
+    let personas = [];
+    try {
+      personas = JSON.parse(raw);
+    } catch (_) {
+      console.error("JSON malformado en filteredPeople");
+      return;
+    }
+    const conErrores = personas.reduce((acc, persona) => {
+      const foto = (persona.foto || "").trim();
+      const dni = (persona.dni || "").trim();
+
+      let errorMsg = null;
+      if (!foto) {
+        errorMsg = "Falta imagen";
+      } else if (!dni) {
+        errorMsg = "DNI ilegible";
+      }
+
+      if (errorMsg) {
+        acc.push({ ...persona, error: errorMsg });
+      }
+      return acc;
+    }, []);
+    setCarnetsConError(conErrores);
+  }, []);
+
+  const handleEdit = (dni) => {
+    router.push(`/pages/modify/edit?dni=${dni}`);
+  };
+  /*const [carnets, setCarnets] = useState([]);
+  const [selectedDNI, setSelectedDNI] = useState([]);
+  const router = useRouter();
+ 
   useEffect(() => {
     const obtenerCarnetsFallidos = async () => {
       try {
         const response = await fetch(FILTER_URL);
         if (!response.ok) throw new Error(response.statusText);
         const data = await response.json();
-
+ 
         const carnetsPendientes = data.map((persona) => ({
           ...persona,
           error: !persona.foto?.trim()
@@ -26,20 +63,20 @@ export default function PendingCardList() {
               ? "DNI ilegible"
               : "Estado pendiente",
         }));
-
+ 
         setCarnets(carnetsPendientes);
       } catch (err) {
         console.error("Error cargando carnets: ", err);
       }
     };
-
+ 
     obtenerCarnetsFallidos();
   }, []);
-
+ 
   const handleEdit = (dni) => {
     router.push(`/pages/modify/edit?dni=${dni}`);
   };
-
+ */
   const isSelected = (dni) => selectedDNI.includes(dni);
 
   const toggleSelection = (dni) => {
@@ -49,10 +86,10 @@ export default function PendingCardList() {
   };
 
   const toggleSelectAll = () => {
-    if (carnets.every((c) => selectedDNI.includes(c.dni))) {
+    if (carnetsConError.every((c) => selectedDNI.includes(c.dni))) {
       setSelectedDNI([]);
     } else {
-      setSelectedDNI(carnets.map((c) => c.dni));
+      setSelectedDNI(carnetsConError.map((c) => c.dni));
     }
   };
 
@@ -64,11 +101,10 @@ export default function PendingCardList() {
             <tr>
               <th className="px-4 py-3">
                 <button
-                  onClick={toggleSelectAll}
                   className="text-[#0065ef] hover:underline font-semibold"
                 >
-                  {carnets.length > 0 &&
-                    carnets.every((c) => selectedDNI.includes(c.dni))
+                  {carnetsConError.length > 0 &&
+                    carnetsConError.every((c) => selectedDNI.includes(c.dni))
                     ? "Deseleccionar todo"
                     : "Seleccionar todo"}
                 </button>
@@ -81,20 +117,20 @@ export default function PendingCardList() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {carnets.length === 0 ? (
+            {carnetsConError.length === 0 ? (
               <tr>
                 <td colSpan="6" className="text-center p-6 text-gray-400">
                   No hay carnets pendientes por fallo.
                 </td>
               </tr>
             ) : (
-              carnets.map((carnet) => (
+              carnetsConError.map((carnet) => (
                 <tr
                   key={carnet.dni}
                   onClick={() => toggleSelection(carnet.dni)}
                   className={`transition-all duration-200 ease-in-out rounded-md cursor-pointer ${isSelected(carnet.dni)
-                      ? "bg-blue-50"
-                      : "hover:bg-gray-50 hover:scale-[1.01] hover:shadow-md"
+                    ? "bg-blue-50"
+                    : "hover:bg-gray-50 hover:scale-[1.01] hover:shadow-md"
                     }`}
                 >
                   <td className="px-4 py-2 flex items-center gap-2">
