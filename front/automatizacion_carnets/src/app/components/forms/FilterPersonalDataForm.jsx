@@ -133,6 +133,25 @@ export default function PersonalDataFiltered() {
   const tipoTitulacion = watch("tipoTitulacion");
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = localStorage.getItem("filteredPeople");
+    if (saved) {
+      try {
+        const list = JSON.parse(saved);
+        setPeople(list);
+        setFilteredPeople(list);
+      } catch (_) {
+
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("filteredPeople", JSON.stringify(filteredPeople));
+  }, [filteredPeople]);
+
+  useEffect(() => {
     const filtrosGuardados =
       typeof window !== "undefined"
         ? JSON.parse(localStorage.getItem("filtrosCarnets")) || {}
