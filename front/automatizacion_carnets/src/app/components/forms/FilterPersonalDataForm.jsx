@@ -627,6 +627,7 @@ export default function PersonalDataFiltered() {
                     </div>
                   </th>
                 ))}
+                <th className="px-4 py-3">Acciones</th> { }
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -647,10 +648,11 @@ export default function PersonalDataFiltered() {
                   <tr
                     key={index}
                     onClick={() => handleSelectPerson(person)}
-                    className={`transition-all duration-200 ease-in-out rounded-md cursor-pointer ${isPersonSelected(person)
-                      ? "bg-blue-50"
-                      : "hover:bg-gray-50 hover:scale-[1.01] hover:shadow-md"
-                      }`}
+                    className={`transition-all duration-200 ease-in-out rounded-md cursor-pointer ${
+                      isPersonSelected(person)
+                        ? "bg-blue-50"
+                        : "hover:bg-gray-50 hover:scale-[1.01] hover:shadow-md"
+                    }`}
                   >
                     <td className="px-4 py-2 flex items-center gap-2">
                       <input
@@ -687,6 +689,17 @@ export default function PersonalDataFiltered() {
 
                     <td className="px-4 py-2">{person.dni}</td>
                     <td className="px-4 py-2">{person.modalidad || "-"}</td>
+                    <td className="px-4 py-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/pages/modify/edit?dni=${person.dni}`);
+                        }}
+                        className="text-blue-600 hover:text-blue-800 font-semibold text-sm"
+                      >
+                        Editar
+                      </button>
+                    </td>
                   </tr>
                 ))}
             </tbody>
