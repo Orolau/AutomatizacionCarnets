@@ -92,30 +92,12 @@ const departamentos = [
 
 const schema = yup.object().shape({
   tipoUsuario: yup.string().required("Selecciona un tipo de usuario"),
-  tipoTitulacion: yup.string().when("tipoUsuario", {
-    is: "alumno",
-    then: (schema) => schema.required("Selecciona tipo de titulación"),
-  }),
-  titulacion: yup.string().when("tipoUsuario", {
-    is: "alumno",
-    then: (schema) => schema.required("Selecciona titulación"),
-  }),
-  curso: yup.string().when("tipoUsuario", {
-    is: "alumno",
-    then: (schema) => schema.required("Selecciona curso"),
-  }),
-  modalidad: yup.string().when("tipoUsuario", {
-    is: "alumno",
-    then: (schema) => schema.required("Selecciona modalidad"),
-  }),
-  cargo: yup.string().when("tipoUsuario", {
-    is: (val) => val === "profesor" || val === "personal",
-    then: (schema) => schema.required("Selecciona cargo"),
-  }),
-  departamento: yup.string().when("tipoUsuario", {
-    is: "profesor",
-    then: (schema) => schema.required("Selecciona departamento"),
-  }),
+  tipoTitulacion: yup.string(),
+  titulacion: yup.string(),
+  curso: yup.string(),
+  modalidad: yup.string(),
+  cargo: yup.string(),
+  departamento: yup.string(),
 });
 export default function PersonalDataFiltered() {
   const router = useRouter();
