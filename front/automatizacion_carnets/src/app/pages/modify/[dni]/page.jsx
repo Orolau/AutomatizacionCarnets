@@ -93,28 +93,7 @@ export default function ModificarCarnetIndividualPage() {
                         />
                     </button>
 
-                    {/* Contenedor de los botones de navegación */}
-                    <div className="flex gap-4">
-                        {/* Botón atrás */}
-                        <button onClick={() => console.log("Atrás")} aria-label="Atrás">
-                            <Image
-                                src="/images/izquierda.png"
-                                alt="Atrás"
-                                width={20}
-                                height={20}
-                            />
-                        </button>
-
-                        {/* Botón adelante */}
-                        <button onClick={() => console.log("Adelante")} aria-label="Adelante">
-                            <Image
-                                src="/images/derecha.png"
-                                alt="Adelante"
-                                width={20}
-                                height={20}
-                            />
-                        </button>
-                    </div>
+                    
                 </div>
 
                 {/* Contenedor principal de carnet y formulario */}

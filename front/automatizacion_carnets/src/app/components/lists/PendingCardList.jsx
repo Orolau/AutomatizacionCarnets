@@ -22,12 +22,19 @@ export default function PendingCardList() {
     const conErrores = personas.reduce((acc, persona) => {
       const foto = (persona.foto || "").trim();
       const dni = (persona.dni || "").trim();
-
+      const nombre = (persona.nombre || "").trim();
+      const apellidos = (persona.apellidos || "").trim();
+      // Validar nombre y apellidos: solo letras y espacios
+      const textoRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
       let errorMsg = null;
       if (!foto) {
         errorMsg = "Falta imagen";
       } else if (!dni || dni.length !== 9) {
         errorMsg = "DNI ilegible";
+      } else if (!nombre || !textoRegex.test(nombre)) {
+        errorMsg = "Nombre inválido";
+      } else if (!apellidos || !textoRegex.test(apellidos)) {
+        errorMsg = "Apellidos inválidos";
       }
 
       if (errorMsg) {

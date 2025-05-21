@@ -56,7 +56,20 @@ const PersonScheme = new mongoose.Schema(
         numeroCarnets: {
             type: Number,
             default: 0
+        },
+        direccion:{
+            type: String,
+        },
+        postal:{
+            type: String,
+        },
+        provincia:{
+            type: String,
+        },
+        poblacion:{
+            type: String,
         }
+
     },
     {
         timestamps: true,

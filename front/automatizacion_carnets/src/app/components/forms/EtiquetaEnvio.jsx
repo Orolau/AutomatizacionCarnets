@@ -14,9 +14,26 @@ const EtiquetaEnvio = () => {
   const [sortDirection, setSortDirection] = useState("asc");
 
   useEffect(() => {
-    fetchOnlinePeople()
-      .then(setCarnets)
-      .catch(error => console.error("Error al obtener los carnets: ", error));
+    const fetchData = async () => {
+      try {
+        // Obtener datos de localStorage
+        const peopleString = localStorage.getItem("filteredPeople");
+        if (peopleString) {
+          const people = JSON.parse(peopleString);
+          // Filtrar por modalidad === "Online"
+          const onlinePeople = people.filter(persona => persona.modalidad === "Online");
+          setCarnets(onlinePeople);
+        } else {
+          // Si no hay datos en localStorage, hacer la llamada API
+          const onlinePeople = await fetchOnlinePeople();
+          setCarnets(onlinePeople);
+        }
+      } catch (error) {
+        console.error("Error al obtener los carnets: ", error);
+      }
+    };
+
+    fetchData();
   }, []);
 
 
@@ -46,8 +63,8 @@ const EtiquetaEnvio = () => {
     doc.setFont("helvetica", "normal");
     doc.text(`Nombre: ${persona.nombre} ${persona.apellidos}`, 20, 30);
     doc.text(`Dirección: ${persona.direccion}`, 20, 40);
-    doc.text(`Población: _____________________`, 20, 50);
-    doc.text(`Código Postal: _______ Provincia: ____________`, 20, 60);
+    doc.text(`Población: ${persona.poblacion}`, 20, 50);
+    doc.text(`Código Postal: ${persona.postal} Provincia: ${persona.provincia}`, 20, 60);
     doc.text(`Nº Bultos: 1    Envío por: U-tad`, 20, 70);
     doc.text(`Peso kgs.: 0.3    Fecha: ${fechaActual}    Ref.: ${referencia}`, 20, 80);
     doc.text("REMITE: Universidad U-tad", 20, 100);
