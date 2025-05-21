@@ -37,11 +37,12 @@ export default function VerificationForm() {
             const response = await VerificationFormInteract(code, email);
 
             if (response && response.mail) {
-                router.push("./finales/principal").then(() => {
+                /* router.push("./finales/principal").then(() => {
                     setTimeout(() => {
                         window.location.replace("/pages/listaFiltrado");
                     }, 300);
-                });
+                }); */
+                router.push("./finales/principal");
             }
         } catch (err) {
             console.error("Error en la verificación:", err.message);
