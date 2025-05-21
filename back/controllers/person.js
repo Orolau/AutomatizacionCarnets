@@ -231,7 +231,6 @@ const createPerson = async (req, res) => {
  * @swagger
  * /api/person/{id}:
  *   get:
- *     summary: Obtener una persona por ID
  *     tags: [Personas]
  *     parameters:
  *       - name: id
